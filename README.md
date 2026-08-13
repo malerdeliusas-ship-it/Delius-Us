@@ -49,6 +49,12 @@ serverfunksjonen `api/kontakt.ts`, som legger meldingen i e-post via
 [Resend](https://resend.com). `Reply-To` settes til kundens adresse, så
 «Svar» i e-postklienten går rett tilbake til den som skrev.
 
+E-posten er tegnet i designets stil: akvarellsølet og logoen øverst,
+marineblå tekst, meldingen i en kremfarget boks og en gul, rund
+«Svar»-knapp. Bildene ligger i `public/epost/` og hentes fra nettsiden.
+Meldingene går til firmaets adresse **malerdelius@gmail.com** (styres av
+`KONTAKT_TIL`).
+
 **Miljøvariabler** (Vercel → Settings → Environment Variables, og `.env`
 lokalt – se `.env.example`):
 
