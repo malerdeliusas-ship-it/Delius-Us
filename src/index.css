@@ -1,0 +1,340 @@
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* Alltid synlig scrollefelt: ellers kan zoom-utregningen (clientWidth) og
+   scrollefeltet mate hverandre og blinke i smale vinduer med klassiske
+   scrollefelt (Windows). Alle sidene er uansett høyere enn skjermen. */
+html {
+  overflow-y: scroll;
+}
+
+body {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  background: #ffffff;
+  color: #022269;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  display: block;
+  max-width: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* ---------- Design-scaler ----------
+   Hele designet er tegnet i 1430px bredde (som i Figma).
+   .stage skalerer det ned for å passe skjermen, slik at
+   nettsiden ser identisk ut med designet på alle bredder. */
+.stage-viewport {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.stage {
+  width: 1430px;
+  transform-origin: top left;
+  position: relative;
+  overflow: hidden; /* klipp innhold som blør utenfor design-rammen (1430px) */
+}
+
+/* Absolutt-plasserte bokser (eksakte Figma-koordinater) */
+.abs {
+  position: absolute;
+}
+
+/* Knappe-hover (liten web-forbedring, endrer ikke utseendet i ro) */
+.btn-press {
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.btn-press:hover {
+  filter: brightness(0.96);
+}
+.btn-press:active {
+  transform: translateY(1px);
+}
+
+.navlink {
+  transition: color 0.15s ease;
+}
+.navlink:hover {
+  color: #ffb000;
+}
+
+/* ==========================================================================
+   Mobil
+   Figma-designet er tegnet for desktop. Under 1000px bygger vi siden på nytt
+   som én kolonne, med nøyaktig samme farger, fonter, bilder og tekster.
+   ========================================================================== */
+
+:root {
+  --navy: #022269;
+  --gold: #ffc300;
+  --gold-alt: #ffc717;
+  --brown: #4e280a;
+  --panel-blue: #224fb1;
+  --kontakt-blue: #2653b5;
+  --team-meta: #0051ff;
+  --kant: 20px;
+}
+
+.m {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: var(--navy);
+  /* clip, ikke hidden: hidden gjør .m til scrollcontainer og da slutter
+     den sticky headeren å feste seg */
+  overflow-x: clip;
+}
+
+.m-inn {
+  padding-left: var(--kant);
+  padding-right: var(--kant);
+}
+
+.m-seksjon {
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+.m h1 {
+  font-size: 34px;
+  line-height: 1.16;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #020369;
+}
+
+.m h2 {
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 800;
+  text-align: center;
+}
+
+.m h3 {
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.m p {
+  font-size: 16px;
+  line-height: 26px;
+}
+
+/* ---------- Header ---------- */
+.m-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 72px;
+  padding: 0 var(--kant);
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(2, 34, 105, 0.08);
+}
+
+.m-logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+}
+
+.m-burger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+}
+
+.m-burger span {
+  display: block;
+  height: 2px;
+  background: var(--navy);
+  border-radius: 2px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.m-burger[aria-expanded='true'] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.m-burger[aria-expanded='true'] span:nth-child(2) {
+  opacity: 0;
+}
+.m-burger[aria-expanded='true'] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.m-meny {
+  position: fixed;
+  inset: 72px 0 0 0;
+  z-index: 39;
+  background: #fff;
+  padding: 24px var(--kant);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* lave, brede skjermer (telefon i landskap): la menyen selv scrolle */
+  overflow-y: auto;
+}
+
+.m-meny a {
+  padding: 16px 4px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--navy);
+  border-bottom: 1px solid rgba(2, 34, 105, 0.1);
+}
+
+/* ---------- Knapper ---------- */
+.m-knapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 14px 28px;
+  border-radius: 65px;
+  background: var(--gold);
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.m-knapp--blokk {
+  display: flex;
+  width: 100%;
+}
+
+.m-merke {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 23px;
+  border-radius: 41px;
+  background: var(--gold);
+  color: #000;
+  font-size: 14px;
+}
+
+/* ---------- Bilder og kort ---------- */
+.m-bilde {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 24px;
+}
+
+.m-kort {
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 28px 24px;
+}
+
+.m-kort--hvit {
+  background: #fff;
+}
+
+.m-rutenett {
+  display: grid;
+  gap: 16px;
+}
+
+.m-rutenett--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ---------- Skjema ---------- */
+.m-felt {
+  width: 100%;
+  border: none;
+  outline: none;
+  border-radius: 43px;
+  background: #fff;
+  padding: 16px 24px;
+  font-family: inherit;
+  font-size: 17px;
+  line-height: 26px;
+  color: var(--navy);
+}
+
+.m-felt--stor {
+  border-radius: 28px;
+  min-height: 150px;
+  resize: none;
+}
+
+/* ---------- Footer ---------- */
+.m-footer {
+  background: var(--navy);
+  color: #fff;
+  padding: 40px var(--kant);
+  display: grid;
+  gap: 28px;
+  font-size: 15px;
+  line-height: 22.5px;
+  font-weight: 300;
+}
+
+.m-footer a {
+  text-decoration: underline;
+}
+
+/* Skjemafelt: plassholderfargen kommer fra designet, satt per felt */
+.field::placeholder {
+  color: var(--ph);
+  opacity: 1;
+}
+.field:focus {
+  box-shadow: 0 0 0 2px rgba(255, 195, 0, 0.9);
+}
+
+/* Honningkrukke mot søppelpost: feltet skal ikke ses, leses opp eller nås med tab */
+.honning {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Kvittering og feilmelding under mobilskjemaet */
+.m-skjemabeskjed {
+  margin: -4px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+}
