@@ -3,10 +3,10 @@ import { useKontaktSkjema, KVITTERING } from '../../lib/kontakt'
 
 /** Kontaktskjemaet på mobil. Meldingen går til `/api/kontakt` og videre på e-post. */
 export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: string }) {
-  const { status, feil, send, knappetekst } = useKontaktSkjema()
+  const { status, feil, send, merk, knappetekst } = useKontaktSkjema()
 
   return (
-    <form style={{ display: 'grid', gap: 16 }} onSubmit={send} noValidate>
+    <form style={{ display: 'grid', gap: 16 }} onSubmit={send} onInput={merk} noValidate>
       <input
         className="m-felt field"
         style={{ '--ph': 'rgba(2,3,105,0.46)' } as React.CSSProperties}

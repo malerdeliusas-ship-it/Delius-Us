@@ -44,17 +44,28 @@ export default async function handler(req: Req, res: Res) {
     | Record<string, unknown>
     | undefined
 
-  const navn = tekst(kropp?.navn, 120)
+  // Navn og side skal være én linje: kontrolltegn (deriblant \r\n) byttes med
+  // mellomrom, så ingen kan smugle egne linjer inn i emnefeltet eller e-posten.
+  const navn = enLinje(tekst(kropp?.navn, 120))
   const epost = tekst(kropp?.epost, 200)
   const melding = tekst(kropp?.melding, 5000)
   const firma = tekst(kropp?.firma, 200)
   const apnet = Number(kropp?.apnet ?? 0)
-  const side = tekst(kropp?.side, 100) || '/'
+  const side = enLinje(tekst(kropp?.side, 100)) || '/'
 
-  // Honningkrukka er fylt ut, eller skjemaet ble sendt under to sekunder etter
-  // at det ble tegnet. Begge deler betyr robot. Vi svarer OK og sender ingenting,
-  // slik at roboten ikke lærer noe av svaret.
-  if (firma || (apnet > 0 && apnet < 2000)) return res.status(200).json({ ok: true })
+  // Honningkrukka er fylt ut: det gjør bare roboter. Vi svarer OK og sender
+  // ingenting, slik at roboten ikke lærer noe av svaret. Loggen beholder sporet.
+  if (firma) {
+    console.log('Droppet innsending: honningkrukke', { navn, epost })
+    return res.status(200).json({ ok: true })
+  }
+
+  // Ingen målt skrivetid, eller innsending under to sekunder etter første
+  // tastetrykk, lukter robot – men kan i sjeldne tilfeller være et ekte
+  // menneske. Meldingen sendes derfor likevel, tydelig merket i emnet,
+  // i stedet for å kaste en mulig kunde.
+  const mistenkt = !Number.isFinite(apnet) || apnet <= 0 || apnet < 2000
+  if (mistenkt) console.log('Mistenkt robot, sender merket', { navn, epost, apnet })
 
   if (!navn) return res.status(400).json({ feil: 'Navn mangler' })
   if (!EPOST_MONSTER.test(epost)) return res.status(400).json({ feil: 'Ugyldig e-post' })
@@ -84,7 +95,7 @@ export default async function handler(req: Req, res: Res) {
         to: til,
         // Svar-knappen i e-postklienten går rett til kunden.
         reply_to: epost,
-        subject: `Ny melding fra malerdelius.no – ${navn}`,
+        subject: `${mistenkt ? '[Mistenkt robot] ' : ''}Ny melding fra malerdelius.no – ${navn}`,
         text: epostTekst(navn, epost, melding, side),
         html: epostHtml(navn, epost, melding, side),
       }),
@@ -106,6 +117,11 @@ function tekst(verdi: unknown, maks: number) {
   return typeof verdi === 'string' ? verdi.trim().slice(0, maks) : ''
 }
 
+/** Bytter kontrolltegn (linjeskift, tab, osv.) med mellomrom. */
+function enLinje(s: string) {
+  return s.replace(/[\u0000-\u001f\u007f]/g, ' ').trim()
+}
+
 function tryggParse(s: string) {
   try {
     return JSON.parse(s)
@@ -122,8 +138,11 @@ function forsteVerdi(v: string | string[] | undefined) {
 function forMange(ip: string) {
   const na = Date.now()
   const nylige = (sett.get(ip) ?? []).filter((t) => na - t < VINDU_MS)
-  nylige.push(na)
-  sett.set(ip, nylige)
+  // Avviste forsøk telles ikke: da løper sperren ut av seg selv, i stedet for
+  // at hvert nye forsøk holder den i live. Taket begrenser også minnebruken.
+  if (nylige.length <= TAK) nylige.push(na)
+  if (nylige.length === 0) sett.delete(ip)
+  else sett.set(ip, nylige)
   return nylige.length > TAK
 }
 
@@ -191,7 +210,15 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
   const base = bildeBase()
   const fornavn = esc(navn.split(/\s+/)[0] || navn)
   const svarEmne = encodeURIComponent('Sv: Henvendelsen din til Maler Delius')
+  // RFC 6068 tillater prosentkodet adresse i mailto, og kodingen hindrer at
+  // tegn som ?/&/% i adressen tolkes som egne parametre i lenken.
+  const epostHref = encodeURIComponent(epost)
   const skrift = "'Montserrat', Helvetica, Arial, sans-serif"
+  // Forhåndsvisningen kuttes på hele tegn (ikke midt i et emoji-par).
+  const smakebit = esc([...melding].slice(0, 140).join(''))
+  // Outlook for Windows forstår ikke white-space:pre-wrap, så linjeskiftene
+  // legges inn som <br> etter at teksten er escapet.
+  const meldingHtml = esc(melding).replace(/\r?\n/g, '<br>')
 
   const rad = (etikett: string, verdi: string) => `
     <tr>
@@ -210,7 +237,7 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
 </head>
 <body style="margin:0;padding:0;background-color:#fef5e9;">
   <!-- Forhåndsvisningen i innboksen: begynnelsen av meldingen, ikke overskriften -->
-  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${esc(melding.slice(0, 140))}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">${smakebit}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#fef5e9;">
     <tr>
@@ -228,8 +255,8 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td align="center" style="padding:6px 48px 0;">
-                    <img src="${base}/epost/logo.png" width="180" alt="Maler Delius AS"
-                         style="display:block;width:180px;height:auto;border:0;">
+                    <img src="${base}/epost/logo.png" width="230" alt="Maler Delius AS"
+                         style="display:block;width:230px;height:auto;border:0;">
                   </td>
                 </tr>
                 <tr>
@@ -248,7 +275,7 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
                   <td style="padding:0 48px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #eef1f9;">
                       ${rad('Navn', esc(navn))}
-                      ${rad('E-post', `<a href="mailto:${esc(epost)}" style="color:#0051ff;text-decoration:none;">${esc(epost)}</a>`)}
+                      ${rad('E-post', `<a href="mailto:${epostHref}" style="color:#0051ff;text-decoration:none;">${esc(epost)}</a>`)}
                       ${rad('Side', esc(sidenavn(side)))}
                     </table>
                   </td>
@@ -259,7 +286,7 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
                   <td style="padding:26px 48px 0;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td style="background-color:#fef5e9;border-radius:18px;padding:22px 26px;font-family:${skrift};font-size:15px;line-height:26px;color:#022269;white-space:pre-wrap;word-break:break-word;">${esc(melding)}</td>
+                        <td style="background-color:#fef5e9;border-radius:18px;padding:22px 26px;font-family:${skrift};font-size:15px;line-height:26px;color:#022269;word-break:break-word;">${meldingHtml}</td>
                       </tr>
                     </table>
                   </td>
@@ -270,8 +297,8 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
                   <td align="center" style="padding:30px 48px 40px;">
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <td align="center" style="background-color:#ffc717;border-radius:65px;">
-                          <a href="mailto:${esc(epost)}?subject=${svarEmne}"
+                        <td align="center" style="background-color:#ffc717;border-radius:65px;mso-padding-alt:17px 46px;">
+                          <a href="mailto:${epostHref}?subject=${svarEmne}"
                              style="display:inline-block;padding:17px 46px;font-family:${skrift};font-size:16px;font-weight:700;color:#002f96;text-decoration:none;border-radius:65px;">
                             Svar til ${fornavn}
                           </a>
@@ -288,7 +315,7 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
                   <td align="center" style="background-color:#022269;border-radius:0 0 28px 28px;padding:26px 48px;">
                     <div style="font-family:${skrift};font-size:15px;font-weight:700;color:#ffffff;padding-bottom:6px;">Maler Delius AS</div>
                     <div style="font-family:${skrift};font-size:12.5px;line-height:20px;color:#c6cfec;">
-                      Ullevålsveien 76, 0454 Oslo &nbsp;·&nbsp; Org nr. 934 409 256<br>
+                      Ullevålsveien 76, 0454 Oslo &nbsp;·&nbsp; Org.nr. 934 409 256<br>
                       <a href="https://malerdelius.no" style="color:#ffc300;text-decoration:none;">malerdelius.no</a>
                     </div>
                   </td>

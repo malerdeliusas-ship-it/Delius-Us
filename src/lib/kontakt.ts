@@ -17,6 +17,8 @@ const FEIL = {
   navn: 'Skriv inn navnet ditt.',
   epost: 'Skriv inn en gyldig e-postadresse.',
   melding: 'Skriv noen ord om hva du trenger hjelp til.',
+  forMange:
+    'Det er sendt mange meldinger herfra på kort tid. Vent noen minutter og prøv igjen.',
   server:
     'Meldingen kunne ikke sendes akkurat nå. Prøv igjen, eller ring oss på 966 93 780.',
 }
@@ -24,8 +26,17 @@ const FEIL = {
 export function useKontaktSkjema() {
   const [status, setStatus] = useState<Status>('klar')
   const [feil, setFeil] = useState('')
-  /** Tidspunktet skjemaet ble tegnet – brukes til å avsløre robotinnsending. */
-  const apnet = useRef(Date.now())
+  /**
+   * Tidspunktet for det første tastetrykket i skjemaet – brukes til å avsløre
+   * robotinnsending. Regnet fra første inntasting, ikke fra sidelasting, så
+   * autofyll pluss rask innsending ikke rammer ekte folk.
+   */
+  const forsteTast = useRef<number | null>(null)
+
+  /** Settes som onInput på selve skjemaet. */
+  function merk() {
+    forsteTast.current ??= Date.now()
+  }
 
   async function send(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -54,11 +65,12 @@ export function useKontaktSkjema() {
           epost,
           melding,
           firma,
-          apnet: Date.now() - apnet.current,
+          apnet: forsteTast.current ? Date.now() - forsteTast.current : 0,
           side: window.location.pathname,
         }),
       })
 
+      if (svar.status === 429) return vis(FEIL.forMange)
       if (!svar.ok) throw new Error(String(svar.status))
 
       skjema.reset()
@@ -78,7 +90,7 @@ export function useKontaktSkjema() {
   const knappetekst =
     status === 'sender' ? 'Sender …' : status === 'sendt' ? 'Takk!' : 'Kontakt oss'
 
-  return { status, feil, send, knappetekst }
+  return { status, feil, send, merk, knappetekst }
 }
 
 /** Kvitteringen under skjemaet når meldingen er kommet fram. */

@@ -24,7 +24,7 @@ export default function ContactForm({
   btnL: number
   btnW: number
 }) {
-  const { status, feil, send, knappetekst } = useKontaktSkjema()
+  const { status, feil, send, merk, knappetekst } = useKontaktSkjema()
 
   const felt = (top: number, h: number, phFarge: string): CSSProperties =>
     ({
@@ -59,7 +59,7 @@ export default function ContactForm({
   }
 
   return (
-    <form onSubmit={send} noValidate>
+    <form onSubmit={send} onInput={merk} noValidate>
       <input
         className="field"
         type="text"
