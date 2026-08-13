@@ -33,9 +33,17 @@ export function useKontaktSkjema() {
    */
   const forsteTast = useRef<number | null>(null)
 
-  /** Settes som onInput på selve skjemaet. */
+  /**
+   * Settes som onInput på selve skjemaet. Registrerer første tastetrykk,
+   * og rydder bort en rød feilmelding straks brukeren begynner å rette –
+   * i stedet for at den blir stående til neste innsending.
+   */
   function merk() {
     forsteTast.current ??= Date.now()
+    if (status === 'feil') {
+      setStatus('klar')
+      setFeil('')
+    }
   }
 
   async function send(e: React.FormEvent<HTMLFormElement>) {

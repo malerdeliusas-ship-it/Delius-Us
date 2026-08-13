@@ -33,7 +33,7 @@ export default function Kontakt() {
     <Stage height={2025}>
       <Abs l={1} t={100} w={1429} h={1922} style={{ background: G.kontakt, overflow: 'hidden' }} />
 
-      <SiteHeader logoL={40} logoW={278} navL={668} />
+      <SiteHeader />
 
       <Txt l={582} t={322} w={266} size={40} weight={800} lh={60} color={C.white}>
         Kontakt oss

@@ -71,7 +71,7 @@ export default function Portefolje() {
         <Rect key={b.t} l={b.l} t={b.t} w={b.w} h={b.h} r={83} bg={b.bg} />
       ))}
 
-      <SiteHeader logoL={50} logoW={278} navL={625} />
+      <SiteHeader />
       <CropImg src={splash} l={-6} t={96} w={1441} h={249} r={25} tf={TF_SPRUT} loading="eager" />
 
       <Txt l={606} t={286} w={217} size={40} weight={800} lh={60} color={C.navy}>

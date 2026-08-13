@@ -68,7 +68,7 @@ export default function Malertjenester() {
       />
       <Abs l={1} t={0} w={1429} h={2594} style={{ background: MT_OVERLAY }} />
 
-      <SiteHeader logoL={40} logoW={278} navL={668} />
+      <SiteHeader />
 
       <Txt l={550} t={309} w={331} size={40} weight={800} lh={60} color={C.navy}>
         Våre tjenester

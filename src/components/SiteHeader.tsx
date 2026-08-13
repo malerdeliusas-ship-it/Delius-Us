@@ -3,25 +3,22 @@ import { Abs, CropImg } from './prim'
 import { C, FONT } from '../lib/theme'
 import logo from '../assets/figma/logo.png'
 
-type Tf = [[number, number, number], [number, number, number]]
-
 /**
- * Header, eksakt fra Figma. Logoen står litt forskjellig fra side til side i
- * designet, så plasseringen sendes inn per side. Nav-lenkene og
- * Kontakt-knappen ligger alltid på faste avstander fra `navL`.
+ * Header, lik på alle sider. I Figma sto logoen og menyen noen piksler
+ * forskjellig fra side til side (40–118px), så headeren «hoppet» ved
+ * sidebytte. Forsidens plassering brukes derfor overalt – forsiden er
+ * uendret mot designet, og undersidene avviker bare noen få piksler.
  */
-export default function SiteHeader({
-  logoL,
-  logoW,
-  navL,
-  logoTf,
-}: {
-  logoL: number
-  logoW: number
-  navL: number
-  /** Figmas beskjæring av logoen. Bare forsiden bruker et utsnitt. */
-  logoTf?: Tf
-}) {
+
+/** Figmas beskjæring av logoen på forsiden. */
+const TF_LOGO: [[number, number, number], [number, number, number]] =
+  [[0.769784152507782, 0, 0.21223022043704987], [0, 0.9972774982452393, 0.0013612788170576096]]
+
+const LOGO_L = 118.5
+const LOGO_W = 214
+const NAV_L = 625.5
+
+export default function SiteHeader() {
   const nav = [
     { label: 'Om oss', to: '/om-oss', dx: 0, w: 79 },
     { label: 'Portefølje', to: '/portefolje', dx: 129, w: 114 },
@@ -31,15 +28,7 @@ export default function SiteHeader({
   return (
     <Abs l={0} t={0} w={1430} h={96} style={{ zIndex: 5 }}>
       <Link to="/" aria-label="Maler Delius AS – til forsiden">
-        {logoTf ? (
-          <CropImg src={logo} alt="Maler Delius AS" l={logoL} t={0} w={logoW} h={96} tf={logoTf} loading="eager" />
-        ) : (
-          <img
-            src={logo}
-            alt="Maler Delius AS"
-            style={{ position: 'absolute', left: logoL, top: 0, width: logoW, height: 96, objectFit: 'cover' }}
-          />
-        )}
+        <CropImg src={logo} alt="Maler Delius AS" l={LOGO_L} t={0} w={LOGO_W} h={96} tf={TF_LOGO} loading="eager" />
       </Link>
 
       {nav.map((n) => (
@@ -49,7 +38,7 @@ export default function SiteHeader({
           className="navlink"
           style={{
             position: 'absolute',
-            left: navL + n.dx,
+            left: NAV_L + n.dx,
             top: 60,
             width: n.w,
             fontFamily: FONT,
@@ -68,7 +57,7 @@ export default function SiteHeader({
         className="btn-press"
         style={{
           position: 'absolute',
-          left: navL + 498,
+          left: NAV_L + 498,
           top: 44,
           width: 188,
           height: 52,

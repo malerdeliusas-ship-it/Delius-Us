@@ -39,7 +39,7 @@ export default function OmOss() {
     <Stage height={1858}>
       <Rect l={0} t={514} w={1430} h={1100} bg={C.panelBlue} />
 
-      <SiteHeader logoL={51} logoW={278} navL={625} />
+      <SiteHeader />
 
       <CropImg
         src={teamBilde}

@@ -17,8 +17,6 @@ import icGaranti from '../assets/figma/ic-garanti.png'
 const HERO_MASK = 'polygon(20.213% 41.722%, 0% 100%, 100% 100%, 100% 0%, 43.692% 0%)'
 
 /** Figmas beskjæringer (imageTransform) på bildefyllene. */
-const TF_LOGO: [[number, number, number], [number, number, number]] =
-  [[0.769784152507782, 0, 0.21223022043704987], [0, 0.9972774982452393, 0.0013612788170576096]]
 const TF_HERO: [[number, number, number], [number, number, number]] =
   [[0.9834954738616943, 0, 0.016504546627402306], [0, 0.952681839466095, 0.023504769429564476]]
 const TF_OMOSS: [[number, number, number], [number, number, number]] =
@@ -49,7 +47,7 @@ export default function Home() {
     <Stage height={5488}>
       {/* ---------- Hero ---------- */}
       <Abs l={0} t={0} w={1430} h={837} style={{ background: C.cream, overflow: 'hidden' }}>
-        <SiteHeader logoL={118.5} logoW={214} navL={625.5} logoTf={TF_LOGO} />
+        <SiteHeader />
 
         <Txt l={118} t={220.25} w={580} size={56} weight={700} lh={63.28} ls={2.24} color={C.navyH1}>
           Profesjonell maling for hjem og bedrifter i Oslo
