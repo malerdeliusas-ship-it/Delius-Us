@@ -321,6 +321,97 @@ textarea {
   box-shadow: 0 0 0 2px rgba(255, 195, 0, 0.9);
 }
 
+/* ---------- Skjemastatus: kvittering og feil ---------- */
+
+/* Feltet som stoppet innsendingen: rød ring og et lite rist */
+.felt-feil,
+.felt-feil:focus {
+  box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.85);
+  animation: felt-rist 0.35s ease-in-out;
+}
+
+@keyframes felt-rist {
+  20% { transform: translateX(-5px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+
+.skjema-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 22px;
+  font-weight: 500;
+  animation: skjema-inn 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.skjema-status svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.skjema-status strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.skjema-status--ok {
+  background: #e5f6ec;
+  color: #0f6b38;
+}
+
+.skjema-status--feil {
+  background: #fdecea;
+  color: #b3261e;
+}
+
+@keyframes skjema-inn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Haken tegner seg: først sirkelen, så streken */
+.skjema-hake circle {
+  stroke-dasharray: 76;
+  stroke-dashoffset: 76;
+  animation: hake-tegn 0.45s 0.1s ease-out forwards;
+}
+
+.skjema-hake path {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  animation: hake-tegn 0.3s 0.5s ease-out forwards;
+}
+
+@keyframes hake-tegn {
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skjema-status,
+  .felt-feil,
+  .skjema-hake circle,
+  .skjema-hake path {
+    animation: none;
+  }
+  .skjema-hake circle,
+  .skjema-hake path {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Honningkrukke mot søppelpost: feltet skal ikke ses, leses opp eller nås med tab */
 .honning {
   position: absolute;
@@ -331,10 +422,3 @@ textarea {
   pointer-events: none;
 }
 
-/* Kvittering og feilmelding under mobilskjemaet */
-.m-skjemabeskjed {
-  margin: -4px 0 0;
-  font-size: 15px;
-  line-height: 22px;
-  font-weight: 500;
-}

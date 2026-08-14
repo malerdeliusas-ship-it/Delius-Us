@@ -1,14 +1,18 @@
 import { C } from '../../lib/theme'
-import { useKontaktSkjema, KVITTERING } from '../../lib/kontakt'
+import { useKontaktSkjema } from '../../lib/kontakt'
+import SkjemaStatus from '../SkjemaStatus'
 
 /** Kontaktskjemaet på mobil. Meldingen går til `/api/kontakt` og videre på e-post. */
 export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: string }) {
-  const { status, feil, send, merk, knappetekst } = useKontaktSkjema()
+  const { status, feil, feilFelt, send, merk, knappetekst } = useKontaktSkjema()
+
+  const klasse = (navn: 'navn' | 'epost' | 'melding', ekstra = '') =>
+    `m-felt ${ekstra} field${feilFelt === navn ? ' felt-feil' : ''}`
 
   return (
     <form style={{ display: 'grid', gap: 16 }} onSubmit={send} onInput={merk} noValidate>
       <input
-        className="m-felt field"
+        className={klasse('navn')}
         style={{ '--ph': 'rgba(2,3,105,0.46)' } as React.CSSProperties}
         type="text"
         name="navn"
@@ -17,7 +21,7 @@ export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: s
         placeholder="Navn, etternavn"
       />
       <input
-        className="m-felt field"
+        className={klasse('epost')}
         style={{ '--ph': C.placeholder } as React.CSSProperties}
         type="email"
         name="epost"
@@ -26,7 +30,7 @@ export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: s
         placeholder="E-mail"
       />
       <textarea
-        className="m-felt m-felt--stor field"
+        className={klasse('melding', 'm-felt--stor')}
         style={{ '--ph': C.placeholder } as React.CSSProperties}
         name="melding"
         aria-label="Melding"
@@ -56,16 +60,8 @@ export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: s
         {knappetekst}
       </button>
 
-      {status === 'sendt' && (
-        <p className="m-skjemabeskjed" style={{ color: C.navy }} role="status">
-          {KVITTERING}
-        </p>
-      )}
-      {status === 'feil' && feil && (
-        <p className="m-skjemabeskjed" style={{ color: '#b3261e' }} role="alert">
-          {feil}
-        </p>
-      )}
+      {status === 'sendt' && <SkjemaStatus type="ok" />}
+      {status === 'feil' && feil && <SkjemaStatus type="feil" tekst={feil} />}
     </form>
   )
 }

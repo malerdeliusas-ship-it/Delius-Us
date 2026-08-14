@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import { C, FONT } from '../lib/theme'
-import { useKontaktSkjema, KVITTERING } from '../lib/kontakt'
+import { useKontaktSkjema } from '../lib/kontakt'
+import SkjemaStatus from './SkjemaStatus'
 
 /**
  * Kontaktskjemaet slik det er tegnet i Figma. Det står to steder med identisk
@@ -8,8 +9,9 @@ import { useKontaktSkjema, KVITTERING } from '../lib/kontakt'
  * 94px fra hverandre, og knappen 383px under det første feltet.
  *
  * Meldingen går til `/api/kontakt`, som sender den videre på e-post.
- * Beskjeder til brukeren står absolutt plassert under knappen, slik at
- * resten av siden ikke flytter seg når de dukker opp.
+ * Kvitteringen og feilene står absolutt plassert under knappen, så resten
+ * av siden ikke flytter seg når de dukker opp. Feltet som stoppet
+ * innsendingen får rød ring (`felt-feil`).
  */
 export default function ContactForm({
   l,
@@ -24,7 +26,7 @@ export default function ContactForm({
   btnL: number
   btnW: number
 }) {
-  const { status, feil, send, merk, knappetekst } = useKontaktSkjema()
+  const { status, feil, feilFelt, send, merk, knappetekst } = useKontaktSkjema()
 
   const felt = (top: number, h: number, phFarge: string): CSSProperties =>
     ({
@@ -47,21 +49,21 @@ export default function ContactForm({
       '--ph': phFarge,
     }) as CSSProperties
 
-  const beskjed: CSSProperties = {
+  const klasse = (navn: 'navn' | 'epost' | 'melding') =>
+    feilFelt === navn ? 'field felt-feil' : 'field'
+
+  const statusBoks: CSSProperties = {
     position: 'absolute',
     left: l,
-    top: t + 383 + 66,
+    top: t + 383 + 74,
     width: w,
     fontFamily: FONT,
-    fontSize: 16,
-    lineHeight: '24px',
-    fontWeight: 500,
   }
 
   return (
     <form onSubmit={send} onInput={merk} noValidate>
       <input
-        className="field"
+        className={klasse('navn')}
         type="text"
         name="navn"
         autoComplete="name"
@@ -70,7 +72,7 @@ export default function ContactForm({
         style={felt(t, 62, 'rgba(2,3,105,0.46)')}
       />
       <input
-        className="field"
+        className={klasse('epost')}
         type="email"
         name="epost"
         autoComplete="email"
@@ -79,7 +81,7 @@ export default function ContactForm({
         style={felt(t + 94, 62, C.placeholder)}
       />
       <textarea
-        className="field"
+        className={klasse('melding')}
         name="melding"
         aria-label="Melding"
         placeholder="Melding..."
@@ -120,14 +122,14 @@ export default function ContactForm({
       </button>
 
       {status === 'sendt' && (
-        <p style={{ ...beskjed, color: C.navy }} role="status">
-          {KVITTERING}
-        </p>
+        <div style={statusBoks}>
+          <SkjemaStatus type="ok" />
+        </div>
       )}
       {status === 'feil' && feil && (
-        <p style={{ ...beskjed, color: '#b3261e' }} role="alert">
-          {feil}
-        </p>
+        <div style={statusBoks}>
+          <SkjemaStatus type="feil" tekst={feil} />
+        </div>
       )}
     </form>
   )

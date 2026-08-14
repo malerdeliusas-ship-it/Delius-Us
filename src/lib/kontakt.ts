@@ -23,9 +23,13 @@ const FEIL = {
     'Meldingen kunne ikke sendes akkurat nå. Prøv igjen, eller ring oss på 966 93 780.',
 }
 
+export type Felt = 'navn' | 'epost' | 'melding' | null
+
 export function useKontaktSkjema() {
   const [status, setStatus] = useState<Status>('klar')
   const [feil, setFeil] = useState('')
+  /** Feltet som stoppet innsendingen – det får rød ring i skjemaet. */
+  const [feilFelt, setFeilFelt] = useState<Felt>(null)
   /**
    * Tidspunktet for det første tastetrykket i skjemaet – brukes til å avsløre
    * robotinnsending. Regnet fra første inntasting, ikke fra sidelasting, så
@@ -43,6 +47,7 @@ export function useKontaktSkjema() {
     if (status === 'feil') {
       setStatus('klar')
       setFeil('')
+      setFeilFelt(null)
     }
   }
 
@@ -57,11 +62,12 @@ export function useKontaktSkjema() {
     const melding = String(data.get('melding') ?? '').trim()
     const firma = String(data.get('firma') ?? '')
 
-    if (!navn) return vis(FEIL.navn)
-    if (!EPOST_MONSTER.test(epost)) return vis(FEIL.epost)
-    if (melding.length < 5) return vis(FEIL.melding)
+    if (!navn) return vis(FEIL.navn, 'navn')
+    if (!EPOST_MONSTER.test(epost)) return vis(FEIL.epost, 'epost')
+    if (melding.length < 5) return vis(FEIL.melding, 'melding')
 
     setFeil('')
+    setFeilFelt(null)
     setStatus('sender')
 
     try {
@@ -89,17 +95,15 @@ export function useKontaktSkjema() {
     }
   }
 
-  function vis(melding: string) {
+  function vis(melding: string, felt: Felt = null) {
     setStatus('feil')
     setFeil(melding)
+    setFeilFelt(felt)
   }
 
   /** Teksten på knappen følger status, så brukeren ser at noe skjer. */
   const knappetekst =
     status === 'sender' ? 'Sender …' : status === 'sendt' ? 'Takk!' : 'Kontakt oss'
 
-  return { status, feil, send, merk, knappetekst }
+  return { status, feil, feilFelt, send, merk, knappetekst }
 }
-
-/** Kvitteringen under skjemaet når meldingen er kommet fram. */
-export const KVITTERING = 'Takk! Vi har fått meldingen din og svarer så snart vi kan.'
