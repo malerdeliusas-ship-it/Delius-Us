@@ -4,7 +4,7 @@ import SiteFooter from '../components/SiteFooter'
 import { Txt, Img, Rect, CropImg } from '../components/prim'
 import { C, FONT_MUKTA } from '../lib/theme'
 
-import splash from '../assets/figma/splash.png'
+import splash from '../assets/figma/splash.webp'
 import anmeldelser from '../assets/figma/mittanbud-anmeldelser.jpg'
 import icTeam from '../assets/figma/ic-team.png'
 import f06530 from '../assets/figma/portefolje-dsc06530-1.jpg'
@@ -74,7 +74,7 @@ export default function Portefolje() {
       <SiteHeader />
       <CropImg src={splash} l={-6} t={96} w={1441} h={249} r={25} tf={TF_SPRUT} loading="eager" />
 
-      <Txt l={606} t={286} w={217} size={40} weight={800} lh={60} color={C.navy}>
+      <Txt as="h1" l={606} t={286} w={217} size={40} weight={800} lh={60} color={C.navy}>
         Portefølje
       </Txt>
 

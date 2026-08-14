@@ -88,7 +88,7 @@ export default function HomeMobil() {
             <div key={p.navn} style={{ textAlign: 'center' }}>
               <img
                 src={p.bilde}
-                alt={p.navn.trim()}
+                alt={p.navn.trim() + ', maler hos Maler Delius AS i Oslo'}
                 style={{
                   width: '100%',
                   aspectRatio: '271 / 406',
@@ -112,7 +112,7 @@ export default function HomeMobil() {
         <div style={{ display: 'grid', gap: 20, marginTop: 28 }}>
           {TJENESTER.map((s) => (
             <div key={s.id} className="m-kort">
-              <img src={s.ikon} alt="" style={{ height: 64, width: 'auto' }} />
+              <img src={s.ikon} alt="" loading="lazy" decoding="async" style={{ height: 64, width: 'auto' }} />
               <h3 style={{ marginTop: 16 }}>{s.tittel}</h3>
               <p style={{ marginTop: 12, color: C.brown, whiteSpace: 'pre-line' }}>{s.brod}</p>
             </div>

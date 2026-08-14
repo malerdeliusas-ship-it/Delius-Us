@@ -49,7 +49,7 @@ export default function Home() {
       <Abs l={0} t={0} w={1430} h={837} style={{ background: C.cream, overflow: 'hidden' }}>
         <SiteHeader />
 
-        <Txt l={118} t={220.25} w={580} size={56} weight={700} lh={63.28} ls={2.24} color={C.navyH1}>
+        <Txt as="h1" l={118} t={220.25} w={580} size={56} weight={700} lh={63.28} ls={2.24} color={C.navyH1}>
           Profesjonell maling for hjem og bedrifter i Oslo
         </Txt>
         <Txt l={118} t={436.25} w={578} size={18} weight={600} lh={27} color="rgba(2,34,105,0.65)">
@@ -119,12 +119,12 @@ export default function Home() {
 
       {/* ---------- Vårt team ---------- */}
       <Abs l={0} t={1714} w={1430} h={1312} style={{ background: G.team, overflow: 'hidden' }}>
-        <Txt l={605} t={37} w={222} size={40} weight={800} lh={60} color={C.navy}>
+        <Txt as="h2" l={605} t={37} w={222} size={40} weight={800} lh={60} color={C.navy}>
           Vårt team
         </Txt>
         {TEAM.map((p) => (
           <div key={p.navn}>
-            <Img src={p.bilde} alt={p.navn.trim()} l={p.iL} t={p.iT - 1714} w={p.iW} h={p.iH} r={p.r} />
+            <Img src={p.bilde} alt={p.navn.trim() + ', maler hos Maler Delius AS i Oslo'} l={p.iL} t={p.iT - 1714} w={p.iW} h={p.iH} r={p.r} />
             <Txt
               l={p.nL}
               t={p.nT - 1714}
@@ -155,7 +155,7 @@ export default function Home() {
 
       {/* ---------- Våre tjenester ---------- */}
       <Abs l={-5} t={3026} w={1435} h={1343} style={{ background: G.tjenester, overflow: 'hidden' }}>
-        <Txt l={124} t={67} w={1187} size={40} weight={800} lh={60} color={C.navy} align="center">
+        <Txt as="h2" l={124} t={67} w={1187} size={40} weight={800} lh={60} color={C.navy} align="center">
           Våre tjenester
         </Txt>
         {KORT_POS.map(([l, t]) => (
@@ -166,6 +166,8 @@ export default function Home() {
             <img
               src={s.ikon}
               alt=""
+              loading="lazy"
+              decoding="async"
               style={{ position: 'absolute', left: s.iL + 5, top: s.iT - 3026, width: s.iW, height: s.iH }}
             />
             {s.titler.map((tt, i) => (
@@ -192,7 +194,7 @@ export default function Home() {
 
       {/* ---------- Kontakt oss ---------- */}
       <Abs l={0} t={4369} w={1430} h={875} style={{ background: C.contactBlue, overflow: 'hidden' }}>
-        <Txt l={449.5} t={96} w={543} size={40} weight={800} lh={60} color={C.white} align="center">
+        <Txt as="h2" l={449.5} t={96} w={543} size={40} weight={800} lh={60} color={C.white} align="center">
           Kontakt oss!
         </Txt>
         <Abs

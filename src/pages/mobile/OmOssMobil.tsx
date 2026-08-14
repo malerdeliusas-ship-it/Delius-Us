@@ -3,7 +3,7 @@ import MobilSide from '../../components/mobile/Shell'
 import { C } from '../../lib/theme'
 import { GRUNNER } from '../OmOss'
 
-import splash from '../../assets/figma/splash-omoss.png'
+import splash from '../../assets/figma/splash-omoss.webp'
 import teamBilde from '../../assets/figma/omoss-team.jpg'
 import foto1 from '../../assets/figma/omoss-dsc06303-1.jpg'
 import foto2 from '../../assets/figma/omoss-dsc07360-1.jpg'

@@ -11,7 +11,7 @@ const TF_TEAM: [[number, number, number], [number, number, number]] =
 const TF_SPRUT: [[number, number, number], [number, number, number]] =
   [[0.9979108572006226, 0, 0], [0, 0.47440609335899353, 0.00016262807184830308]]
 
-import splash from '../assets/figma/splash-omoss.png'
+import splash from '../assets/figma/splash-omoss.webp'
 import teamBilde from '../assets/figma/omoss-team.jpg'
 import foto1 from '../assets/figma/omoss-dsc06303-1.jpg'
 import foto2 from '../assets/figma/omoss-dsc07360-1.jpg'
@@ -53,7 +53,7 @@ export default function OmOss() {
         tf={TF_TEAM}
       />
 
-      <Txt l={130} t={328} w={500} size={28} weight={400} lh={42} color={C.navy} italic>
+      <Txt as="h1" l={130} t={328} w={500} size={28} weight={400} lh={42} color={C.navy} italic>
         {'Velkommen til   '}
         <span style={{ fontWeight: 700, fontStyle: 'normal' }}>MALER DELIUS AS</span>
       </Txt>

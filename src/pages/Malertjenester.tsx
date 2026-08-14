@@ -5,7 +5,7 @@ import GoldButton from '../components/GoldButton'
 import { Abs, Txt, Rect, CropImg } from '../components/prim'
 import { C, MT_OVERLAY, FONT } from '../lib/theme'
 import { TJENESTER } from '../lib/site'
-import splash from '../assets/figma/splash.png'
+import splash from '../assets/figma/splash.webp'
 
 /** Tjenestekortene står likt som på forsiden, bare flyttet (+6, −2780). */
 const DX = 6
@@ -70,7 +70,7 @@ export default function Malertjenester() {
 
       <SiteHeader />
 
-      <Txt l={550} t={309} w={331} size={40} weight={800} lh={60} color={C.navy}>
+      <Txt as="h1" l={550} t={309} w={331} size={40} weight={800} lh={60} color={C.navy}>
         Våre tjenester
       </Txt>
 

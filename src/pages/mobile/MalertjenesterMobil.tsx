@@ -4,7 +4,7 @@ import { C, G } from '../../lib/theme'
 import { TJENESTER } from '../../lib/site'
 import { TRINN } from '../Malertjenester'
 
-import splash from '../../assets/figma/splash.png'
+import splash from '../../assets/figma/splash.webp'
 
 export default function MalertjenesterMobil() {
   return (
@@ -21,7 +21,7 @@ export default function MalertjenesterMobil() {
           <div style={{ display: 'grid', gap: 20, marginTop: 28 }}>
             {TJENESTER.map((s) => (
               <div key={s.id} className="m-kort">
-                <img src={s.ikon} alt="" style={{ height: 64, width: 'auto' }} />
+                <img src={s.ikon} alt="" loading="lazy" decoding="async" style={{ height: 64, width: 'auto' }} />
                 <h3 style={{ marginTop: 16 }}>{s.tittel}</h3>
                 <p style={{ marginTop: 12, color: C.brown, whiteSpace: 'pre-line' }}>{s.brod}</p>
               </div>

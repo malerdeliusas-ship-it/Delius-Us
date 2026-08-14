@@ -6,7 +6,7 @@ import ContactForm from '../components/ContactForm'
 import { Abs, Txt, Rect, CropImg } from '../components/prim'
 import { C, G, FONT, BEDRIFT } from '../lib/theme'
 
-import splash from '../assets/figma/splash.png'
+import splash from '../assets/figma/splash.webp'
 import icMarker from '../assets/figma/ic-marker.png'
 import icWeb from '../assets/figma/ic-web.png'
 import icMail from '../assets/figma/ic-mail.png'
@@ -35,7 +35,7 @@ export default function Kontakt() {
 
       <SiteHeader />
 
-      <Txt l={582} t={322} w={266} size={40} weight={800} lh={60} color={C.white}>
+      <Txt as="h1" l={582} t={322} w={266} size={40} weight={800} lh={60} color={C.white}>
         Kontakt oss
       </Txt>
 

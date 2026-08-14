@@ -1,12 +1,20 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { FONT } from '../lib/theme'
 
+/**
+ * Hvilket HTML-element som brukes. Utseendet er identisk uansett: den globale
+ * resetten nuller marger/padding, og all typografi settes rett på elementet.
+ * Taggen finnes bare for søkemotorer og skjermlesere.
+ */
+type Tag = 'div' | 'h1' | 'h2' | 'h3' | 'p' | 'header' | 'footer' | 'nav' | 'section'
+
 /** Absolutt-plassert boks med eksakte Figma-koordinater. */
 export function Abs({
   l,
   t,
   w,
   h,
+  as: TagNavn = 'div',
   style,
   className,
   children,
@@ -15,17 +23,18 @@ export function Abs({
   t: number
   w?: number
   h?: number
+  as?: Tag
   style?: CSSProperties
   className?: string
   children?: ReactNode
 }) {
   return (
-    <div
+    <TagNavn
       className={className}
       style={{ position: 'absolute', left: l, top: t, width: w, height: h, ...style }}
     >
       {children}
-    </div>
+    </TagNavn>
   )
 }
 
@@ -42,6 +51,7 @@ export function Txt({
   align = 'left',
   italic,
   font = FONT,
+  as: TagNavn = 'div',
   style,
   children,
 }: {
@@ -56,11 +66,12 @@ export function Txt({
   align?: 'left' | 'center' | 'right'
   italic?: boolean
   font?: string
+  as?: Tag
   style?: CSSProperties
   children: ReactNode
 }) {
   return (
-    <div
+    <TagNavn
       style={{
         position: 'absolute',
         left: l,
@@ -80,7 +91,7 @@ export function Txt({
       }}
     >
       {children}
-    </div>
+    </TagNavn>
   )
 }
 

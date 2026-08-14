@@ -21,7 +21,7 @@ const u: React.CSSProperties = { textDecoration: 'underline' }
  */
 export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
   return (
-    <Abs l={l} t={t} w={1430} h={244} style={{ background: C.navy }}>
+    <Abs as="footer" l={l} t={t} w={1430} h={244} style={{ background: C.navy }}>
       <div style={{ ...col, left: 222, width: 240 }}>
         <div>Kontakt</div>
         <div>{BEDRIFT.adresse}</div>

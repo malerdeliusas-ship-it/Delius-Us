@@ -1,6 +1,7 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop'
 import useIsMobile from './lib/useIsMobile'
+import useSeo from './lib/seo'
 
 import Home from './pages/Home'
 import OmOss from './pages/OmOss'
@@ -21,6 +22,7 @@ import KontaktMobil from './pages/mobile/KontaktMobil'
  */
 export default function App() {
   const mobil = useIsMobile()
+  useSeo()
 
   const sider = {
     forside: mobil ? <HomeMobil /> : <Home />,
@@ -39,7 +41,9 @@ export default function App() {
         <Route path="/portefolje" element={sider.portefolje} />
         <Route path="/malertjenester" element={sider.malertjenester} />
         <Route path="/kontakt" element={sider.kontakt} />
-        <Route path="*" element={sider.forside} />
+        {/* Ukjente adresser sendes hjem, så tastefeil ikke blir stående som
+            egne kopier av forsiden (myk 404) i søkemotorene. */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   )

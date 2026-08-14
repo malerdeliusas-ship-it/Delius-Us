@@ -2,7 +2,7 @@ import MobilSide from '../../components/mobile/Shell'
 import { C, FONT_MUKTA } from '../../lib/theme'
 import { KORT } from '../Portefolje'
 
-import splash from '../../assets/figma/splash.png'
+import splash from '../../assets/figma/splash.webp'
 import icTeam from '../../assets/figma/ic-team.png'
 import anmeldelser from '../../assets/figma/mittanbud-anmeldelser.jpg'
 import f06530 from '../../assets/figma/portefolje-dsc06530-1.jpg'
