@@ -94,7 +94,7 @@ export const BEDRIFT = {
   epost: 'info@malerdelius.no',
   nettsted: 'malerdelius.no',
   orgnr: 'Org nr. 934 409 256',
-  facebook: 'https://www.facebook.com/',
-  instagram: 'https://www.instagram.com/',
+  facebook: '', // adresa reala vine de la kunden
+  instagram: '', // adresa reala vine de la kunden
   kart: 'https://www.google.com/maps/search/?api=1&query=Ullev%C3%A5lsveien+76,+0454+Oslo',
 }

@@ -63,12 +63,12 @@ export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
       <div style={{ ...col, left: 942, width: 120 }}>
         <div>Følg oss</div>
         <div>
-          <a href={BEDRIFT.facebook} target="_blank" rel="noreferrer" style={u}>
+          <a href={BEDRIFT.facebook || undefined} target="_blank" rel="noreferrer" style={u}>
             FACEBOOK
           </a>
         </div>
         <div>
-          <a href={BEDRIFT.instagram} target="_blank" rel="noreferrer" style={u}>
+          <a href={BEDRIFT.instagram || undefined} target="_blank" rel="noreferrer" style={u}>
             INSTAGRAM
           </a>
         </div>
