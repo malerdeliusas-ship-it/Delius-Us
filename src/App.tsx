@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop'
 import useIsMobile from './lib/useIsMobile'
 import useSeo from './lib/seo'
+import { useMykScroll } from './lib/mykScroll'
 
 import Home from './pages/Home'
 import OmOss from './pages/OmOss'
@@ -23,6 +24,7 @@ import KontaktMobil from './pages/mobile/KontaktMobil'
 export default function App() {
   const mobil = useIsMobile()
   useSeo()
+  useMykScroll()
 
   const sider = {
     forside: mobil ? <HomeMobil /> : <Home />,

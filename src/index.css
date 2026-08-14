@@ -19,6 +19,19 @@ html {
   overflow-y: scroll;
 }
 
+/* Myk rulling (Lenis): anbefalt oppsett fra biblioteket. height:auto her,
+   ellers krangler height:100% ovenfor med den animerte rullingen. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 body {
   font-family: 'Montserrat', system-ui, sans-serif;
   background: #ffffff;
