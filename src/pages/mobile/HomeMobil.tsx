@@ -12,14 +12,15 @@ export default function HomeMobil() {
   return (
     <MobilSide>
       {/* ---------- Hero ---------- */}
-      <section className="m-seksjon m-inn" style={{ background: C.cream }}>
+      {/* Midtstilt komposisjon: tittel, ingress og knapp på én akse gir ro */}
+      <section className="m-seksjon m-inn" style={{ background: C.cream, textAlign: 'center' }}>
         <h1>Profesjonell maling for hjem og bedrifter i Oslo</h1>
-        <p style={{ marginTop: 20, color: 'rgba(2,34,105,0.65)', fontWeight: 600 }}>
+        <p style={{ marginTop: 18, color: 'rgba(2,34,105,0.65)', fontWeight: 600 }}>
           Vi holder til i Oslo og spesialiserer oss på å levere førsteklasses maler- og
           reparasjonstjenester. Vår misjon er å forvandle rom ved å tilføre komfort og trivsel i
           hvert hjem og kontor.
         </p>
-        <Link to="/kontakt" className="m-knapp btn-press" style={{ marginTop: 24 }}>
+        <Link to="/kontakt" className="m-knapp m-knapp--senter btn-press" style={{ marginTop: 24 }}>
           Bestill gratis befaring
         </Link>
         <img
@@ -39,13 +40,14 @@ export default function HomeMobil() {
               background: b.bg,
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: 20,
               padding: '20px var(--kant)',
             }}
           >
             <img src={b.ic} alt="" width={64} height={64} style={{ opacity: b.op, flexShrink: 0 }} />
-            <div style={{ fontSize: 22, lineHeight: '28px', fontWeight: 600, color: b.farge, whiteSpace: 'pre-line' }}>
-              {b.tekst}
+            <div style={{ fontSize: 22, lineHeight: '28px', fontWeight: 600, color: b.farge }}>
+              {b.tekst.replace(/\n/g, ' ')}
             </div>
           </div>
         ))}
@@ -53,9 +55,12 @@ export default function HomeMobil() {
 
       {/* ---------- Velkommen ---------- */}
       <section className="m-seksjon m-inn">
-        <div style={{ fontSize: 24, lineHeight: '32px', fontStyle: 'italic' }}>
+        {/* Firmanavnet er inline-block: bryter det, bryter det som ett stykke */}
+        <div className="m-balanse" style={{ fontSize: 24, lineHeight: '32px', fontStyle: 'italic', textAlign: 'center' }}>
           Velkommen til{' '}
-          <span style={{ fontWeight: 700, fontStyle: 'normal' }}>MALER DELIUS AS</span>
+          <span style={{ fontWeight: 700, fontStyle: 'normal', display: 'inline-block' }}>
+            MALER DELIUS AS
+          </span>
         </div>
         <img className="m-bilde" src={omOssBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} />
         <p style={{ marginTop: 20, fontStyle: 'italic' }}>
@@ -75,7 +80,7 @@ export default function HomeMobil() {
             </div>
           ))}
         </div>
-        <Link to="/kontakt" className="m-knapp btn-press" style={{ marginTop: 28, color: C.brown }}>
+        <Link to="/kontakt" className="m-knapp m-knapp--senter btn-press" style={{ marginTop: 28, color: C.brown }}>
           Kontakt oss
         </Link>
       </section>
@@ -114,7 +119,11 @@ export default function HomeMobil() {
             <div key={s.id} className="m-kort">
               <img src={s.ikon} alt="" loading="lazy" decoding="async" style={{ height: 64, width: 'auto' }} />
               <h3 style={{ marginTop: 16 }}>{s.tittel}</h3>
-              <p style={{ marginTop: 12, color: C.brown, whiteSpace: 'pre-line' }}>{s.brod}</p>
+              <ul className="m-liste" style={{ marginTop: 12, color: C.brown, fontSize: 16, lineHeight: '26px' }}>
+                {s.brod.split('\n').map((linje) => (
+                  <li key={linje}>{linje}</li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>

@@ -27,9 +27,11 @@ export default function OmOssMobil() {
       />
 
       <section className="m-seksjon m-inn">
-        <div style={{ fontSize: 24, lineHeight: '32px', fontStyle: 'italic' }}>
+        <div className="m-balanse" style={{ fontSize: 24, lineHeight: '32px', fontStyle: 'italic', textAlign: 'center' }}>
           Velkommen til{' '}
-          <span style={{ fontWeight: 700, fontStyle: 'normal' }}>MALER DELIUS AS</span>
+          <span style={{ fontWeight: 700, fontStyle: 'normal', display: 'inline-block' }}>
+            MALER DELIUS AS
+          </span>
         </div>
         <img className="m-bilde" src={teamBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} />
         <p style={{ marginTop: 20, fontWeight: 500, letterSpacing: '0.04em' }}>
@@ -51,7 +53,7 @@ export default function OmOssMobil() {
             </div>
           ))}
         </div>
-        <Link to="/kontakt" className="m-knapp btn-press" style={{ marginTop: 28, color: C.brown }}>
+        <Link to="/kontakt" className="m-knapp m-knapp--senter btn-press" style={{ marginTop: 28, color: C.brown }}>
           Kontakt oss
         </Link>
 

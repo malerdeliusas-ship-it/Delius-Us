@@ -23,7 +23,11 @@ export default function MalertjenesterMobil() {
               <div key={s.id} className="m-kort">
                 <img src={s.ikon} alt="" loading="lazy" decoding="async" style={{ height: 64, width: 'auto' }} />
                 <h3 style={{ marginTop: 16 }}>{s.tittel}</h3>
-                <p style={{ marginTop: 12, color: C.brown, whiteSpace: 'pre-line' }}>{s.brod}</p>
+              <ul className="m-liste" style={{ marginTop: 12, color: C.brown, fontSize: 16, lineHeight: '26px' }}>
+                {s.brod.split('\n').map((linje) => (
+                  <li key={linje}>{linje}</li>
+                ))}
+              </ul>
               </div>
             ))}
           </div>
@@ -65,7 +69,7 @@ export default function MalertjenesterMobil() {
 
         <section className="m-seksjon m-inn" style={{ textAlign: 'center' }}>
           <h2 style={{ color: '#fff', fontWeight: 700 }}>Få en gratis befaring</h2>
-          <Link to="/kontakt" className="m-knapp btn-press" style={{ marginTop: 20, color: C.brown }}>
+          <Link to="/kontakt" className="m-knapp m-knapp--senter btn-press" style={{ marginTop: 20, color: C.brown }}>
             Kontakt oss
           </Link>
         </section>

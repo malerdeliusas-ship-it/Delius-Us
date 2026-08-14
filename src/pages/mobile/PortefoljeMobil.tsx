@@ -41,7 +41,7 @@ export default function PortefoljeMobil() {
         style={{ display: 'block', width: '100%', height: 90, objectFit: 'cover', objectPosition: 'top' }}
       />
 
-      <section className="m-inn" style={{ paddingTop: 32, paddingBottom: 8 }}>
+      <section className="m-inn" style={{ paddingTop: 32, paddingBottom: 28 }}>
         <h2>Portefølje</h2>
       </section>
 

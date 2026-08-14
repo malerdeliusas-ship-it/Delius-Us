@@ -90,7 +90,7 @@ export const TJENESTER: {
     tittel: 'Interiørmaling',
     titler: [{ l: 165, t: 3926, w: 262, align: 'center', tekst: 'Interiørmaling' }],
     bL: 165, bT: 3982, bW: 262,
-    brod: '-Valg av fargeløsninger som harmonisk passer inn i ditt interiør.\n-Rask og kvalitetsmessig utførelse av arbeidet.\n-Minimalt inngrep i din daglige rutine.',
+    brod: '– Valg av fargeløsninger som harmonisk passer inn i ditt interiør.\n– Rask og kvalitetsmessig utførelse av arbeidet.\n– Minimalt inngrep i din daglige rutine.',
   },
   {
     id: 'fargevalg', ikon: icFargevalg, iL: 623, iT: 3813, iW: 156, iH: 79,

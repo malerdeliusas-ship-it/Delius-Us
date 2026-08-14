@@ -64,7 +64,7 @@ export default function KontaktMobil() {
             ))}
           </div>
 
-          <div style={{ marginTop: 28, borderRadius: 28, overflow: 'hidden' }}>
+          <div style={{ marginTop: 28, borderRadius: 28, overflow: 'hidden', background: '#e8ecf4', minHeight: 320 }}>
             <iframe
               title="Maler Delius AS på kartet"
               src={KART_EMBED}

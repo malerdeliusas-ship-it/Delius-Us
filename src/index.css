@@ -137,10 +137,10 @@ textarea {
 }
 
 .m h1 {
-  font-size: 34px;
-  line-height: 1.16;
+  font-size: 30px;
+  line-height: 1.2;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: #020369;
 }
 
@@ -162,6 +162,44 @@ textarea {
   line-height: 26px;
 }
 
+/* Overskrifter brytes i jevne linjer (aldri ett ensomt ord på siste linje),
+   og avsnitt slipper å ende på et enslig ord. Eldre nettlesere ignorerer
+   dette stille. */
+.m h1,
+.m h2,
+.m h3,
+.m-balanse {
+  text-wrap: balance;
+}
+
+.m p {
+  text-wrap: pretty;
+}
+
+/* Frittstående knapper står midtstilt, likt på alle sidene.
+   Dobbel klasse: må vinne over .m-knapp sin display:inline-flex uansett
+   hvor i filen reglene står. */
+.m-knapp.m-knapp--senter {
+  display: flex;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Punktlister i tjenestekortene: hengende innrykk, så linjer som brytes
+   starter under teksten og ikke under tankestreken */
+.m-liste {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  padding: 0;
+}
+
+.m-liste li {
+  padding-left: 1.15em;
+  text-indent: -1.15em;
+}
+
 /* ---------- Header ---------- */
 .m-header {
   position: sticky;
@@ -181,6 +219,9 @@ textarea {
   height: 44px;
   width: auto;
   object-fit: contain;
+  /* PNG-en har 31px usynlig luft til venstre; trekkes inn så logoens
+     synlige kant står like langt fra kanten som menyknappen */
+  margin-left: -21px;
 }
 
 .m-burger {
