@@ -2,7 +2,7 @@ import Stage from '../components/Stage'
 import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 import { Txt, Img, Rect, CropImg } from '../components/prim'
-import { C, FONT_MUKTA } from '../lib/theme'
+import { C, FONT_MUKTA, BEDRIFT } from '../lib/theme'
 
 import splash from '../assets/figma/splash.webp'
 import anmeldelser from '../assets/figma/mittanbud-anmeldelser.jpg'
@@ -122,7 +122,15 @@ export default function Portefolje() {
       <CropImg src={f02672} alt="Malingsspann og verktøy" l={597} t={2650} w={306} h={186} r={67} tf={TF_02672} />
 
       {/* ---------- Tall og anmeldelser ---------- */}
-      <Img src={anmeldelser} alt="Kundevurderinger av Maler Delius AS på Mittanbud" l={449} t={3395} w={862} h={326} r={67} />
+      <a
+        href={BEDRIFT.mittanbud}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Se vurderingene våre på Mittanbud"
+        style={{ display: 'contents' }}
+      >
+        <Img src={anmeldelser} alt="Kundevurderinger av Maler Delius AS på Mittanbud" l={449} t={3395} w={862} h={326} r={67} />
+      </a>
 
       <Rect l={1038} t={2990} w={273} h={326} r={67} bg={C.white} />
       <Txt l={1074} t={3088} w={201} size={48} weight={700} lh={72} color={C.black} align="center">

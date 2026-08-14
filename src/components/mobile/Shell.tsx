@@ -88,13 +88,18 @@ function MobilFooter() {
       <div>
         <div style={{ marginBottom: 6 }}>Følg oss</div>
         <div>
-          <a href={BEDRIFT.facebook || undefined} target="_blank" rel="noreferrer">
+          <a href={BEDRIFT.facebook} target="_blank" rel="noreferrer">
             FACEBOOK
           </a>
         </div>
         <div>
-          <a href={BEDRIFT.instagram || undefined} target="_blank" rel="noreferrer">
+          <a href={BEDRIFT.instagram} target="_blank" rel="noreferrer">
             INSTAGRAM
+          </a>
+        </div>
+        <div>
+          <a href={BEDRIFT.tiktok} target="_blank" rel="noreferrer">
+            TIKTOK
           </a>
         </div>
       </div>

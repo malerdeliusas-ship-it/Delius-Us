@@ -85,16 +85,22 @@ export const FONT_MUKTA = "'Mukta', 'Montserrat', system-ui, sans-serif"
 
 export const DESIGN_WIDTH = 1430
 
-/** Bedriftens data. Adressen er den som står i kontaktraden i designet. */
+/**
+ * Bedriftens data. Adressen er den som står i kontaktraden i designet.
+ * E-postadressen er den bedriften selv bruker (bekreftet av kunden);
+ * designet viste info@malerdelius.no, som ikke er i bruk.
+ */
 export const BEDRIFT = {
   navn: 'Maler Delius AS',
   adresse: 'Ullevålsveien 76, 0454 Oslo',
   telefon: '+47 966 93 780',
   telefonLenke: 'tel:+4796693780',
-  epost: 'info@malerdelius.no',
+  epost: 'malerdelius@gmail.com',
   nettsted: 'malerdelius.no',
   orgnr: 'Org nr. 934 409 256',
-  facebook: '', // adresa reala vine de la kunden
-  instagram: '', // adresa reala vine de la kunden
+  facebook: 'https://www.facebook.com/share/1CPdfc8UBm/',
+  instagram: 'https://www.instagram.com/malerdelius',
+  tiktok: 'https://www.tiktok.com/@malerdelius',
+  mittanbud: 'https://mittanbud.no/bedrift/9061904',
   kart: 'https://www.google.com/maps/search/?api=1&query=Ullev%C3%A5lsveien+76,+0454+Oslo',
 }

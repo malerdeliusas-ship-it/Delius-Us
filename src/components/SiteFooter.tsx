@@ -60,16 +60,22 @@ export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
         </div>
       </div>
 
+      {/* Designet hadde to kanaler; TikTok kom til da kunden sendte adressene. */}
       <div style={{ ...col, left: 942, width: 120 }}>
         <div>Følg oss</div>
         <div>
-          <a href={BEDRIFT.facebook || undefined} target="_blank" rel="noreferrer" style={u}>
+          <a href={BEDRIFT.facebook} target="_blank" rel="noreferrer" style={u}>
             FACEBOOK
           </a>
         </div>
         <div>
-          <a href={BEDRIFT.instagram || undefined} target="_blank" rel="noreferrer" style={u}>
+          <a href={BEDRIFT.instagram} target="_blank" rel="noreferrer" style={u}>
             INSTAGRAM
+          </a>
+        </div>
+        <div>
+          <a href={BEDRIFT.tiktok} target="_blank" rel="noreferrer" style={u}>
+            TIKTOK
           </a>
         </div>
       </div>

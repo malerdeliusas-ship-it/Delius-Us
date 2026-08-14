@@ -15,7 +15,9 @@ import icMail from '../assets/figma/ic-mail.png'
 const RAD = [
   { ikon: icMarker, iL: 119, iW: 90, iH: 63, iT: 1081, tL: 216, tT: 1094.5, tW: 349, tekst: BEDRIFT.adresse, href: BEDRIFT.kart, alt: 'Adresse' },
   { ikon: icWeb, iL: 620, iW: 90, iH: 63, iT: 1081, tL: 710, tT: 1094.5, tW: 191, tekst: BEDRIFT.nettsted, href: `https://${BEDRIFT.nettsted}`, alt: 'Nettsted' },
-  { ikon: icMail, iL: 957, iW: 90, iH: 62, iT: 1082, tL: 1047, tT: 1095, tW: 265, tekst: BEDRIFT.epost, href: `mailto:${BEDRIFT.epost}`, alt: 'E-post' },
+  // Bredden er 320 og ikke designets 265: den nye e-postadressen er lengre,
+  // og teksten skal få plass på én linje. Startpunktet er uendret.
+  { ikon: icMail, iL: 957, iW: 90, iH: 62, iT: 1082, tL: 1047, tT: 1095, tW: 320, tekst: BEDRIFT.epost, href: `mailto:${BEDRIFT.epost}`, alt: 'E-post' },
 ]
 
 /**

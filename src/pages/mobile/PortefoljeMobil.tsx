@@ -1,5 +1,5 @@
 import MobilSide from '../../components/mobile/Shell'
-import { C, FONT_MUKTA } from '../../lib/theme'
+import { C, FONT_MUKTA, BEDRIFT } from '../../lib/theme'
 import { KORT } from '../Portefolje'
 
 import splash from '../../assets/figma/splash.webp'
@@ -83,12 +83,19 @@ export default function PortefoljeMobil() {
           </div>
         </div>
 
-        <img
-          className="m-bilde"
-          src={anmeldelser}
-          alt="Kundevurderinger av Maler Delius AS på Mittanbud"
-          style={{ marginTop: 18 }}
-        />
+        <a
+          href={BEDRIFT.mittanbud}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Se vurderingene våre på Mittanbud"
+        >
+          <img
+            className="m-bilde"
+            src={anmeldelser}
+            alt="Kundevurderinger av Maler Delius AS på Mittanbud"
+            style={{ marginTop: 18 }}
+          />
+        </a>
       </section>
     </MobilSide>
   )
