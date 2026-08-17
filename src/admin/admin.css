@@ -46,23 +46,36 @@
 .adm-side-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 0 6px 26px;
+  gap: 11px;
+  margin: 0 0 26px;
 }
 
-.adm-side-logo img {
-  height: 38px;
+/**
+ * Logoen er skrevet i marineblått, og sidestolpen er marineblå – rett på
+ * bakgrunnen forsvant den rett og slett. Den står derfor på en hvit plate,
+ * slik firmamerket vises uendret og tydelig, som ellers på nettstedet.
+ */
+.adm-side-merke {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 13px;
+  /* smalere til venstre: PNG-en har innbakt gjennomsiktig luft der */
+  padding: 7px 13px 8px 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+.adm-side-merke img {
+  display: block;
+  height: 31px;
   width: auto;
-  border-radius: 10px;
-  /* PNG-en har gjennomsiktig luft til venstre; trekkes inn så merket står
-     like langt fra kanten som menypunktene under */
-  margin-left: -5px;
 }
 
-.adm-side-logo span {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
+.adm-side-ord {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--gull);
 }
@@ -748,11 +761,17 @@ select.adm-inn {
     margin: 0 8px 0 0;
   }
 
-  .adm-side-logo img {
-    height: 36px;
+  /* mindre plate i den lave toppstripa; bare ADMIN-ordet gjemmes */
+  .adm-side-merke {
+    padding: 5px 9px 6px 5px;
+    border-radius: 10px;
   }
 
-  .adm-side-logo span {
+  .adm-side-merke img {
+    height: 24px;
+  }
+
+  .adm-side-ord {
     display: none;
   }
 

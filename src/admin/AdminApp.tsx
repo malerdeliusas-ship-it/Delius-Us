@@ -40,8 +40,10 @@ function Ramme({ children }: { children: React.ReactNode }) {
     <div className="adm">
       <aside className="adm-side">
         <div className="adm-side-logo">
-          <img src={logo} alt="Maler Delius AS" />
-          <span>Admin</span>
+          <span className="adm-side-merke">
+            <img src={logo} alt="Maler Delius AS" />
+          </span>
+          <span className="adm-side-ord">Admin</span>
         </div>
 
         <nav className="adm-meny" aria-label="Admin-meny">
