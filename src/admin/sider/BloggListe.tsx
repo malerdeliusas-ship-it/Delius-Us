@@ -75,9 +75,9 @@ export default function BloggListe() {
                       <span className="adm-merke adm-merke--graa">Kladd</span>
                     )}
                   </td>
-                  <td>{datoKort(i.publisert_dato)}</td>
-                  <td>{datoKort(i.oppdatert)}</td>
-                  <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                  <td className="adm-nowrap">{datoKort(i.publisert_dato)}</td>
+                  <td className="adm-nowrap">{datoKort(i.oppdatert)}</td>
+                  <td className="adm-nowrap" style={{ textAlign: 'right' }}>
                     {i.publisert && (
                       <a
                         className="adm-knapp adm-knapp--stille adm-knapp--liten"

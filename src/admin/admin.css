@@ -46,14 +46,17 @@
 .adm-side-logo {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 12px;
   margin: 0 6px 26px;
 }
 
 .adm-side-logo img {
-  height: 46px;
+  height: 38px;
   width: auto;
   border-radius: 10px;
+  /* PNG-en har gjennomsiktig luft til venstre; trekkes inn så merket står
+     like langt fra kanten som menypunktene under */
+  margin-left: -5px;
 }
 
 .adm-side-logo span {
@@ -394,6 +397,11 @@ select.adm-inn {
 
 .adm-tabell tr:last-child td {
   border-bottom: none;
+}
+
+/* datoer og knappeceller skal aldri brytes over flere linjer */
+.adm-nowrap {
+  white-space: nowrap;
 }
 
 /* ---------- Merkelapper ---------- */

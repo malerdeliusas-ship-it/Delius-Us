@@ -187,7 +187,7 @@ export default function Lenker() {
                         <span className="adm-kode">/l/{l.kode}</span>
                       </td>
                       <td>{sideNavn(l.mal)}</td>
-                      <td style={{ color: 'var(--tekst-svak)' }}>{datoKort(l.opprettet)}</td>
+                      <td className="adm-nowrap" style={{ color: 'var(--tekst-svak)' }}>{datoKort(l.opprettet)}</td>
                       <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{t?.okter ?? 0}</td>
                       <td style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{t?.visninger ?? 0}</td>
                       <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>

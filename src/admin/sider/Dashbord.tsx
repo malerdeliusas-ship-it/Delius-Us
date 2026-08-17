@@ -5,7 +5,7 @@ import { supabase, type BloggInnlegg } from '../../lib/supabase'
 import { Laster, Sidetopp, Status } from '../deler'
 import { Sparklinje } from '../diagram'
 import { hentStatistikk, serieTilPunkter, type Statistikk as Stat } from '../statistikkData'
-import { datoKort, folkeligFeil } from '../verktoy'
+import { folkeligFeil } from '../verktoy'
 
 /** Oversikten: dagen i dag, siste 30 dager og snarveier til alt. */
 export default function Dashbord() {
@@ -104,8 +104,7 @@ export default function Dashbord() {
                             <span className="adm-merke adm-merke--graa">Kladd</span>
                           )}
                         </td>
-                        <td style={{ color: 'var(--tekst-svak)' }}>{datoKort(i.oppdatert)}</td>
-                        <td style={{ textAlign: 'right' }}>
+                        <td style={{ textAlign: 'right' }} className="adm-nowrap">
                           <Link className="adm-knapp adm-knapp--stille adm-knapp--liten" to={`/admin/blogg/${i.id}`}>
                             <Pencil size={14} />
                             Rediger

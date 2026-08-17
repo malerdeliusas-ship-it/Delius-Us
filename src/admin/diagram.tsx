@@ -103,14 +103,16 @@ export function LinjeDiagram({
             )
           })}
 
-          {/* datoetiketter */}
+          {/* Datoetiketter. Den første og den siste står helt ytterst, så de
+              ankres til kanten sin – midtstilt ville halve teksten falt
+              utenfor diagrammet. */}
           {punkter.map((p, i) =>
             i % hopp === 0 || i === punkter.length - 1 ? (
               <text
                 key={i}
                 x={x(i)}
                 y={H - 8}
-                textAnchor="middle"
+                textAnchor={i === 0 ? 'start' : i === punkter.length - 1 ? 'end' : 'middle'}
                 fontSize={11}
                 fill="rgba(2,34,105,0.55)"
               >
