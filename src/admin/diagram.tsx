@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useSprak } from './sprak'
 
 /**
  * Diagrammene i admin-panelet: håndtegnet SVG i nettstedets farger.
@@ -41,6 +42,7 @@ export function LinjeDiagram({
   punkter: Punkt[]
   medUnike?: boolean
 }) {
+  const { t } = useSprak()
   const [pekt, setPekt] = useState<number | null>(null)
   const flate = useRef<HTMLDivElement>(null)
 
@@ -73,12 +75,12 @@ export function LinjeDiagram({
       <div style={{ display: 'flex', gap: 18, marginBottom: 10, fontSize: 13, fontWeight: 600, color: 'var(--tekst-svak)' }}>
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
           <span style={{ width: 11, height: 11, borderRadius: 3.5, background: SERIE_A }} />
-          Sidevisninger
+          {t('diagram.visninger')}
         </span>
         {medUnike && (
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
             <span style={{ width: 11, height: 11, borderRadius: 3.5, background: SERIE_B }} />
-            Unike besøk
+            {t('diagram.unike')}
           </span>
         )}
       </div>
@@ -89,7 +91,7 @@ export function LinjeDiagram({
         onPointerMove={pek}
         onPointerLeave={() => setPekt(null)}
       >
-        <svg viewBox={`0 0 ${B} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label="Besøk per dag">
+        <svg viewBox={`0 0 ${B} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }} role="img" aria-label={t('diagram.aria')}>
           {/* stille rutenett */}
           {[0, 0.5, 1].map((andel) => {
             const gy = TOPP + innerH - andel * innerH
@@ -168,9 +170,13 @@ export function LinjeDiagram({
             }}
           >
             <div style={{ fontWeight: 700, marginBottom: 3 }}>{valgt.etikett}</div>
-            <div>Sidevisninger: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{valgt.visninger}</b></div>
+            <div>
+              {t('diagram.visninger')}: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{valgt.visninger}</b>
+            </div>
             {medUnike && (
-              <div>Unike besøk: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{valgt.unike}</b></div>
+              <div>
+                {t('diagram.unike')}: <b style={{ fontVariantNumeric: 'tabular-nums' }}>{valgt.unike}</b>
+              </div>
             )}
           </div>
         )}
@@ -203,10 +209,10 @@ export function Sparklinje({ verdier }: { verdier: number[] }) {
 /** Vannrette stolper med tall – til «mest sett», kilder og enheter. */
 export function Stolper({
   rader,
-  tom = 'Ingenting å vise ennå.',
+  tom,
 }: {
   rader: { navn: string; verdi: number }[]
-  tom?: string
+  tom: string
 }) {
   const maks = Math.max(1, ...rader.map((r) => r.verdi))
   if (rader.length === 0) {

@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase'
 import type { Punkt } from './diagram'
+import type { Oversetter } from './sprak'
 
 /**
  * Besøkstallene. Alt regnestykket – inkludert hvilke dager perioden dekker –
@@ -77,17 +78,22 @@ export function serieTilPunkter(stat: Statistikk, oppløsning: 'dag' | 'maned'):
   })
 }
 
-/** Stinavn → lesbart sidenavn i listene. */
-export function sideNavn(sti: string): string {
-  const kjent: Record<string, string> = {
-    '/': 'Forsiden',
-    '/om-oss': 'Om oss',
-    '/portefolje': 'Portefølje',
-    '/malertjenester': 'Malertjenester',
-    '/kontakt': 'Kontakt',
-    '/blogg': 'Blogg',
+/** Stinavn → lesbart sidenavn i listene, på panelets språk. */
+export function sideNavn(sti: string, t: Oversetter): string {
+  switch (sti) {
+    case '/':
+      return t('side.forsiden')
+    case '/om-oss':
+      return t('side.omOss')
+    case '/portefolje':
+      return t('side.portefolje')
+    case '/malertjenester':
+      return t('side.malertjenester')
+    case '/kontakt':
+      return t('side.kontakt')
+    case '/blogg':
+      return t('side.blogg')
   }
-  if (kjent[sti]) return kjent[sti]
-  if (sti.startsWith('/blogg/')) return `Blogg: ${sti.slice(7)}`
+  if (sti.startsWith('/blogg/')) return t('side.bloggPrefiks', { slug: sti.slice(7) })
   return sti
 }

@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { IKKE_SPOR } from '../lib/spor'
+import { useSprak } from './sprak'
 
 /**
  * Innlogging for admin-panelet, rett mot Supabase Auth.
@@ -90,22 +91,21 @@ function Venter({ tekst }: { tekst: string }) {
 
 /** Innlogget, men e-posten står ikke i admin_epost. */
 function UtenTilgang({ epost }: { epost?: string }) {
+  const { t } = useSprak()
+  const hvem = epost ? t('vakt.som', { epost }) : ''
   return (
     <div className="adm-inngang">
       <div className="adm-inngang-kort" style={{ maxWidth: 520 }}>
-        <h1>Ingen admin-tilgang</h1>
-        <p style={{ marginBottom: 20 }}>
-          Du er logget inn{epost ? ` som ${epost}` : ''}, men denne brukeren har
-          ikke tilgang til panelet.
-        </p>
+        <h1>{t('vakt.ingenTilgang')}</h1>
+        <p style={{ marginBottom: 20 }}>{t('vakt.innloggetSom', { hvem })}</p>
         <div className="adm-status adm-status--feil" style={{ marginBottom: 20, display: 'block' }}>
-          Legg adressen inn i databasen for å gi tilgang. I Supabase → SQL Editor:
+          {t('vakt.leggInn')}
           <div className="adm-kode" style={{ display: 'block', marginTop: 10, padding: '10px 12px' }}>
             insert into admin_epost (epost) values ('{epost ?? 'din@epost.no'}');
           </div>
         </div>
         <button className="adm-knapp" style={{ width: '100%' }} onClick={() => void loggUt()}>
-          Logg ut
+          {t('meny.loggUt')}
         </button>
       </div>
     </div>
@@ -123,10 +123,11 @@ export function Vakt({
   children: ReactNode
 }) {
   const { pathname } = useLocation()
+  const { t } = useSprak()
 
-  if (okt === undefined) return <Venter tekst="Sjekker innlogging …" />
+  if (okt === undefined) return <Venter tekst={t('vakt.sjekkerInn')} />
   if (!okt) return <Navigate to="/admin/logg-inn" replace state={{ fra: pathname }} />
-  if (erAdmin === undefined) return <Venter tekst="Sjekker tilgangen …" />
+  if (erAdmin === undefined) return <Venter tekst={t('vakt.sjekkerTilgang')} />
   if (!erAdmin) return <UtenTilgang epost={okt.user?.email ?? undefined} />
 
   return <>{children}</>

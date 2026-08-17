@@ -11,17 +11,19 @@ import {
   type Statistikk as Stat,
 } from '../statistikkData'
 import { folkeligFeil } from '../verktoy'
+import { useSprak, type Nokkel } from '../sprak'
 
 /** Besøkstallene: hvor mange, hvilke sider, hvor de kom fra. */
 
-const PERIODER = [
-  { navn: '7 dager', dager: 7 },
-  { navn: '30 dager', dager: 30 },
-  { navn: '90 dager', dager: 90 },
-  { navn: '12 måneder', maneder: 12 },
-] as const
+const PERIODER: ({ nokkel: Nokkel } & ({ dager: number } | { maneder: number }))[] = [
+  { nokkel: 'stat.p7', dager: 7 },
+  { nokkel: 'stat.p30', dager: 30 },
+  { nokkel: 'stat.p90', dager: 90 },
+  { nokkel: 'stat.p12', maneder: 12 },
+]
 
 export default function Statistikk() {
+  const { t } = useSprak()
   const [periode, setPeriode] = useState(1) // 30 dager
   const [stat, setStat] = useState<Stat | null>(null)
   const [lenker, setLenker] = useState<Lenke[]>([])
@@ -37,12 +39,12 @@ export default function Statistikk() {
     setFeil(null)
     async function hent() {
       try {
-        const s = perManed
+        const s = 'maneder' in valgt
           ? await hentStatistikkManeder(valgt.maneder)
           : await hentStatistikk(valgt.dager)
         if (aktiv) setStat(s)
       } catch (f) {
-        if (aktiv) setFeil(folkeligFeil((f as Error).message))
+        if (aktiv) setFeil((f as Error).message)
       }
     }
     void hent()
@@ -79,53 +81,54 @@ export default function Statistikk() {
 
   return (
     <>
-      <Sidetopp
-        tittel="Statistikk"
-        under="Besøk på nettstedet, uten informasjonskapsler og uten å lagre noe om den enkelte."
-      >
+      <Sidetopp tittel={t('meny.statistikk')} under={t('stat.under')}>
         <div className="adm-perioder">
           {PERIODER.map((p, i) => (
             <button
-              key={p.navn}
+              key={p.nokkel}
               className={i === periode ? 'adm-aktiv' : undefined}
               aria-pressed={i === periode}
               onClick={() => setPeriode(i)}
             >
-              {p.navn}
+              {t(p.nokkel)}
             </button>
           ))}
         </div>
       </Sidetopp>
 
-      {feil && <Status type="feil" style={{ marginBottom: 18 }}>{feil}</Status>}
-      {!feil && !stat && <Laster tekst="Teller opp besøkene …" />}
+      {feil && <Status type="feil" style={{ marginBottom: 18 }}>{folkeligFeil(feil, t)}</Status>}
+      {!feil && !stat && <Laster tekst={t('stat.teller')} />}
 
       {stat && (
         <div className="adm-rute">
           <div className="adm-tall">
             <div className="adm-tall-kort">
-              <span className="adm-tall-navn">Sidevisninger</span>
+              <span className="adm-tall-navn">{t('stat.sidevisninger')}</span>
               <span className="adm-tall-verdi">{stat.totalt.visninger}</span>
-              <span className="adm-tall-detalj">siste {valgt.navn}</span>
+              <span className="adm-tall-detalj">
+                {t('stat.sisteX', { periode: t(valgt.nokkel) })}
+              </span>
             </div>
             <div className="adm-tall-kort">
-              <span className="adm-tall-navn">Unike besøk</span>
+              <span className="adm-tall-navn">{t('stat.unike')}</span>
               <span className="adm-tall-verdi">{stat.totalt.unike}</span>
-              <span className="adm-tall-detalj">økter – én per besøkende per fane</span>
+              <span className="adm-tall-detalj">{t('stat.unikeDetalj')}</span>
             </div>
             <div className="adm-tall-kort">
-              <span className="adm-tall-navn">Mest sett</span>
+              <span className="adm-tall-navn">{t('stat.mestSett')}</span>
               <span className="adm-tall-verdi" style={{ fontSize: 22 }}>
-                {stat.sider[0] ? sideNavn(stat.sider[0].sti) : '–'}
+                {stat.sider[0] ? sideNavn(stat.sider[0].sti, t) : '–'}
               </span>
               <span className="adm-tall-detalj">
-                {stat.sider[0] ? `${stat.sider[0].visninger} visninger` : 'ingen besøk ennå'}
+                {stat.sider[0]
+                  ? t('stat.visningerX', { antall: stat.sider[0].visninger })
+                  : t('stat.ingenBesok')}
               </span>
             </div>
             <div className="adm-tall-kort">
-              <span className="adm-tall-navn">Fra mobil</span>
+              <span className="adm-tall-navn">{t('stat.fraMobil')}</span>
               <span className="adm-tall-verdi">{mobilAndel === null ? '–' : `${mobilAndel} %`}</span>
-              <span className="adm-tall-detalj">andel av øktene</span>
+              <span className="adm-tall-detalj">{t('stat.andel')}</span>
             </div>
           </div>
 
@@ -140,14 +143,14 @@ export default function Statistikk() {
               }}
             >
               <div className="adm-diagram-tittel" style={{ marginBottom: 0 }}>
-                Besøk per {perManed ? 'måned' : 'dag'}
+                {perManed ? t('stat.besokPerManed') : t('stat.besokPerDag')}
               </div>
               <button
                 className="adm-knapp adm-knapp--stille adm-knapp--liten"
                 onClick={() => setSomTabell((v) => !v)}
               >
                 <Table2 size={15} />
-                {somTabell ? 'Vis diagram' : 'Vis tabell'}
+                {somTabell ? t('stat.visDiagram') : t('stat.visTabell')}
               </button>
             </div>
             <div style={{ marginTop: 16 }}>
@@ -160,17 +163,16 @@ export default function Statistikk() {
                     fontSize: 14.5,
                   }}
                 >
-                  Ingen besøk registrert i perioden ennå. Tallene begynner å rulle
-                  inn så snart noen åpner nettstedet.
+                  {t('stat.tomPeriode')}
                 </div>
               ) : somTabell ? (
                 <div className="adm-tabell-rull">
                   <table className="adm-tabell">
                     <thead>
                       <tr>
-                        <th>{perManed ? 'Måned' : 'Dag'}</th>
-                        <th style={{ textAlign: 'right' }}>Sidevisninger</th>
-                        <th style={{ textAlign: 'right' }}>Unike besøk</th>
+                        <th>{perManed ? t('stat.maned') : t('stat.dag')}</th>
+                        <th style={{ textAlign: 'right' }}>{t('stat.sidevisninger')}</th>
+                        <th style={{ textAlign: 'right' }}>{t('stat.unike')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -202,48 +204,47 @@ export default function Statistikk() {
             }}
           >
             <div className="adm-kort">
-              <div className="adm-diagram-tittel">Mest sette sider</div>
+              <div className="adm-diagram-tittel">{t('stat.mestSette')}</div>
               <Stolper
                 rader={stat.sider.slice(0, 8).map((s) => ({
-                  navn: sideNavn(s.sti),
+                  navn: sideNavn(s.sti, t),
                   verdi: s.visninger,
                 }))}
+                tom={t('stat.ingenting')}
               />
             </div>
             <div className="adm-kort">
-              <div className="adm-diagram-tittel">Hvor besøkene kom fra</div>
+              <div className="adm-diagram-tittel">{t('stat.kilder')}</div>
               <Stolper
                 rader={stat.kilder.slice(0, 8).map((k) => ({
-                  navn: k.kilde === 'direkte' ? 'Direkte / skrev inn adressen' : k.kilde,
+                  navn: k.kilde === 'direkte' ? t('stat.direkte') : k.kilde,
                   verdi: k.okter,
                 }))}
-                tom="Ingen kilder registrert ennå."
+                tom={t('stat.ingenKilder')}
               />
             </div>
             <div className="adm-kort">
-              <div className="adm-diagram-tittel">Enheter</div>
+              <div className="adm-diagram-tittel">{t('stat.enheter')}</div>
               <Stolper
                 rader={stat.enheter.map((e) => ({
-                  navn: e.enhet === 'mobil' ? 'Mobil' : 'Datamaskin',
+                  navn: e.enhet === 'mobil' ? t('stat.mobil') : t('stat.datamaskin'),
                   verdi: e.okter,
                 }))}
+                tom={t('stat.ingenting')}
               />
             </div>
             <div className="adm-kort">
-              <div className="adm-diagram-tittel">Trafikk fra lenkene dine</div>
+              <div className="adm-diagram-tittel">{t('stat.lenketrafikk')}</div>
               {stat.lenker.length === 0 ? (
-                <div style={{ fontSize: 13.5, color: 'var(--tekst-svak)' }}>
-                  Ingen besøk via sporingslenker i perioden. Lag lenker under «Lenker»
-                  og del dem – så dukker tallene opp her.
-                </div>
+                <div style={{ fontSize: 13.5, color: 'var(--tekst-svak)' }}>{t('stat.lenkeTom')}</div>
               ) : (
                 <div className="adm-tabell-rull">
                   <table className="adm-tabell">
                     <thead>
                       <tr>
-                        <th>Lenke</th>
-                        <th style={{ textAlign: 'right' }}>Besøk</th>
-                        <th style={{ textAlign: 'right' }}>Visninger</th>
+                        <th>{t('stat.lenke')}</th>
+                        <th style={{ textAlign: 'right' }}>{t('stat.besok')}</th>
+                        <th style={{ textAlign: 'right' }}>{t('stat.visningerKol')}</th>
                       </tr>
                     </thead>
                     <tbody>

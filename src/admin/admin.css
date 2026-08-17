@@ -39,45 +39,91 @@
   flex-direction: column;
   background: linear-gradient(180deg, var(--marine) 0%, var(--marine-dyp) 100%);
   color: #fff;
-  padding: 26px 18px 22px;
+  padding: 0 18px 22px;
   z-index: 10;
 }
 
-.adm-side-logo {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin: 0 0 26px;
-}
-
 /**
- * Logoen er skrevet i marineblått, og sidestolpen er marineblå – rett på
- * bakgrunnen forsvant den rett og slett. Den står derfor på en hvit plate,
- * slik firmamerket vises uendret og tydelig, som ellers på nettstedet.
+ * Toppen av stolpen er kremhvit, som nettstedets egne flater: logoen er
+ * skrevet i marineblått og trenger lys bunn for å synes ordentlig.
+ * Gullstreken i bunnen er skillet mot resten, som forblir marineblå.
  */
-.adm-side-merke {
+.adm-side-topp {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: #fff;
-  border-radius: 13px;
-  /* smalere til venstre: PNG-en har innbakt gjennomsiktig luft der */
-  padding: 7px 13px 8px 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 -18px 22px;
+  padding: 20px 20px 16px;
+  background: var(--krem);
+  border-bottom: 3px solid var(--gull);
 }
 
-.adm-side-merke img {
+.adm-side-topp img {
   display: block;
-  height: 31px;
+  height: 48px;
   width: auto;
+  /* PNG-en har innbakt gjennomsiktig luft til venstre */
+  margin-left: -9px;
 }
 
 .adm-side-ord {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--gull);
+  color: var(--marine);
+  background: var(--gull);
+  border-radius: 20px;
+  padding: 5px 11px;
+}
+
+/* Språkvalget: to små knapper, NO | RO */
+.adm-sprak {
+  display: inline-flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 4px;
+  margin: 0 0 8px 8px;
+  width: fit-content;
+}
+
+.adm-sprak button {
+  padding: 6px 13px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.72);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.adm-sprak button:hover {
+  color: #fff;
+}
+
+.adm-sprak button.adm-aktiv {
+  background: var(--gull);
+  color: var(--marine);
+}
+
+/* på den hvite innloggingskortet trenger knappene mørk tekst */
+.adm-inngang-kort .adm-sprak {
+  background: rgba(2, 34, 105, 0.07);
+  margin: 0 0 14px auto;
+}
+
+.adm-inngang-kort .adm-sprak button {
+  color: var(--tekst-svak);
+}
+
+.adm-inngang-kort .adm-sprak button:hover {
+  color: var(--marine);
+}
+
+.adm-inngang-kort .adm-sprak button.adm-aktiv {
+  color: var(--marine);
 }
 
 .adm-meny {
@@ -591,44 +637,126 @@ select.adm-inn {
   border-radius: 12px;
 }
 
-/* ---------- Galleri ---------- */
-.adm-galleri {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
-}
-
-.adm-galleri-kort {
-  background: var(--hvit);
-  border-radius: 20px;
-  box-shadow: var(--skygge);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.adm-galleri-kort img {
+/* ---------- Galleriet: Portefølje-siden i miniatyr ----------
+   Kartet tegnes i designets egne koordinater (1430px bredt) og krympes
+   med CSS-zoom, akkurat som selve nettstedet. Alt inni er derfor målt i
+   design-piksler; knappene er store der, og blir passe små etter zoom. */
+.adm-kart-ramme {
   width: 100%;
-  aspect-ratio: 4 / 3;
+}
+
+.adm-kart {
+  position: relative;
+  width: 1430px;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--hvit);
+}
+
+.adm-kart-plass {
+  position: absolute;
+  overflow: hidden;
+  /* tynn hvit ring, så plassene leses som «klikkbare» oppå kulissene */
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.75);
+}
+
+.adm-kart-plass img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-.adm-galleri-kort .adm-galleri-info {
-  padding: 14px 16px 16px;
+.adm-kart-plass:hover img {
+  filter: brightness(0.82);
+}
+
+/* nummeret i hjørnet – samme tall ser man i begge språk */
+.adm-kart-nr {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   display: grid;
-  gap: 10px;
+  place-items: center;
+  background: var(--marine);
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(2, 34, 105, 0.35);
 }
 
-.adm-galleri-kort .adm-galleri-navn {
-  font-size: 13.5px;
+.adm-kart-byttet {
+  position: absolute;
+  top: 20px;
+  right: 16px;
+  background: var(--gronn-bg);
+  color: var(--gronn);
+  font-size: 20px;
   font-weight: 700;
-  color: var(--marine);
+  padding: 6px 18px;
+  border-radius: 30px;
 }
 
-.adm-galleri-kort .adm-galleri-knapper {
+.adm-kart-knapper {
+  position: absolute;
+  inset: auto 0 16px 0;
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
   flex-wrap: wrap;
+  padding: 0 12px;
+}
+
+.adm-kart-knapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 65px;
+  background: var(--gull);
+  color: var(--marine);
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.adm-kart-knapp:hover {
+  filter: brightness(0.96);
+}
+
+.adm-kart-knapp:active {
+  transform: translateY(1px);
+}
+
+.adm-kart-knapp:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.adm-kart-knapp--lys {
+  background: #fff;
+}
+
+/* mens opplastingen jobber ligger et lyst slør over plassen */
+.adm-kart-slor {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.55);
+  animation: adm-pulser 1s ease-in-out infinite alternate;
+}
+
+@keyframes adm-pulser {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 0.8;
+  }
 }
 
 /* ---------- Statistikk ---------- */
@@ -757,22 +885,32 @@ select.adm-inn {
     overflow-x: auto;
   }
 
-  .adm-side-logo {
+  /* den kremhvite toppen blir en liten plate i den lave stripa */
+  .adm-side-topp {
     margin: 0 8px 0 0;
+    padding: 5px 10px 6px 4px;
+    border-bottom: none;
+    border-radius: 11px;
+    flex-shrink: 0;
   }
 
-  /* mindre plate i den lave toppstripa; bare ADMIN-ordet gjemmes */
-  .adm-side-merke {
-    padding: 5px 9px 6px 5px;
-    border-radius: 10px;
-  }
-
-  .adm-side-merke img {
-    height: 24px;
+  .adm-side-topp img {
+    height: 26px;
+    margin-left: -5px;
   }
 
   .adm-side-ord {
     display: none;
+  }
+
+  .adm-sprak {
+    margin: 0 6px 0 0;
+    flex-shrink: 0;
+  }
+
+  .adm-sprak button {
+    padding: 5px 9px;
+    font-size: 11px;
   }
 
   .adm-meny {

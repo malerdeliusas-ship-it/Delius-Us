@@ -12,6 +12,7 @@ import {
 import './admin.css'
 import { supabase } from '../lib/supabase'
 import { useOkt, useErAdmin, loggUt, Vakt } from './auth'
+import { SprakGiver, SprakVelger, useSprak, type Nokkel } from './sprak'
 import logo from '../assets/figma/logo.png'
 
 import LoggInn from './sider/LoggInn'
@@ -25,29 +26,33 @@ import Lenker from './sider/Lenker'
 /**
  * Admin-panelet: eget lite «kontor» på /admin, i nettstedets farger.
  * Lastes som egen bunt (lazy i App.tsx), så besøkende aldri laster det ned.
+ * Alt synlig er på norsk eller rumensk – valget sitter i SprakGiver.
  */
 
-const MENY = [
-  { til: '/admin', tekst: 'Oversikt', Ikon: LayoutDashboard, slutt: true },
-  { til: '/admin/blogg', tekst: 'Blogg', Ikon: Newspaper },
-  { til: '/admin/galleri', tekst: 'Galleri', Ikon: Images },
-  { til: '/admin/statistikk', tekst: 'Statistikk', Ikon: BarChart3 },
-  { til: '/admin/lenker', tekst: 'Lenker', Ikon: Link2 },
+const MENY: { til: string; nokkel: Nokkel; Ikon: typeof LayoutDashboard; slutt?: boolean }[] = [
+  { til: '/admin', nokkel: 'meny.oversikt', Ikon: LayoutDashboard, slutt: true },
+  { til: '/admin/blogg', nokkel: 'meny.blogg', Ikon: Newspaper },
+  { til: '/admin/galleri', nokkel: 'meny.galleri', Ikon: Images },
+  { til: '/admin/statistikk', nokkel: 'meny.statistikk', Ikon: BarChart3 },
+  { til: '/admin/lenker', nokkel: 'meny.lenker', Ikon: Link2 },
 ]
 
 function Ramme({ children }: { children: React.ReactNode }) {
+  const { t } = useSprak()
+
   return (
     <div className="adm">
       <aside className="adm-side">
-        <div className="adm-side-logo">
-          <span className="adm-side-merke">
-            <img src={logo} alt="Maler Delius AS" />
-          </span>
+        {/* Den kremhvite toppen med firmamerket: logoen er marineblå og
+            trenger lys bunn for å synes. Gullstreken under er skillet
+            mot resten av stolpen, som beholder marinefargen. */}
+        <div className="adm-side-topp">
+          <img src={logo} alt="Maler Delius AS" />
           <span className="adm-side-ord">Admin</span>
         </div>
 
-        <nav className="adm-meny" aria-label="Admin-meny">
-          {MENY.map(({ til, tekst, Ikon, slutt }) => (
+        <nav className="adm-meny" aria-label="Admin">
+          {MENY.map(({ til, nokkel, Ikon, slutt }) => (
             <NavLink
               key={til}
               to={til}
@@ -55,23 +60,30 @@ function Ramme({ children }: { children: React.ReactNode }) {
               className={({ isActive }) => (isActive ? 'adm-aktiv' : undefined)}
               /* under 940px vises bare ikonet – navnet må da ligge her, ellers
                  står skjermleseren og musepekeren igjen uten noe å lese */
-              title={tekst}
-              aria-label={tekst}
+              title={t(nokkel)}
+              aria-label={t(nokkel)}
             >
               <Ikon size={19} />
-              <span>{tekst}</span>
+              <span>{t(nokkel)}</span>
             </NavLink>
           ))}
         </nav>
 
         <div className="adm-side-bunn">
-          <a href="/" target="_blank" rel="noreferrer" title="Se nettstedet" aria-label="Se nettstedet">
+          <SprakVelger />
+          <a
+            href="/"
+            target="_blank"
+            rel="noreferrer"
+            title={t('meny.seNettstedet')}
+            aria-label={t('meny.seNettstedet')}
+          >
             <ExternalLink size={18} />
-            <span>Se nettstedet</span>
+            <span>{t('meny.seNettstedet')}</span>
           </a>
-          <button onClick={() => void loggUt()} title="Logg ut" aria-label="Logg ut">
+          <button onClick={() => void loggUt()} title={t('meny.loggUt')} aria-label={t('meny.loggUt')}>
             <LogOut size={18} />
-            <span>Logg ut</span>
+            <span>{t('meny.loggUt')}</span>
           </button>
         </div>
       </aside>
@@ -81,7 +93,21 @@ function Ramme({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function AdminApp() {
+function ManglerOppsett() {
+  const { t } = useSprak()
+  return (
+    <div className="adm">
+      <div className="adm-inngang">
+        <div className="adm-inngang-kort">
+          <h1>{t('oppsett.tittel')}</h1>
+          <p>{t('oppsett.tekst')}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function AdminInnhold() {
   const okt = useOkt()
   const erAdmin = useErAdmin(okt)
 
@@ -90,21 +116,7 @@ export default function AdminApp() {
   }, [])
 
   // uten nøkler i .env kan ingenting virke – si det tydelig
-  if (!supabase) {
-    return (
-      <div className="adm">
-        <div className="adm-inngang">
-          <div className="adm-inngang-kort">
-            <h1>Admin er ikke satt opp</h1>
-            <p>
-              Legg VITE_SUPABASE_URL og VITE_SUPABASE_ANON_KEY i .env-filen
-              (se .env.example) og start utviklingsserveren på nytt.
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  if (!supabase) return <ManglerOppsett />
 
   return (
     <Routes>
@@ -132,5 +144,13 @@ export default function AdminApp() {
         }
       />
     </Routes>
+  )
+}
+
+export default function AdminApp() {
+  return (
+    <SprakGiver>
+      <AdminInnhold />
+    </SprakGiver>
   )
 }

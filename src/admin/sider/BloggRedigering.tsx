@@ -16,6 +16,7 @@ import MdTekst from '../../lib/markdown'
 import { lastOppBilde } from '../bilder'
 import { Felt, Laster, Status } from '../deler'
 import { folkeligFeil, slugifiser } from '../verktoy'
+import { useSprak } from '../sprak'
 
 /**
  * Skriving og redigering av ett innlegg. Venstre side er teksten (enkel
@@ -23,6 +24,7 @@ import { folkeligFeil, slugifiser } from '../verktoy'
  * seende ut på nettstedet – samme visning som bloggen bruker.
  */
 export default function BloggRedigering() {
+  const { t } = useSprak()
   const { id } = useParams()
   const ny = !id
   const navigate = useNavigate()
@@ -55,7 +57,7 @@ export default function BloggRedigering() {
         .maybeSingle<BloggInnlegg>()
       if (!aktiv) return
       if (error || !data) {
-        setMelding({ type: 'feil', tekst: error ? folkeligFeil(error.message) : 'Fant ikke innlegget.' })
+        setMelding({ type: 'feil', tekst: error ? folkeligFeil(error.message, t) : t('red.fantIkke') })
       } else {
         setTittel(data.tittel)
         setSlug(data.slug)
@@ -71,11 +73,11 @@ export default function BloggRedigering() {
     return () => {
       aktiv = false
     }
-  }, [id, ny])
+  }, [id, ny]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function settTittel(t: string) {
-    setTittel(t)
-    if (!slugLaast) setSlug(slugifiser(t))
+  function settTittel(tekst: string) {
+    setTittel(tekst)
+    if (!slugLaast) setSlug(slugifiser(tekst))
   }
 
   /**
@@ -109,9 +111,9 @@ export default function BloggRedigering() {
     setMelding(null)
     try {
       const url = await lastOppBilde(fil, 'blogg')
-      skrivInn(`\n\n![Skriv en bildetekst her](${url})\n\n`)
+      skrivInn(`\n\n![${t('red.bildetekst')}](${url})\n\n`)
     } catch (feil) {
-      setMelding({ type: 'feil', tekst: folkeligFeil((feil as Error).message) })
+      setMelding({ type: 'feil', tekst: folkeligFeil((feil as Error).message, t) })
     }
     setLasterBilde(false)
   }
@@ -125,19 +127,19 @@ export default function BloggRedigering() {
     try {
       setBildeUrl(await lastOppBilde(fil, 'blogg'))
     } catch (feil) {
-      setMelding({ type: 'feil', tekst: folkeligFeil((feil as Error).message) })
+      setMelding({ type: 'feil', tekst: folkeligFeil((feil as Error).message, t) })
     }
     setLasterBilde(false)
   }
 
   async function lagre() {
     if (!tittel.trim()) {
-      setMelding({ type: 'feil', tekst: 'Innlegget trenger en tittel.' })
+      setMelding({ type: 'feil', tekst: t('red.trengerTittel') })
       return
     }
     const renSlug = slugifiser(slug || tittel)
     if (!renSlug) {
-      setMelding({ type: 'feil', tekst: 'Adressen (slug) kan ikke være tom.' })
+      setMelding({ type: 'feil', tekst: t('red.tomSlug') })
       return
     }
     setLagrer(true)
@@ -162,37 +164,37 @@ export default function BloggRedigering() {
         .single<{ id: string }>()
       setLagrer(false)
       if (error) {
-        setMelding({ type: 'feil', tekst: folkeligFeil(error.message) })
+        setMelding({ type: 'feil', tekst: folkeligFeil(error.message, t) })
       } else {
         // Adressen er nå i bruk: den skal ikke lenger endre seg av seg selv
         // når tittelen justeres, ellers bytter innlegget lenke under føttene
         // på den som alt har delt den.
         setSlugLaast(true)
         navigate(`/admin/blogg/${data.id}`, { replace: true })
-        setMelding({ type: 'ok', tekst: publisert ? 'Innlegget er lagret og publisert.' : 'Kladden er lagret.' })
+        setMelding({ type: 'ok', tekst: publisert ? t('red.lagretPublisert') : t('red.lagretKladd') })
       }
     } else {
       const { error } = await supabase!.from('blogg_innlegg').update(rad).eq('id', id)
       setLagrer(false)
       if (error) {
-        setMelding({ type: 'feil', tekst: folkeligFeil(error.message) })
+        setMelding({ type: 'feil', tekst: folkeligFeil(error.message, t) })
       } else {
         setSlug(renSlug)
         if (publisert && !publisertDato) setPublisertDato(rad.publisert_dato)
-        setMelding({ type: 'ok', tekst: publisert ? 'Innlegget er lagret og ligger ute.' : 'Lagret som kladd.' })
+        setMelding({ type: 'ok', tekst: publisert ? t('red.lagretUte') : t('red.lagretSomKladd') })
       }
     }
   }
 
   async function slett() {
     if (!id) return
-    if (!window.confirm('Slette innlegget for godt? Dette kan ikke angres.')) return
+    if (!window.confirm(t('red.slettSporsmal'))) return
     const { error } = await supabase!.from('blogg_innlegg').delete().eq('id', id)
-    if (error) setMelding({ type: 'feil', tekst: folkeligFeil(error.message) })
+    if (error) setMelding({ type: 'feil', tekst: folkeligFeil(error.message, t) })
     else navigate('/admin/blogg')
   }
 
-  if (laster) return <Laster tekst="Henter innlegget …" />
+  if (laster) return <Laster tekst={t('red.henter')} />
 
   return (
     <>
@@ -203,19 +205,19 @@ export default function BloggRedigering() {
             style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 700 }}
           >
             <ArrowLeft size={16} />
-            Alle innlegg
+            {t('red.alle')}
           </Link>
-          <h1 style={{ marginTop: 8 }}>{ny ? 'Nytt innlegg' : 'Rediger innlegg'}</h1>
+          <h1 style={{ marginTop: 8 }}>{ny ? t('red.nytt') : t('red.rediger')}</h1>
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <label className="adm-bryter">
             <input type="checkbox" checked={publisert} onChange={(e) => setPublisert(e.target.checked)} />
             <span className="adm-bryter-spor" />
-            <b>{publisert ? 'Publisert' : 'Kladd'}</b>
+            <b>{publisert ? t('felles.publisert') : t('felles.kladd')}</b>
           </label>
           <button className="adm-knapp" onClick={() => void lagre()} disabled={lagrer || lasterBilde}>
             <Save size={17} />
-            {lagrer ? 'Lagrer …' : 'Lagre'}
+            {lagrer ? t('felles.lagrer') : t('felles.lagre')}
           </button>
         </div>
       </div>
@@ -228,17 +230,17 @@ export default function BloggRedigering() {
 
       <div className="adm-redigering">
         <div className="adm-kort">
-          <Felt navn="Tittel" id="f-tittel">
+          <Felt navn={t('red.tittel')} id="f-tittel">
             <input
               id="f-tittel"
               className="adm-inn"
               value={tittel}
               onChange={(e) => settTittel(e.target.value)}
-              placeholder="F.eks. Slik velger du riktig hvitfarge"
+              placeholder={t('red.tittelPlassholder')}
             />
           </Felt>
 
-          <Felt navn="Adresse (slug)" id="f-slug" hjelp={`Innlegget får adressen malerdelius.no/blogg/${slug || '…'}`}>
+          <Felt navn={t('red.slug')} id="f-slug" hjelp={t('red.slugHjelp', { slug: slug || '…' })}>
             <input
               id="f-slug"
               className="adm-inn"
@@ -250,7 +252,7 @@ export default function BloggRedigering() {
             />
           </Felt>
 
-          <Felt navn="Ingress" id="f-ingress" hjelp="Én–to setninger som vises i bloggoversikten.">
+          <Felt navn={t('red.ingress')} id="f-ingress" hjelp={t('red.ingressHjelp')}>
             <textarea
               id="f-ingress"
               className="adm-inn"
@@ -260,7 +262,7 @@ export default function BloggRedigering() {
             />
           </Felt>
 
-          <Felt navn="Toppbilde">
+          <Felt navn={t('red.toppbilde')}>
             <div className="adm-slipp">
               {bildeUrl && <img src={bildeUrl} alt="" />}
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -271,7 +273,7 @@ export default function BloggRedigering() {
                   disabled={lasterBilde}
                 >
                   <ImagePlus size={15} />
-                  {lasterBilde ? 'Laster opp …' : bildeUrl ? 'Bytt bilde' : 'Velg bilde'}
+                  {lasterBilde ? t('red.lasterOpp') : bildeUrl ? t('red.byttBilde') : t('red.velgBilde')}
                 </button>
                 {bildeUrl && (
                   <button
@@ -279,7 +281,7 @@ export default function BloggRedigering() {
                     className="adm-knapp adm-knapp--fare adm-knapp--liten"
                     onClick={() => setBildeUrl(null)}
                   >
-                    Fjern
+                    {t('red.fjern')}
                   </button>
                 )}
               </div>
@@ -287,25 +289,33 @@ export default function BloggRedigering() {
             <input ref={bildeToppRef} type="file" accept="image/*" hidden onChange={(e) => void lastOppTopp(e)} />
           </Felt>
 
-          <Felt navn="Innhold" id="f-innhold">
+          <Felt navn={t('red.innhold')} id="f-innhold">
             <div>
               <div className="adm-verktoyrad">
-                <button type="button" onClick={() => skrivInn('**', '**', 'fet tekst')} title="Fet">
+                <button type="button" onClick={() => skrivInn('**', '**', t('red.fetTekst'))} title={t('red.fet')}>
                   <Bold size={15} />
                 </button>
-                <button type="button" onClick={() => skrivInn('*', '*', 'kursiv tekst')} title="Kursiv">
+                <button type="button" onClick={() => skrivInn('*', '*', t('red.kursivTekst'))} title={t('red.kursiv')}>
                   <Italic size={15} />
                 </button>
-                <button type="button" onClick={() => skrivInn('\n\n## ', '', 'Overskrift')} title="Overskrift">
+                <button
+                  type="button"
+                  onClick={() => skrivInn('\n\n## ', '', t('red.overskriftTekst'))}
+                  title={t('red.overskrift')}
+                >
                   <Heading2 size={15} />
                 </button>
-                <button type="button" onClick={() => skrivInn('\n\n- ', '', 'punkt')} title="Punktliste">
+                <button
+                  type="button"
+                  onClick={() => skrivInn('\n\n- ', '', t('red.punktTekst'))}
+                  title={t('red.punktliste')}
+                >
                   <List size={15} />
                 </button>
                 <button
                   type="button"
-                  onClick={() => skrivInn('[', '](https://)', 'lenketekst')}
-                  title="Lenke"
+                  onClick={() => skrivInn('[', '](https://)', t('red.lenkeTekst'))}
+                  title={t('red.lenke')}
                 >
                   <LenkeIkon size={15} />
                 </button>
@@ -313,10 +323,10 @@ export default function BloggRedigering() {
                   type="button"
                   onClick={() => bildeInnholdRef.current?.click()}
                   disabled={lasterBilde}
-                  title="Sett inn bilde"
+                  title={t('red.settInnBilde')}
                 >
                   <ImagePlus size={15} />
-                  {lasterBilde ? 'Laster opp …' : 'Bilde'}
+                  {lasterBilde ? t('red.lasterOpp') : t('red.bilde')}
                 </button>
               </div>
               <textarea
@@ -326,9 +336,7 @@ export default function BloggRedigering() {
                 rows={16}
                 value={innhold}
                 onChange={(e) => setInnhold(e.target.value)}
-                placeholder={
-                  'Skriv innlegget her.\n\nTomme linjer gir nye avsnitt. Bruk knappene over for fet, kursiv, overskrifter, lister, lenker og bilder.'
-                }
+                placeholder={t('red.innholdPlassholder')}
               />
               <input
                 ref={bildeInnholdRef}
@@ -343,13 +351,13 @@ export default function BloggRedigering() {
           {!ny && (
             <button className="adm-knapp adm-knapp--fare adm-knapp--liten" onClick={() => void slett()}>
               <Trash2 size={15} />
-              Slett innlegget
+              {t('red.slett')}
             </button>
           )}
         </div>
 
         <div>
-          <div className="adm-diagram-tittel">Slik ser det ut på nettstedet</div>
+          <div className="adm-diagram-tittel">{t('red.forhandTittel')}</div>
           <div className="adm-forhand">
             {tittel && (
               <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--marine)', marginBottom: 6 }}>
@@ -370,7 +378,7 @@ export default function BloggRedigering() {
               {innhold.trim() ? (
                 <MdTekst kilde={innhold} />
               ) : (
-                <p style={{ color: 'var(--tekst-svak)' }}>Forhåndsvisningen dukker opp når du skriver.</p>
+                <p style={{ color: 'var(--tekst-svak)' }}>{t('red.forhandTom')}</p>
               )}
             </div>
           </div>
