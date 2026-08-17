@@ -48,14 +48,22 @@ export function useOkt(): Session | null | undefined {
 export function useErAdmin(okt: Session | null | undefined): boolean | undefined {
   const [erAdmin, setErAdmin] = useState<boolean | undefined>(undefined)
 
+  /*
+   * Vi henger på bruker-id-en, ikke på hele økt-objektet. Supabase fornyer
+   * nøkkelen med jevne mellomrom, og lager et helt nytt objekt hver gang selv
+   * om det er samme person som er logget inn. Hang vi på objektet, ville hele
+   * panelet blitt kastet tilbake til «sjekker tilgangen» midt i arbeidet, og
+   * et halvskrevet innlegg fulgt med i dragsuget.
+   */
+  const brukerId = okt?.user?.id ?? null
+
   useEffect(() => {
-    if (!supabase || okt === undefined) return
-    if (!okt) {
+    if (!supabase) return
+    if (!brukerId) {
       setErAdmin(undefined)
       return
     }
     let aktiv = true
-    setErAdmin(undefined)
     void supabase.rpc('er_admin').then(({ data, error }) => {
       if (!aktiv) return
       // feiler oppslaget (f.eks. fordi oppsett.sql ikke er kjørt ennå), sier vi
@@ -65,7 +73,7 @@ export function useErAdmin(okt: Session | null | undefined): boolean | undefined
     return () => {
       aktiv = false
     }
-  }, [okt])
+  }, [brukerId])
 
   return erAdmin
 }
