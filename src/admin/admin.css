@@ -163,8 +163,11 @@
   gap: 4px;
 }
 
-.adm-side-bunn a,
-.adm-side-bunn button {
+/* Bare de direkte barna: språkknappene ligger inne i .adm-sprak, og uten
+   barn-velgeren her ville disse reglene overstyrt både formen og den gule
+   markeringen av valgt språk (samme spesifisitet, men senere i filen). */
+.adm-side-bunn > a,
+.adm-side-bunn > button {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -177,8 +180,8 @@
   text-align: left;
 }
 
-.adm-side-bunn a:hover,
-.adm-side-bunn button:hover {
+.adm-side-bunn > a:hover,
+.adm-side-bunn > button:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
@@ -938,8 +941,8 @@ select.adm-inn {
     display: flex;
   }
 
-  .adm-side-bunn a span,
-  .adm-side-bunn button span,
+  .adm-side-bunn > a span,
+  .adm-side-bunn > button span,
   .adm-meny a span {
     display: none;
   }

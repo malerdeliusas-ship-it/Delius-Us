@@ -204,7 +204,12 @@ export default function Lenker() {
                           {kopiert === l.id ? <Check size={15} /> : <Copy size={15} />}
                           {kopiert === l.id ? t('len.kopiert') : t('len.kopier')}
                         </button>
-                        <button className="adm-knapp adm-knapp--fare adm-knapp--liten" onClick={() => void slett(l)}>
+                        <button
+                          className="adm-knapp adm-knapp--fare adm-knapp--liten"
+                          onClick={() => void slett(l)}
+                          title={t('len.slett')}
+                          aria-label={t('len.slett')}
+                        >
                           <Trash2 size={15} />
                         </button>
                       </td>

@@ -63,15 +63,19 @@ function tilDato(merke: string): Date {
   return new Date(aar, (mnd ?? 1) - 1, dag ?? 1)
 }
 
-/** Serien fra databasen med norske etiketter, klar for diagrammet. */
-export function serieTilPunkter(stat: Statistikk, oppløsning: 'dag' | 'maned'): Punkt[] {
+/** Serien fra databasen med etiketter på panelets språk, klar for diagrammet. */
+export function serieTilPunkter(
+  stat: Statistikk,
+  oppløsning: 'dag' | 'maned',
+  locale = 'nb-NO'
+): Punkt[] {
   return stat.serie.map((p) => {
     const d = tilDato(p.merke)
     return {
       etikett:
         oppløsning === 'dag'
-          ? d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })
-          : d.toLocaleDateString('nb-NO', { month: 'short', year: '2-digit' }),
+          ? d.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+          : d.toLocaleDateString(locale, { month: 'short', year: '2-digit' }),
       visninger: p.visninger,
       unike: p.unike,
     }

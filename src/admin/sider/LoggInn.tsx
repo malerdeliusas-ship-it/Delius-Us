@@ -19,7 +19,7 @@ export default function LoggInn() {
     setSender(true)
     const svar = await loggInn(epost.trim(), passord)
     setSender(false)
-    if (svar) setFeil(folkeligFeil(svar, t))
+    if (svar) setFeil(svar)
     // ved suksess bytter AdminApp selv til panelet (økten endrer seg)
   }
 
@@ -56,7 +56,11 @@ export default function LoggInn() {
             />
           </Felt>
 
-          {feil && <Status type="feil" style={{ marginBottom: 16 }}>{feil}</Status>}
+          {feil && (
+            <Status type="feil" style={{ marginBottom: 16 }}>
+              {folkeligFeil(feil, t)}
+            </Status>
+          )}
 
           <button className="adm-knapp" style={{ width: '100%' }} disabled={sender}>
             {sender ? t('login.venter') : t('login.knapp')}

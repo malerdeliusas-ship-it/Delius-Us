@@ -23,7 +23,7 @@ const PERIODER: ({ nokkel: Nokkel } & ({ dager: number } | { maneder: number }))
 ]
 
 export default function Statistikk() {
-  const { t, tell } = useSprak()
+  const { t, tell, locale } = useSprak()
   const [periode, setPeriode] = useState(1) // 30 dager
   const [stat, setStat] = useState<Stat | null>(null)
   const [lenker, setLenker] = useState<Lenke[]>([])
@@ -61,8 +61,8 @@ export default function Statistikk() {
   }, [])
 
   const punkter = useMemo(
-    () => (stat ? serieTilPunkter(stat, perManed ? 'maned' : 'dag') : []),
-    [stat, perManed]
+    () => (stat ? serieTilPunkter(stat, perManed ? 'maned' : 'dag', locale) : []),
+    [stat, perManed, locale]
   )
 
   /**

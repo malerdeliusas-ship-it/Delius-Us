@@ -10,7 +10,7 @@ import { useSprak } from '../sprak'
 
 /** Oversikten: dagen i dag, siste 30 dager og snarveier til alt. */
 export default function Dashbord() {
-  const { t, tell } = useSprak()
+  const { t, tell, locale } = useSprak()
   const [stat, setStat] = useState<Stat | null>(null)
   const [innlegg, setInnlegg] = useState<BloggInnlegg[] | null>(null)
   const [feil, setFeil] = useState<string | null>(null)
@@ -40,7 +40,7 @@ export default function Dashbord() {
     }
   }, [])
 
-  const serie = useMemo(() => (stat ? serieTilPunkter(stat, 'dag') : []), [stat])
+  const serie = useMemo(() => (stat ? serieTilPunkter(stat, 'dag', locale) : []), [stat, locale])
   const iDag = serie.length ? serie[serie.length - 1] : null
   const uke = serie.slice(-7).reduce((a, p) => a + p.visninger, 0)
 

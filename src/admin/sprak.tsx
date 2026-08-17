@@ -205,6 +205,7 @@ const NO = {
   'len.tomTekst':
     'Lag den første over – gi den et navn, kopier adressen og del den der du vil måle effekten.',
   'len.kopierManuelt': 'Kopier adressen:',
+  'len.slett': 'Slett lenken',
 
   // diagrammet
   'diagram.visninger': 'Sidevisninger',
@@ -412,6 +413,7 @@ const RO: Record<Nokkel, string> = {
   'len.tomTekst':
     'Creează primul mai sus: dă-i un nume, copiază adresa și distribuie-o acolo unde vrei să măsori efectul.',
   'len.kopierManuelt': 'Copiază adresa:',
+  'len.slett': 'Șterge linkul',
 
   'diagram.visninger': 'Afișări',
   'diagram.unike': 'Vizite unice',
