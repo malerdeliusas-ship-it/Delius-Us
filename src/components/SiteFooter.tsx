@@ -54,6 +54,11 @@ export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
           </Link>
         </div>
         <div>
+          <Link to="/blogg" style={u}>
+            Blogg
+          </Link>
+        </div>
+        <div>
           <Link to="/kontakt" style={u}>
             Kontakt oss
           </Link>

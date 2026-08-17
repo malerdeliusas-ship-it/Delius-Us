@@ -1,0 +1,773 @@
+/* ==========================================================================
+   Admin-panelet til Maler Delius
+   Samme formspråk som nettstedet: marineblå, gull, kremhvit, Montserrat.
+   Alt her er avgrenset med .adm-prefiks og lastes kun på /admin-sidene.
+   ========================================================================== */
+
+.adm {
+  --marine: #022269;
+  --marine-dyp: #01194d;
+  --marine-lys: #224fb1;
+  --gull: #ffc300;
+  --gull-varm: #ffb000;
+  --krem: #fef5e9;
+  --papir: #faf6ee;
+  --hvit: #ffffff;
+  --tekst: #022269;
+  --tekst-svak: rgba(2, 34, 105, 0.62);
+  --strek: rgba(2, 34, 105, 0.1);
+  --skygge: 0 10px 30px rgba(2, 34, 105, 0.07);
+  --radius: 22px;
+  --gronn: #0f6b38;
+  --gronn-bg: #e5f6ec;
+  --rod: #b3261e;
+  --rod-bg: #fdecea;
+
+  min-height: 100vh;
+  display: flex;
+  background: var(--papir);
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: var(--tekst);
+}
+
+/* ---------- Sidestolpen ---------- */
+.adm-side {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--marine) 0%, var(--marine-dyp) 100%);
+  color: #fff;
+  padding: 26px 18px 22px;
+  z-index: 10;
+}
+
+.adm-side-logo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 6px 26px;
+}
+
+.adm-side-logo img {
+  height: 46px;
+  width: auto;
+  border-radius: 10px;
+}
+
+.adm-side-logo span {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gull);
+}
+
+.adm-meny {
+  display: grid;
+  gap: 4px;
+}
+
+.adm-meny a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.adm-meny a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.adm-meny a.adm-aktiv {
+  background: rgba(255, 195, 0, 0.14);
+  color: var(--gull);
+}
+
+.adm-meny a svg {
+  flex-shrink: 0;
+}
+
+.adm-side-bunn {
+  margin-top: auto;
+  display: grid;
+  gap: 4px;
+}
+
+.adm-side-bunn a,
+.adm-side-bunn button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.66);
+  transition: background 0.15s ease, color 0.15s ease;
+  text-align: left;
+}
+
+.adm-side-bunn a:hover,
+.adm-side-bunn button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* ---------- Hovedflaten ---------- */
+.adm-hoved {
+  flex: 1;
+  margin-left: 250px;
+  padding: 38px 44px 64px;
+  min-width: 0;
+}
+
+.adm-topp {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+.adm-topp h1 {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--marine);
+}
+
+.adm-topp p {
+  margin-top: 6px;
+  font-size: 15px;
+  color: var(--tekst-svak);
+}
+
+/* ---------- Kort ---------- */
+.adm-kort {
+  background: var(--hvit);
+  border-radius: var(--radius);
+  box-shadow: var(--skygge);
+  padding: 26px 28px;
+}
+
+.adm-rute {
+  display: grid;
+  gap: 20px;
+}
+
+/* ---------- Nøkkeltall ---------- */
+.adm-tall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.adm-tall-kort {
+  background: var(--hvit);
+  border-radius: var(--radius);
+  box-shadow: var(--skygge);
+  padding: 22px 24px;
+  display: grid;
+  gap: 4px;
+}
+
+.adm-tall-kort .adm-tall-navn {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tekst-svak);
+}
+
+.adm-tall-kort .adm-tall-verdi {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--marine);
+  line-height: 1.1;
+}
+
+.adm-tall-kort .adm-tall-detalj {
+  font-size: 13px;
+  color: var(--tekst-svak);
+}
+
+/* ---------- Knapper ---------- */
+.adm-knapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 26px;
+  border-radius: 65px;
+  background: var(--gull);
+  color: var(--marine);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.adm-knapp:hover {
+  filter: brightness(0.96);
+}
+
+.adm-knapp:active {
+  transform: translateY(1px);
+}
+
+.adm-knapp:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.adm-knapp--stille {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px var(--strek);
+  color: var(--marine);
+}
+
+.adm-knapp--stille:hover {
+  filter: none;
+  background: rgba(2, 34, 105, 0.05);
+}
+
+.adm-knapp--fare {
+  background: transparent;
+  box-shadow: inset 0 0 0 2px rgba(179, 38, 30, 0.35);
+  color: var(--rod);
+}
+
+.adm-knapp--fare:hover {
+  filter: none;
+  background: var(--rod-bg);
+}
+
+.adm-knapp--liten {
+  min-height: 38px;
+  padding: 0 18px;
+  font-size: 13.5px;
+}
+
+/* ---------- Skjema ---------- */
+.adm-felt {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.adm-felt > span {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--marine);
+}
+
+.adm-felt small {
+  font-size: 12.5px;
+  color: var(--tekst-svak);
+}
+
+.adm-inn {
+  width: 100%;
+  border: 1.5px solid var(--strek);
+  border-radius: 14px;
+  background: var(--hvit);
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--marine);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adm-inn:focus {
+  border-color: var(--gull);
+  box-shadow: 0 0 0 3px rgba(255, 195, 0, 0.25);
+}
+
+textarea.adm-inn {
+  resize: vertical;
+  line-height: 1.55;
+}
+
+select.adm-inn {
+  cursor: pointer;
+}
+
+/* Av/på-bryter (publisert) */
+.adm-bryter {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.adm-bryter input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.adm-bryter .adm-bryter-spor {
+  width: 52px;
+  height: 30px;
+  border-radius: 30px;
+  background: rgba(2, 34, 105, 0.18);
+  position: relative;
+  transition: background 0.18s ease;
+  flex-shrink: 0;
+}
+
+.adm-bryter .adm-bryter-spor::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s ease;
+}
+
+.adm-bryter input:checked + .adm-bryter-spor {
+  background: var(--gull);
+}
+
+.adm-bryter input:checked + .adm-bryter-spor::after {
+  transform: translateX(22px);
+}
+
+.adm-bryter b {
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+/* ---------- Tabeller / lister ---------- */
+.adm-tabell {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+}
+
+.adm-tabell th {
+  text-align: left;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tekst-svak);
+  padding: 10px 14px;
+  border-bottom: 1.5px solid var(--strek);
+}
+
+.adm-tabell td {
+  padding: 14px;
+  border-bottom: 1px solid var(--strek);
+  vertical-align: middle;
+}
+
+.adm-tabell tr:last-child td {
+  border-bottom: none;
+}
+
+/* ---------- Merkelapper ---------- */
+.adm-merke {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.adm-merke--gronn {
+  background: var(--gronn-bg);
+  color: var(--gronn);
+}
+
+.adm-merke--graa {
+  background: rgba(2, 34, 105, 0.08);
+  color: var(--tekst-svak);
+}
+
+/* ---------- Statusmeldinger ---------- */
+.adm-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 17px;
+  border-radius: 15px;
+  font-size: 14.5px;
+  font-weight: 500;
+  animation: adm-inn 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.adm-status--ok {
+  background: var(--gronn-bg);
+  color: var(--gronn);
+}
+
+.adm-status--feil {
+  background: var(--rod-bg);
+  color: var(--rod);
+}
+
+@keyframes adm-inn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Innlogging ---------- */
+.adm-inngang {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(1100px 500px at 85% -10%, rgba(255, 195, 0, 0.16), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(34, 79, 177, 0.14), transparent 60%),
+    var(--krem);
+  padding: 24px;
+}
+
+.adm-inngang-kort {
+  width: 100%;
+  max-width: 420px;
+  background: var(--hvit);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(2, 34, 105, 0.16);
+  padding: 40px 38px 36px;
+}
+
+.adm-inngang-kort img {
+  height: 58px;
+  margin: 0 auto 6px;
+  border-radius: 12px;
+}
+
+.adm-inngang-kort h1 {
+  text-align: center;
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--marine);
+  margin-bottom: 2px;
+}
+
+.adm-inngang-kort > p {
+  text-align: center;
+  font-size: 14px;
+  color: var(--tekst-svak);
+  margin-bottom: 26px;
+}
+
+/* ---------- Redigering av innlegg ---------- */
+.adm-redigering {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.adm-verktoyrad {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.adm-verktoyrad button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--marine);
+  background: rgba(2, 34, 105, 0.06);
+  transition: background 0.15s ease;
+}
+
+.adm-verktoyrad button:hover {
+  background: rgba(255, 195, 0, 0.3);
+}
+
+.adm-forhand {
+  background: var(--hvit);
+  border: 1.5px dashed var(--strek);
+  border-radius: 18px;
+  padding: 26px 28px;
+  min-height: 320px;
+}
+
+.adm-forhand .blogg-innhold {
+  font-size: 17px;
+  line-height: 29px;
+}
+
+.adm-forhand .blogg-innhold h2 {
+  font-size: 24px;
+}
+
+.adm-forhand .blogg-innhold h3 {
+  font-size: 19px;
+}
+
+.adm-forhand .blogg-innhold figure img {
+  border-radius: 18px;
+}
+
+/* Opplastingsflate for toppbilde */
+.adm-slipp {
+  border: 2px dashed rgba(2, 34, 105, 0.22);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--tekst-svak);
+}
+
+.adm-slipp img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* ---------- Galleri ---------- */
+.adm-galleri {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.adm-galleri-kort {
+  background: var(--hvit);
+  border-radius: 20px;
+  box-shadow: var(--skygge);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-galleri-kort img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.adm-galleri-kort .adm-galleri-info {
+  padding: 14px 16px 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.adm-galleri-kort .adm-galleri-navn {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--marine);
+}
+
+.adm-galleri-kort .adm-galleri-knapper {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Statistikk ---------- */
+.adm-perioder {
+  display: inline-flex;
+  gap: 6px;
+  background: rgba(2, 34, 105, 0.06);
+  border-radius: 40px;
+  padding: 5px;
+}
+
+.adm-perioder button {
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--tekst-svak);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.adm-perioder button.adm-aktiv {
+  background: var(--marine);
+  color: #fff;
+}
+
+.adm-diagram-tittel {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--marine);
+  margin-bottom: 14px;
+}
+
+/* Vannrette stolper (mest sette sider, kilder …) */
+.adm-stolper {
+  display: grid;
+  gap: 10px;
+}
+
+.adm-stolpe {
+  display: grid;
+  grid-template-columns: minmax(90px, 200px) 1fr 52px;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+}
+
+.adm-stolpe .adm-stolpe-navn {
+  font-weight: 600;
+  color: var(--marine);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adm-stolpe .adm-stolpe-spor {
+  height: 12px;
+  border-radius: 8px;
+  background: rgba(2, 34, 105, 0.07);
+  overflow: hidden;
+}
+
+.adm-stolpe .adm-stolpe-fyll {
+  height: 100%;
+  border-radius: 8px;
+  background: var(--marine-lys);
+}
+
+.adm-stolpe .adm-stolpe-tall {
+  text-align: right;
+  font-weight: 700;
+  color: var(--marine);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Kopierbar lenke ---------- */
+.adm-kode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  background: rgba(2, 34, 105, 0.06);
+  border-radius: 8px;
+  padding: 4px 9px;
+  color: var(--marine);
+  word-break: break-all;
+}
+
+/* ---------- Laster ---------- */
+.adm-laster {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  padding: 70px 0;
+  color: var(--tekst-svak);
+  font-size: 14.5px;
+}
+
+.adm-snurr {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3.5px solid rgba(2, 34, 105, 0.15);
+  border-top-color: var(--gull);
+  animation: adm-snurr 0.8s linear infinite;
+}
+
+@keyframes adm-snurr {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Smale skjermer ---------- */
+@media (max-width: 940px) {
+  .adm {
+    flex-direction: column;
+  }
+
+  .adm-side {
+    position: sticky;
+    top: 0;
+    inset: auto;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    overflow-x: auto;
+  }
+
+  .adm-side-logo {
+    margin: 0 8px 0 0;
+  }
+
+  .adm-side-logo img {
+    height: 36px;
+  }
+
+  .adm-side-logo span {
+    display: none;
+  }
+
+  .adm-meny {
+    display: flex;
+    gap: 2px;
+  }
+
+  .adm-meny a {
+    padding: 9px 11px;
+    font-size: 13.5px;
+    white-space: nowrap;
+  }
+
+  .adm-side-bunn {
+    margin: 0 0 0 auto;
+    display: flex;
+  }
+
+  .adm-side-bunn a span,
+  .adm-side-bunn button span,
+  .adm-meny a span {
+    display: none;
+  }
+
+  .adm-hoved {
+    margin-left: 0;
+    padding: 22px 18px 48px;
+  }
+
+  .adm-redigering {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adm-status {
+    animation: none;
+  }
+}

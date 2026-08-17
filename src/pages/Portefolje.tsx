@@ -3,6 +3,7 @@ import SiteHeader from '../components/SiteHeader'
 import SiteFooter from '../components/SiteFooter'
 import { Txt, Img, Rect, CropImg } from '../components/prim'
 import { C, FONT_MUKTA, BEDRIFT } from '../lib/theme'
+import { useGalleri } from '../lib/galleri'
 
 import splash from '../assets/figma/splash.webp'
 import anmeldelser from '../assets/figma/mittanbud-anmeldelser.jpg'
@@ -65,6 +66,9 @@ const TF_02620: [[number, number, number], [number, number, number]] =
   [[0.734415590763092, 0, 0], [0, 0.6692269444465637, 0.2814437747001648]]
 
 export default function Portefolje() {
+  // galleribilder byttet i admin-panelet; null = bruk originalen fra designet
+  const g = useGalleri()
+
   return (
     <Stage height={4050}>
       {BAND.map((b) => (
@@ -79,10 +83,10 @@ export default function Portefolje() {
       </Txt>
 
       {/* Bilder som ligger under kortene */}
-      <Img src={f07386} alt="Ferdig malt rom" l={935} t={1022} w={375} h={556} r={57} />
-      <Img src={f07295} alt="Malt stue" l={119} t={1648} w={510} h={287} r={67} />
-      <Img src={f05797} alt="Detalj av takliste" l={552} t={2025} w={326} h={159} r={67} />
-      <Img src={f02756} alt="Malerarbeid i gang" l={936} t={2287} w={375} h={563} r={67} />
+      <Img src={g('pf-5') ?? f07386} alt="Ferdig malt rom" l={935} t={1022} w={375} h={556} r={57} />
+      <Img src={g('pf-6') ?? f07295} alt="Malt stue" l={119} t={1648} w={510} h={287} r={67} />
+      <Img src={g('pf-9') ?? f05797} alt="Detalj av takliste" l={552} t={2025} w={326} h={159} r={67} />
+      <Img src={g('pf-11') ?? f02756} alt="Malerarbeid i gang" l={936} t={2287} w={375} h={563} r={67} />
 
       {/* De fire tekstkortene */}
       {KORT.map((k) => (
@@ -112,14 +116,19 @@ export default function Portefolje() {
       ))}
 
       {/* Bilder som ligger oppå kortene */}
-      <Img src={f05793} alt="Restaurert murvegg" l={659} t={1648} w={219} h={324} r={67} />
-      <Img src={f05791} alt="Rom under oppussing" l={598} t={1086} w={305} h={453} r={67} />
-      <Img src={f06535} alt="Nymalt rom" l={495} t={717} w={391} h={209} r={67} />
-      <Img src={f06530} alt="Rom klart til maling" l={119} t={454} w={315} h={472} r={67} />
-      <Img src={f06515} alt="Malt rom med lyst tak" l={495} t={454} w={440} h={227} r={67} />
-      <Img src={f05812} alt="Takdetalj etter restaurering" l={119} t={1954} w={412} h={232} r={67} />
-      <Img src={f02723} alt="Malingsprøver på vegg" l={699} t={2310} w={204} h={306} r={67} />
-      <CropImg src={f02672} alt="Malingsspann og verktøy" l={597} t={2650} w={306} h={186} r={67} tf={TF_02672} />
+      <Img src={g('pf-7') ?? f05793} alt="Restaurert murvegg" l={659} t={1648} w={219} h={324} r={67} />
+      <Img src={g('pf-4') ?? f05791} alt="Rom under oppussing" l={598} t={1086} w={305} h={453} r={67} />
+      <Img src={g('pf-3') ?? f06535} alt="Nymalt rom" l={495} t={717} w={391} h={209} r={67} />
+      <Img src={g('pf-1') ?? f06530} alt="Rom klart til maling" l={119} t={454} w={315} h={472} r={67} />
+      <Img src={g('pf-2') ?? f06515} alt="Malt rom med lyst tak" l={495} t={454} w={440} h={227} r={67} />
+      <Img src={g('pf-8') ?? f05812} alt="Takdetalj etter restaurering" l={119} t={1954} w={412} h={232} r={67} />
+      <Img src={g('pf-10') ?? f02723} alt="Malingsprøver på vegg" l={699} t={2310} w={204} h={306} r={67} />
+      {/* originalen har Figmas eget utsnitt; et byttet bilde vises uten det */}
+      {g('pf-12') ? (
+        <Img src={g('pf-12')!} alt="Malingsspann og verktøy" l={597} t={2650} w={306} h={186} r={67} />
+      ) : (
+        <CropImg src={f02672} alt="Malingsspann og verktøy" l={597} t={2650} w={306} h={186} r={67} tf={TF_02672} />
+      )}
 
       {/* ---------- Tall og anmeldelser ---------- */}
       <a
@@ -157,7 +166,11 @@ export default function Portefolje() {
         <span style={{ color: C.mittanbud }}>Mittanbud</span>
       </Txt>
 
-      <CropImg src={f02620} alt="Skilt fra Maler Delius AS på byggeplass" l={119} t={2985} w={536} h={326} r={67} tf={TF_02620} />
+      {g('pf-13') ? (
+        <Img src={g('pf-13')!} alt="Skilt fra Maler Delius AS på byggeplass" l={119} t={2985} w={536} h={326} r={67} />
+      ) : (
+        <CropImg src={f02620} alt="Skilt fra Maler Delius AS på byggeplass" l={119} t={2985} w={536} h={326} r={67} tf={TF_02620} />
+      )}
 
       <SiteFooter t={3806} />
     </Stage>

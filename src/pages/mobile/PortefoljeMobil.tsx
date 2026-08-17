@@ -1,6 +1,7 @@
 import MobilSide from '../../components/mobile/Shell'
 import { C, FONT_MUKTA, BEDRIFT } from '../../lib/theme'
 import { KORT } from '../Portefolje'
+import { useGalleri } from '../../lib/galleri'
 
 import splash from '../../assets/figma/splash.webp'
 import icTeam from '../../assets/figma/ic-team.png'
@@ -19,12 +20,41 @@ import f02756 from '../../assets/figma/portefolje-dsc02756-1.jpg'
 import f02672 from '../../assets/figma/portefolje-dsc02672-1.jpg'
 import f02620 from '../../assets/figma/portefolje-dsc02620-1.jpg'
 
-/** Samme fire blokker som på desktop, med bildene som hører til hver av dem. */
+/** Samme fire blokker som på desktop, med bildene som hører til hver av dem.
+    Plass-nøklene (pf-…) peker på galleriet som kan byttes i admin-panelet. */
 const BLOKKER = [
-  { bg: C.pf[0], bilder: [f06530, f06515, f06535], alt: ['Rom klart til maling', 'Malt rom med lyst tak', 'Nymalt rom'] },
-  { bg: C.pf[1], bilder: [f05791, f07386], alt: ['Rom under oppussing', 'Ferdig malt rom'] },
-  { bg: C.pf[2], bilder: [f07295, f05793, f05812, f05797], alt: ['Malt stue', 'Restaurert murvegg', 'Takdetalj etter restaurering', 'Detalj av takliste'] },
-  { bg: C.pf[3], bilder: [f02723, f02756, f02672], alt: ['Malingsprøver på vegg', 'Malerarbeid i gang', 'Malingsspann og verktøy'] },
+  {
+    bg: C.pf[0],
+    bilder: [
+      { plass: 'pf-1', org: f06530, alt: 'Rom klart til maling' },
+      { plass: 'pf-2', org: f06515, alt: 'Malt rom med lyst tak' },
+      { plass: 'pf-3', org: f06535, alt: 'Nymalt rom' },
+    ],
+  },
+  {
+    bg: C.pf[1],
+    bilder: [
+      { plass: 'pf-4', org: f05791, alt: 'Rom under oppussing' },
+      { plass: 'pf-5', org: f07386, alt: 'Ferdig malt rom' },
+    ],
+  },
+  {
+    bg: C.pf[2],
+    bilder: [
+      { plass: 'pf-6', org: f07295, alt: 'Malt stue' },
+      { plass: 'pf-7', org: f05793, alt: 'Restaurert murvegg' },
+      { plass: 'pf-8', org: f05812, alt: 'Takdetalj etter restaurering' },
+      { plass: 'pf-9', org: f05797, alt: 'Detalj av takliste' },
+    ],
+  },
+  {
+    bg: C.pf[3],
+    bilder: [
+      { plass: 'pf-10', org: f02723, alt: 'Malingsprøver på vegg' },
+      { plass: 'pf-11', org: f02756, alt: 'Malerarbeid i gang' },
+      { plass: 'pf-12', org: f02672, alt: 'Malingsspann og verktøy' },
+    ],
+  },
 ]
 
 const TALL = [
@@ -33,6 +63,8 @@ const TALL = [
 ]
 
 export default function PortefoljeMobil() {
+  const g = useGalleri()
+
   return (
     <MobilSide>
       <img
@@ -53,8 +85,8 @@ export default function PortefoljeMobil() {
             {KORT[i].brod.tekst}
           </p>
           <div style={{ display: 'grid', gap: 14, marginTop: 22 }}>
-            {b.bilder.map((src, j) => (
-              <img key={j} className="m-bilde" src={src} alt={b.alt[j]} />
+            {b.bilder.map((bilde) => (
+              <img key={bilde.plass} className="m-bilde" src={g(bilde.plass) ?? bilde.org} alt={bilde.alt} />
             ))}
           </div>
         </section>
@@ -62,7 +94,7 @@ export default function PortefoljeMobil() {
 
       {/* ---------- Tall og anmeldelser ---------- */}
       <section className="m-seksjon m-inn" style={{ background: C.pf[4] }}>
-        <img className="m-bilde" src={f02620} alt="Skilt fra Maler Delius AS på byggeplass" />
+        <img className="m-bilde" src={g('pf-13') ?? f02620} alt="Skilt fra Maler Delius AS på byggeplass" />
 
         <div className="m-rutenett m-rutenett--2" style={{ marginTop: 18 }}>
           {TALL.map((t) => (

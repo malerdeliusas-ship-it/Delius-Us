@@ -35,13 +35,24 @@ const SIDER: Record<string, { tittel: string; beskrivelse: string }> = {
     beskrivelse:
       'Ta kontakt med Maler Delius AS for et uforpliktende tilbud eller gratis befaring i Oslo. Ring 966 93 780 eller send skjemaet.',
   },
+  '/blogg': {
+    tittel: 'Blogg – Maler Delius AS',
+    beskrivelse:
+      'Nytt fra Maler Delius AS: maletips, ferdige prosjekter og små glimt fra hverdagen til malerne våre i Oslo.',
+  },
 }
 
 export default function useSeo() {
   const { pathname } = useLocation()
 
   useEffect(() => {
-    const side = SIDER[pathname] ?? SIDER['/']
+    // admin-panelet og sporingslenkene setter sine egne titler
+    if (pathname.startsWith('/admin') || pathname.startsWith('/l/')) return
+
+    // enkeltinnlegg starter med bloggens tittel; innlegget bytter den
+    // selv når det er lastet
+    const side =
+      SIDER[pathname] ?? (pathname.startsWith('/blogg') ? SIDER['/blogg'] : SIDER['/'])
 
     document.title = side.tittel
 

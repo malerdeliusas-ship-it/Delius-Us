@@ -7,6 +7,7 @@ const LENKER = [
   { til: '/om-oss', tekst: 'Om oss' },
   { til: '/portefolje', tekst: 'Portefølje' },
   { til: '/malertjenester', tekst: 'Malertjenester' },
+  { til: '/blogg', tekst: 'Blogg' },
   { til: '/kontakt', tekst: 'Kontakt oss' },
 ]
 

@@ -16,7 +16,11 @@ const TF_LOGO: [[number, number, number], [number, number, number]] =
 
 const LOGO_L = 118.5
 const LOGO_W = 214
-const NAV_L = 625.5
+/* Menyen sto opprinnelig på 625.5, men da bloggen kom til ble hele raden
+   flyttet 116px mot venstre, så alle lenkene får plass med samme 50px
+   mellomrom som i designet. Knappen står der den alltid har stått. */
+const NAV_L = 509.5
+const KNAPP_L = 1123.5
 
 export default function SiteHeader() {
   const { pathname } = useLocation()
@@ -24,6 +28,7 @@ export default function SiteHeader() {
     { label: 'Om oss', to: '/om-oss', dx: 0, w: 79 },
     { label: 'Portefølje', to: '/portefolje', dx: 129, w: 114 },
     { label: 'Malertjenester', to: '/malertjenester', dx: 293, w: 155 },
+    { label: 'Blogg', to: '/blogg', dx: 498, w: 66 },
   ]
 
   return (
@@ -40,7 +45,7 @@ export default function SiteHeader() {
             key={n.to}
             to={n.to}
             className="navlink"
-            aria-current={pathname === n.to ? 'page' : undefined}
+            aria-current={pathname === n.to || (n.to === '/blogg' && pathname.startsWith('/blogg')) ? 'page' : undefined}
             style={{
               position: 'absolute',
               left: NAV_L + n.dx,
@@ -63,7 +68,7 @@ export default function SiteHeader() {
           aria-current={pathname === '/kontakt' ? 'page' : undefined}
           style={{
             position: 'absolute',
-            left: NAV_L + 498,
+            left: KNAPP_L,
             top: 44,
             width: 188,
             height: 52,
