@@ -160,7 +160,15 @@
 
 .adm-rute {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
+}
+
+/* Brede tabeller ruller inne i sitt eget felt, slik at siden aldri blir
+   bredere enn skjermen (da forsvinner menylinjen sidelengs med den). */
+.adm-tabell-rull {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- Nøkkeltall ---------- */
@@ -265,10 +273,16 @@
   margin-bottom: 18px;
 }
 
-.adm-felt > span {
+.adm-felt > span,
+.adm-felt > label {
   font-size: 13.5px;
   font-weight: 700;
   color: var(--marine);
+}
+
+.adm-felt > label {
+  width: fit-content;
+  cursor: pointer;
 }
 
 .adm-felt small {

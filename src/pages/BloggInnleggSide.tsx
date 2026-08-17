@@ -1,18 +1,18 @@
-import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import BloggStage from '../components/BloggStage'
 import MdTekst from '../lib/markdown'
 import { C, FONT, FONT_MUKTA } from '../lib/theme'
 import { useInnlegg, datoTekst } from '../lib/blogg'
+import { useIkkeIndekser, useInnleggSeo } from '../lib/seo'
 
 /** Ett blogginnlegg på desktop. */
 export default function BloggInnleggSide() {
   const { slug = '' } = useParams()
   const innlegg = useInnlegg(slug)
 
-  useEffect(() => {
-    if (innlegg) document.title = `${innlegg.tittel} – Maler Delius AS`
-  }, [innlegg])
+  useInnleggSeo(innlegg?.tittel, innlegg?.ingress)
+  // en adresse uten innlegg skal ikke bli liggende som en tom side i Google
+  useIkkeIndekser(innlegg === null)
 
   return (
     <BloggStage>

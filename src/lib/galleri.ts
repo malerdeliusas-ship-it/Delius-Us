@@ -47,9 +47,23 @@ async function hentOverstyringer(): Promise<Record<string, string>> {
   if (!henting) {
     henting = (async () => {
       const kart: Record<string, string> = {}
-      if (supabase) {
-        const { data } = await supabase.from('galleri_bilder').select('plass, bilde_url')
+      if (!supabase) {
+        hentet = kart
+        return kart
+      }
+      try {
+        const { data, error } = await supabase.from('galleri_bilder').select('plass, bilde_url')
+        if (error) {
+          // Et mislykket forsøk skal ikke huskes: da ville originalbildene
+          // blitt låst for resten av besøket, også etter at nettet er
+          // tilbake. Neste side som spør, prøver på nytt.
+          henting = null
+          return kart
+        }
         for (const rad of data ?? []) kart[rad.plass] = rad.bilde_url
+      } catch {
+        henting = null
+        return kart
       }
       hentet = kart
       return kart

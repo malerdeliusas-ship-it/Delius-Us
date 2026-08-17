@@ -4,7 +4,7 @@ import { Plus, Newspaper, Images, Link2, BarChart3, Pencil } from 'lucide-react'
 import { supabase, type BloggInnlegg } from '../../lib/supabase'
 import { Laster, Sidetopp, Status } from '../deler'
 import { Sparklinje } from '../diagram'
-import { hentStatistikk, dagStart, dagSerie, type Statistikk as Stat } from '../statistikkData'
+import { hentStatistikk, serieTilPunkter, type Statistikk as Stat } from '../statistikkData'
 import { datoKort, folkeligFeil } from '../verktoy'
 
 /** Oversikten: dagen i dag, siste 30 dager og snarveier til alt. */
@@ -17,7 +17,7 @@ export default function Dashbord() {
     let aktiv = true
     async function hent() {
       try {
-        const s = await hentStatistikk(dagStart(29), new Date(Date.now() + 60_000))
+        const s = await hentStatistikk(30)
         if (aktiv) setStat(s)
       } catch (f) {
         if (aktiv) setFeil(folkeligFeil((f as Error).message))
@@ -38,7 +38,7 @@ export default function Dashbord() {
     }
   }, [])
 
-  const serie = useMemo(() => (stat ? dagSerie(stat, 30) : []), [stat])
+  const serie = useMemo(() => (stat ? serieTilPunkter(stat, 'dag') : []), [stat])
   const iDag = serie.length ? serie[serie.length - 1] : null
   const uke = serie.slice(-7).reduce((a, p) => a + p.visninger, 0)
 
@@ -91,8 +91,9 @@ export default function Dashbord() {
                   Ingen innlegg ennå – trykk «Nytt innlegg» og kom i gang!
                 </p>
               ) : (
-                <table className="adm-tabell">
-                  <tbody>
+                <div className="adm-tabell-rull">
+                  <table className="adm-tabell">
+                    <tbody>
                     {innlegg.map((i) => (
                       <tr key={i.id}>
                         <td style={{ fontWeight: 700 }}>{i.tittel}</td>
@@ -112,8 +113,9 @@ export default function Dashbord() {
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
 

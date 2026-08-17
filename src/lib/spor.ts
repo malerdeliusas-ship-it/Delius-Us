@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { supabase } from './supabase'
 
@@ -74,15 +74,34 @@ function kilde(): string | null {
   }
 }
 
+/**
+ * Bare nettstedets egne sider telles. En adresse med skrivefeil sendes hjem
+ * av ruteren, og uten denne sjefen ville både skrivefeilen og forsiden blitt
+ * registrert – ett besøk hadde blitt to visninger. Admin-sidene og
+ * sporingslenkene faller også utenfor listen, som de skal.
+ */
+const KJENTE_SIDER = new Set([
+  '/',
+  '/om-oss',
+  '/portefolje',
+  '/malertjenester',
+  '/kontakt',
+  '/blogg',
+])
+
+function erEgenSide(sti: string): boolean {
+  return KJENTE_SIDER.has(sti) || /^\/blogg\/[a-z0-9-]{1,120}$/.test(sti)
+}
+
 function registrer(sti: string) {
   if (!supabase) return
-  // egne besøk (admin) og admin-sidene selv skal ikke inn i statistikken
+  if (!erEgenSide(sti)) return
+  // egne besøk (admin-maskinen) skal ikke inn i statistikken
   try {
     if (localStorage.getItem(IKKE_SPOR)) return
   } catch {
     /* uten localStorage sporer vi som vanlig */
   }
-  if (sti.startsWith('/admin') || sti.startsWith('/l/')) return
 
   void supabase
     .from('sidevisninger')
@@ -102,11 +121,21 @@ function registrer(sti: string) {
 /** Kobles på i App: teller hver sidevisning ved rutebytte. */
 export function useSporing() {
   const { pathname, search } = useLocation()
+  const sistTalt = useRef<string | null>(null)
 
   useEffect(() => {
     // ?ref=kode fra f.eks. delte adresser – husk koden for resten av økta
     const ref = new URLSearchParams(search).get('ref')
     if (ref) huskLenkekode(ref)
+
+    // React kjører effekter to ganger i utviklingsmodus (StrictMode). Uten
+    // denne sperren telles hver sidevisning dobbelt når vi jobber lokalt.
+    // To visninger av samme side på rad kan ellers ikke skje: klikk på en
+    // lenke til siden man alt står på endrer ikke pathname, og en ny
+    // sidelasting starter komponenten – og dermed sperren – på nytt.
+    if (sistTalt.current === pathname) return
+    sistTalt.current = pathname
+
     registrer(pathname)
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 }

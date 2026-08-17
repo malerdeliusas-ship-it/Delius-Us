@@ -49,20 +49,31 @@ export function Sidetopp({
   )
 }
 
+/**
+ * Ett felt med overskrift og eventuell hjelpetekst.
+ *
+ * `id` skal peke på skjemafeltet inni. Da knyttes overskriften til feltet med
+ * `for`, og et klikk på overskriften setter markøren i feltet. Uten `id` blir
+ * overskriften ren tekst – det er riktig for felt som inneholder knapper, for
+ * en <label> rundt en knapp ville trykket på knappen når man klikker
+ * overskriften.
+ */
 export function Felt({
   navn,
   hjelp,
+  id,
   children,
 }: {
   navn: string
   hjelp?: string
+  id?: string
   children: ReactNode
 }) {
   return (
-    <label className="adm-felt">
-      <span>{navn}</span>
+    <div className="adm-felt">
+      {id ? <label htmlFor={id}>{navn}</label> : <span>{navn}</span>}
       {children}
       {hjelp && <small>{hjelp}</small>}
-    </label>
+    </div>
   )
 }

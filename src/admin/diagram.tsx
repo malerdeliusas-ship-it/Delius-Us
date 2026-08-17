@@ -18,14 +18,20 @@ const HOYRE = 14
 const TOPP = 14
 const BUNN = 30
 
-/** Rund opp til et «pent» takpunkt for y-aksen. */
+/**
+ * Rund opp til et «pent» takpunkt for y-aksen.
+ *
+ * Taket må være delelig på to, for midtstreken er merket med halvparten:
+ * med et odde tak ville streken stått på 2,5 men hatt tallet 3 ved siden av.
+ */
 function tak(maks: number): number {
-  if (maks <= 5) return 5
+  if (maks <= 4) return 4
   const grov = 10 ** Math.floor(Math.log10(maks))
-  for (const m of [1, 2, 2.5, 5, 10]) {
-    if (maks <= grov * m) return Math.ceil(grov * m)
+  for (const m of [1, 2, 5, 10]) {
+    const kandidat = Math.ceil(grov * m)
+    if (maks <= kandidat) return kandidat % 2 === 0 ? kandidat : kandidat + 1
   }
-  return maks
+  return maks % 2 === 0 ? maks : maks + 1
 }
 
 export function LinjeDiagram({

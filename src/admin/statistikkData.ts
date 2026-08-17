@@ -1,11 +1,18 @@
 import { supabase } from '../lib/supabase'
 import type { Punkt } from './diagram'
 
-/** Henting og tilrettelegging av besøkstallene for admin-sidene. */
+/**
+ * Besøkstallene. Alt regnestykket – inkludert hvilke dager perioden dekker –
+ * gjøres i databasen, i norsk tid. Her gjør vi bare om datomerkene til
+ * lesbare etiketter. Grunnen står i supabase/oppsett.sql: regnet nettleseren
+ * ut dagene selv, ville en maskin i en annen tidssone lete etter datoer som
+ * ikke finnes i svaret, og trafikk ville forsvunnet ut av grafen.
+ */
 
 export type Statistikk = {
   totalt: { visninger: number; unike: number }
-  dager: { dag: string; visninger: number; unike: number }[]
+  /** ferdig utfylt serie, ett punkt per dag (eller måned) i perioden */
+  serie: { merke: string; visninger: number; unike: number }[]
   sider: { sti: string; visninger: number }[]
   kilder: { kilde: string; okter: number }[]
   enheter: { enhet: string; okter: number }[]
@@ -14,78 +21,60 @@ export type Statistikk = {
 
 const TOM: Statistikk = {
   totalt: { visninger: 0, unike: 0 },
-  dager: [],
+  serie: [],
   sider: [],
   kilder: [],
   enheter: [],
   lenker: [],
 }
 
-/** Spør databasen om alt på én gang (funksjonen hent_statistikk). */
-export async function hentStatistikk(fra: Date, til: Date): Promise<Statistikk> {
+/** Dagsoppløsning: siste `dager` dager til og med i dag. */
+export async function hentStatistikk(dager: number): Promise<Statistikk> {
   if (!supabase) return TOM
-  const { data, error } = await supabase.rpc('hent_statistikk', {
-    fra: fra.toISOString(),
-    til: til.toISOString(),
-  })
+  const { data, error } = await supabase.rpc('hent_statistikk', { dager })
   if (error) throw new Error(error.message)
   return { ...TOM, ...((data ?? {}) as Partial<Statistikk>) }
 }
 
-/** Midnatt lokal tid, `dagerSiden` dager tilbake. */
-export function dagStart(dagerSiden: number): Date {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() - dagerSiden)
-  return d
+/** Månedsoppløsning: hele kalendermåneder, `maneder` av dem. */
+export async function hentStatistikkManeder(maneder: number): Promise<Statistikk> {
+  if (!supabase) return TOM
+  const { data, error } = await supabase.rpc('hent_statistikk_maneder', { maneder })
+  if (error) throw new Error(error.message)
+  return { ...TOM, ...((data ?? {}) as Partial<Statistikk>) }
 }
 
-function nokkel(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
-
-/**
- * Fyller hullene: databasen har bare rader for dager med besøk, diagrammet
- * trenger alle dagene i perioden – stille dager som 0.
- */
-export function dagSerie(stat: Statistikk, antallDager: number): Punkt[] {
-  const kart = new Map(stat.dager.map((d) => [d.dag, d]))
-  const ut: Punkt[] = []
-  for (let i = antallDager - 1; i >= 0; i--) {
-    const dato = dagStart(i)
-    const rad = kart.get(nokkel(dato))
-    ut.push({
-      etikett: dato.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' }),
-      visninger: rad?.visninger ?? 0,
-      unike: rad?.unike ?? 0,
-    })
-  }
-  return ut
+/** Klikktall per sporingslenke, hele historikken. */
+export async function hentLenkeklikk(): Promise<Statistikk['lenker']> {
+  if (!supabase) return []
+  const { data, error } = await supabase.rpc('lenke_klikk')
+  if (error) throw new Error(error.message)
+  return (data ?? []) as Statistikk['lenker']
 }
 
 /**
- * Tolv måneder som tolv punkter. Bare sidevisninger – å summere «unike per
- * dag» over en måned ville talt samme besøkende flere ganger og gitt et
- * tall som ser riktig ut, men lyver.
+ * «2026-08-17» → Date, lest som en ren kalenderdato. Vi setter den sammen
+ * felt for felt i stedet for `new Date(tekst)`, som ville tolket den som
+ * midnatt UTC og dermed vist dagen før for alle vest for Greenwich.
  */
-export function manedSerie(stat: Statistikk): Punkt[] {
-  const kart = new Map<string, number>()
-  for (const d of stat.dager) {
-    const mnd = d.dag.slice(0, 7)
-    kart.set(mnd, (kart.get(mnd) ?? 0) + d.visninger)
-  }
-  const ut: Punkt[] = []
-  const naa = new Date()
-  for (let i = 11; i >= 0; i--) {
-    const dato = new Date(naa.getFullYear(), naa.getMonth() - i, 1)
-    const k = `${dato.getFullYear()}-${String(dato.getMonth() + 1).padStart(2, '0')}`
-    ut.push({
-      etikett: dato.toLocaleDateString('nb-NO', { month: 'short' }),
-      visninger: kart.get(k) ?? 0,
-      unike: 0,
-    })
-  }
-  return ut
+function tilDato(merke: string): Date {
+  const [aar, mnd, dag] = merke.split('-').map(Number)
+  return new Date(aar, (mnd ?? 1) - 1, dag ?? 1)
+}
+
+/** Serien fra databasen med norske etiketter, klar for diagrammet. */
+export function serieTilPunkter(stat: Statistikk, oppløsning: 'dag' | 'maned'): Punkt[] {
+  return stat.serie.map((p) => {
+    const d = tilDato(p.merke)
+    return {
+      etikett:
+        oppløsning === 'dag'
+          ? d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' })
+          : d.toLocaleDateString('nb-NO', { month: 'short', year: '2-digit' }),
+      visninger: p.visninger,
+      unike: p.unike,
+    }
+  })
 }
 
 /** Stinavn → lesbart sidenavn i listene. */

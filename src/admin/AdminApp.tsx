@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import './admin.css'
 import { supabase } from '../lib/supabase'
-import { useOkt, loggUt, Vakt } from './auth'
+import { useOkt, useErAdmin, loggUt, Vakt } from './auth'
 import logo from '../assets/figma/logo.png'
 
 import LoggInn from './sider/LoggInn'
@@ -51,6 +51,10 @@ function Ramme({ children }: { children: React.ReactNode }) {
               to={til}
               end={slutt}
               className={({ isActive }) => (isActive ? 'adm-aktiv' : undefined)}
+              /* under 940px vises bare ikonet – navnet må da ligge her, ellers
+                 står skjermleseren og musepekeren igjen uten noe å lese */
+              title={tekst}
+              aria-label={tekst}
             >
               <Ikon size={19} />
               <span>{tekst}</span>
@@ -59,11 +63,11 @@ function Ramme({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="adm-side-bunn">
-          <a href="/" target="_blank" rel="noreferrer">
+          <a href="/" target="_blank" rel="noreferrer" title="Se nettstedet" aria-label="Se nettstedet">
             <ExternalLink size={18} />
             <span>Se nettstedet</span>
           </a>
-          <button onClick={() => void loggUt()}>
+          <button onClick={() => void loggUt()} title="Logg ut" aria-label="Logg ut">
             <LogOut size={18} />
             <span>Logg ut</span>
           </button>
@@ -77,6 +81,7 @@ function Ramme({ children }: { children: React.ReactNode }) {
 
 export default function AdminApp() {
   const okt = useOkt()
+  const erAdmin = useErAdmin(okt)
 
   useEffect(() => {
     document.title = 'Admin – Maler Delius AS'
@@ -108,7 +113,7 @@ export default function AdminApp() {
       <Route
         path="*"
         element={
-          <Vakt okt={okt}>
+          <Vakt okt={okt} erAdmin={erAdmin}>
             <Ramme>
               <Routes>
                 <Route index element={<Dashbord />} />

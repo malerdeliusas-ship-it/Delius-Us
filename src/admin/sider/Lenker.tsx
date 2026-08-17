@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Copy, Check, Trash2, Plus } from 'lucide-react'
 import { supabase, type Lenke } from '../../lib/supabase'
 import { Felt, Laster, Sidetopp, Status } from '../deler'
-import { hentStatistikk, sideNavn, type Statistikk as Stat } from '../statistikkData'
+import { hentLenkeklikk, sideNavn, type Statistikk } from '../statistikkData'
 import { datoKort, folkeligFeil, slugifiser } from '../verktoy'
 
 /**
@@ -22,7 +22,7 @@ const MAL_SIDER = [
 
 export default function Lenker() {
   const [lenker, setLenker] = useState<Lenke[] | null>(null)
-  const [stat, setStat] = useState<Stat | null>(null)
+  const [klikk, setKlikk] = useState<Statistikk['lenker']>([])
   const [feil, setFeil] = useState<string | null>(null)
 
   const [navn, setNavn] = useState('')
@@ -43,11 +43,11 @@ export default function Lenker() {
       if (error) setFeil(folkeligFeil(error.message))
       setLenker((data ?? []) as Lenke[])
       try {
-        // klikktallene: hele historikken, ikke bare siste tida
-        const s = await hentStatistikk(new Date('2026-01-01'), new Date(Date.now() + 60_000))
-        if (aktiv) setStat(s)
+        // klikktallene dekker hele historikken, ikke en fast periode
+        const k = await hentLenkeklikk()
+        if (aktiv) setKlikk(k)
       } catch {
-        /* uten statistikk vises lenkene likevel */
+        /* uten tallene vises lenkene likevel */
       }
     }
     void hent()
@@ -107,9 +107,9 @@ export default function Lenker() {
 
   const tall = useMemo(() => {
     const kart = new Map<string, { visninger: number; okter: number }>()
-    for (const r of stat?.lenker ?? []) kart.set(r.kode, { visninger: r.visninger, okter: r.okter })
+    for (const r of klikk) kart.set(r.kode, { visninger: r.visninger, okter: r.okter })
     return kart
-  }, [stat])
+  }, [klikk])
 
   return (
     <>
@@ -124,16 +124,18 @@ export default function Lenker() {
         <form className="adm-kort" onSubmit={(e) => void opprett(e)}>
           <div className="adm-diagram-tittel">Ny lenke</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0 18px' }}>
-            <Felt navn="Navn" hjelp="Bare for deg, f.eks. «Facebook-annonse august».">
+            <Felt navn="Navn" id="l-navn" hjelp="Bare for deg, f.eks. «Facebook-annonse august».">
               <input
+                id="l-navn"
                 className="adm-inn"
                 value={navn}
                 onChange={(e) => settNavn(e.target.value)}
                 placeholder="Facebook-annonse august"
               />
             </Felt>
-            <Felt navn="Kode" hjelp={`Adressen blir ${window.location.host}/l/${kode || '…'}`}>
+            <Felt navn="Kode" id="l-kode" hjelp={`Adressen blir ${window.location.host}/l/${kode || '…'}`}>
               <input
+                id="l-kode"
                 className="adm-inn"
                 value={kode}
                 onChange={(e) => {
@@ -142,8 +144,8 @@ export default function Lenker() {
                 }}
               />
             </Felt>
-            <Felt navn="Sender besøkende til">
-              <select className="adm-inn" value={mal} onChange={(e) => setMal(e.target.value)}>
+            <Felt navn="Sender besøkende til" id="l-mal">
+              <select id="l-mal" className="adm-inn" value={mal} onChange={(e) => setMal(e.target.value)}>
                 {MAL_SIDER.map((s) => (
                   <option key={s.sti} value={s.sti}>
                     {s.navn}
@@ -162,6 +164,7 @@ export default function Lenker() {
 
         {lenker !== null && lenker.length > 0 && (
           <div className="adm-kort" style={{ padding: '10px 6px' }}>
+            <div className="adm-tabell-rull">
             <table className="adm-tabell">
               <thead>
                 <tr>
@@ -205,6 +208,7 @@ export default function Lenker() {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         )}
 

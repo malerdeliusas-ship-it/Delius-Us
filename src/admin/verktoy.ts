@@ -42,7 +42,8 @@ export function folkeligFeil(melding: string): string {
     [/Failed to fetch|NetworkError|fetch failed/i, 'Fikk ikke kontakt med databasen. Sjekk nettforbindelsen.'],
     [/bucket not found/i, 'Bildelageret «bilder» finnes ikke ennå – kjør oppsettet i Supabase først.'],
     [/schema cache|does not exist/i, 'Databasetabellene er ikke laget ennå – kjør supabase/oppsett.sql i Supabase først.'],
-    [/row-level security/i, 'Ingen tilgang. Logg inn på nytt og prøv igjen.'],
+    [/Ingen admin-tilgang/i, 'Denne brukeren har ikke admin-tilgang. Legg e-postadressen inn i tabellen admin_epost i Supabase.'],
+    [/row-level security/i, 'Ingen tilgang til å lagre dette. Sjekk at e-postadressen din står i tabellen admin_epost i Supabase.'],
   ]
   for (const [monster, svar] of kjent) if (monster.test(melding)) return svar
   return melding

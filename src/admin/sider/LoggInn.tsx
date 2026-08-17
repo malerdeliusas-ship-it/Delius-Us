@@ -29,8 +29,9 @@ export default function LoggInn() {
           <h1>Admin-panelet</h1>
           <p>Logg inn for å styre bloggen, galleriet og statistikken.</p>
 
-          <Felt navn="E-post">
+          <Felt navn="E-post" id="inn-epost">
             <input
+              id="inn-epost"
               className="adm-inn"
               type="email"
               autoComplete="username"
@@ -40,8 +41,9 @@ export default function LoggInn() {
             />
           </Felt>
 
-          <Felt navn="Passord">
+          <Felt navn="Passord" id="inn-passord">
             <input
+              id="inn-passord"
               className="adm-inn"
               type="password"
               autoComplete="current-password"

@@ -78,15 +78,23 @@ export default function BloggRedigering() {
     if (!slugLaast) setSlug(slugifiser(t))
   }
 
-  /** Legg tekst rundt/inn i markeringen i tekstfeltet. */
+  /**
+   * Legg tekst rundt/inn i markeringen i tekstfeltet.
+   *
+   * Teksten leses fra feltet selv, ikke fra `innhold`-variabelen. Det er
+   * viktig for bildeknappen: den venter på at opplastingen blir ferdig, og
+   * rekker man å skrive i mellomtiden, ville den gamle verdien fra
+   * variabelen ha overskrevet det man nettopp skrev.
+   */
   function skrivInn(foran: string, bak = '', plassholder = '') {
     const felt = tekstRef.current
     if (!felt) return
+    const kilde = felt.value
     const fra = felt.selectionStart
     const til = felt.selectionEnd
-    const valgt = innhold.slice(fra, til) || plassholder
-    const neste = innhold.slice(0, fra) + foran + valgt + bak + innhold.slice(til)
-    setInnhold(neste)
+    const valgt = kilde.slice(fra, til) || plassholder
+
+    setInnhold(kilde.slice(0, fra) + foran + valgt + bak + kilde.slice(til))
     requestAnimationFrame(() => {
       felt.focus()
       felt.setSelectionRange(fra + foran.length, fra + foran.length + valgt.length)
@@ -156,6 +164,10 @@ export default function BloggRedigering() {
       if (error) {
         setMelding({ type: 'feil', tekst: folkeligFeil(error.message) })
       } else {
+        // Adressen er nå i bruk: den skal ikke lenger endre seg av seg selv
+        // når tittelen justeres, ellers bytter innlegget lenke under føttene
+        // på den som alt har delt den.
+        setSlugLaast(true)
         navigate(`/admin/blogg/${data.id}`, { replace: true })
         setMelding({ type: 'ok', tekst: publisert ? 'Innlegget er lagret og publisert.' : 'Kladden er lagret.' })
       }
@@ -216,8 +228,9 @@ export default function BloggRedigering() {
 
       <div className="adm-redigering">
         <div className="adm-kort">
-          <Felt navn="Tittel">
+          <Felt navn="Tittel" id="f-tittel">
             <input
+              id="f-tittel"
               className="adm-inn"
               value={tittel}
               onChange={(e) => settTittel(e.target.value)}
@@ -225,8 +238,9 @@ export default function BloggRedigering() {
             />
           </Felt>
 
-          <Felt navn="Adresse (slug)" hjelp={`Innlegget får adressen malerdelius.no/blogg/${slug || '…'}`}>
+          <Felt navn="Adresse (slug)" id="f-slug" hjelp={`Innlegget får adressen malerdelius.no/blogg/${slug || '…'}`}>
             <input
+              id="f-slug"
               className="adm-inn"
               value={slug}
               onChange={(e) => {
@@ -236,8 +250,9 @@ export default function BloggRedigering() {
             />
           </Felt>
 
-          <Felt navn="Ingress" hjelp="Én–to setninger som vises i bloggoversikten.">
+          <Felt navn="Ingress" id="f-ingress" hjelp="Én–to setninger som vises i bloggoversikten.">
             <textarea
+              id="f-ingress"
               className="adm-inn"
               rows={2}
               value={ingress}
@@ -272,7 +287,7 @@ export default function BloggRedigering() {
             <input ref={bildeToppRef} type="file" accept="image/*" hidden onChange={(e) => void lastOppTopp(e)} />
           </Felt>
 
-          <Felt navn="Innhold">
+          <Felt navn="Innhold" id="f-innhold">
             <div>
               <div className="adm-verktoyrad">
                 <button type="button" onClick={() => skrivInn('**', '**', 'fet tekst')} title="Fet">
@@ -305,6 +320,7 @@ export default function BloggRedigering() {
                 </button>
               </div>
               <textarea
+                id="f-innhold"
                 ref={tekstRef}
                 className="adm-inn"
                 rows={16}

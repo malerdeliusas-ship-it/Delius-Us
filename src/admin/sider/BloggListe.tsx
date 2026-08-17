@@ -53,6 +53,7 @@ export default function BloggListe() {
 
       {liste !== null && liste.length > 0 && (
         <div className="adm-kort" style={{ padding: '10px 6px' }}>
+          <div className="adm-tabell-rull">
           <table className="adm-tabell">
             <thead>
               <tr>
@@ -98,6 +99,7 @@ export default function BloggListe() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </>

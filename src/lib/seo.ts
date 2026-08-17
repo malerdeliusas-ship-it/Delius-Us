@@ -42,6 +42,36 @@ const SIDER: Record<string, { tittel: string; beskrivelse: string }> = {
   },
 }
 
+/**
+ * Ber søkemotorene la denne visningen være. Brukes når en bloggadresse ikke
+ * finnes: siden svarer teknisk sett «alt i orden» (nettstedet er en SPA), og
+ * uten dette ville hver skrivefeil blitt liggende som en egen tom side i
+ * søkeresultatene.
+ */
+export function useIkkeIndekser(aktiv: boolean) {
+  useEffect(() => {
+    if (!aktiv) return
+    const merke = document.createElement('meta')
+    merke.name = 'robots'
+    merke.content = 'noindex'
+    document.head.appendChild(merke)
+    return () => merke.remove()
+  }, [aktiv])
+}
+
+/** Setter tittel og beskrivelse for ett blogginnlegg. */
+export function useInnleggSeo(tittel?: string, beskrivelse?: string) {
+  useEffect(() => {
+    if (!tittel) return
+    document.title = `${tittel} – Maler Delius AS`
+    if (beskrivelse) {
+      document
+        .querySelector('meta[name="description"]')
+        ?.setAttribute('content', beskrivelse.slice(0, 300))
+    }
+  }, [tittel, beskrivelse])
+}
+
 export default function useSeo() {
   const { pathname } = useLocation()
 

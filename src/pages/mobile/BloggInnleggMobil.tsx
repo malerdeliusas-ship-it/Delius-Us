@@ -1,17 +1,16 @@
-import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import MobilSide from '../../components/mobile/Shell'
 import MdTekst from '../../lib/markdown'
 import { useInnlegg, datoTekst } from '../../lib/blogg'
+import { useIkkeIndekser, useInnleggSeo } from '../../lib/seo'
 
 /** Ett blogginnlegg på mobil. */
 export default function BloggInnleggMobil() {
   const { slug = '' } = useParams()
   const innlegg = useInnlegg(slug)
 
-  useEffect(() => {
-    if (innlegg) document.title = `${innlegg.tittel} – Maler Delius AS`
-  }, [innlegg])
+  useInnleggSeo(innlegg?.tittel, innlegg?.ingress)
+  useIkkeIndekser(innlegg === null)
 
   return (
     <MobilSide>
