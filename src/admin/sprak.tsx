@@ -22,6 +22,7 @@ const NO = {
   'meny.lenker': 'Lenker',
   'meny.seNettstedet': 'Se nettstedet',
   'meny.loggUt': 'Logg ut',
+  'meny.aria': 'Admin-meny',
   'sprak.bytt': 'Bytt språk',
 
   // oppsett mangler
@@ -54,11 +55,9 @@ const NO = {
   'dash.under': 'Velkommen tilbake! Slik står det til med nettstedet akkurat nå.',
   'dash.nytt': 'Nytt innlegg',
   'dash.iDag': 'I dag',
-  'dash.visningerUnike': 'sidevisninger ({unike} unike)',
   'dash.siste7': 'Siste 7 dager',
   'dash.visninger': 'sidevisninger',
   'dash.siste30': 'Siste 30 dager',
-  'dash.unikeBesok': '{antall} unike besøk',
   'dash.seStatistikk': 'Se hele statistikken →',
   'dash.sisteInnlegg': 'Siste innlegg',
   'dash.ingenInnlegg': 'Ingen innlegg ennå – trykk «Nytt innlegg» og kom i gang!',
@@ -146,7 +145,6 @@ const NO = {
   'stat.unike': 'Unike besøk',
   'stat.unikeDetalj': 'økter – én per besøkende per fane',
   'stat.mestSett': 'Mest sett',
-  'stat.visningerX': '{antall} visninger',
   'stat.ingenBesok': 'ingen besøk ennå',
   'stat.fraMobil': 'Fra mobil',
   'stat.andel': 'andel av øktene',
@@ -241,6 +239,7 @@ const RO: Record<Nokkel, string> = {
   'meny.lenker': 'Linkuri',
   'meny.seNettstedet': 'Vezi site-ul',
   'meny.loggUt': 'Ieșire',
+  'meny.aria': 'Meniu administrare',
   'sprak.bytt': 'Schimbă limba',
 
   'oppsett.tittel': 'Panoul nu este configurat',
@@ -252,9 +251,9 @@ const RO: Record<Nokkel, string> = {
   'login.epost': 'E-mail',
   'login.passord': 'Parolă',
   'login.knapp': 'Autentificare',
-  'login.venter': 'Se autentifică …',
-  'vakt.sjekkerInn': 'Se verifică autentificarea …',
-  'vakt.sjekkerTilgang': 'Se verifică accesul …',
+  'login.venter': 'Se autentifică…',
+  'vakt.sjekkerInn': 'Se verifică autentificarea…',
+  'vakt.sjekkerTilgang': 'Se verifică accesul…',
   'vakt.ingenTilgang': 'Fără acces de administrator',
   'vakt.innloggetSom': 'Ești autentificat{hvem}, dar acest cont nu are acces la panou.',
   'vakt.som': ' ca {epost}',
@@ -264,30 +263,28 @@ const RO: Record<Nokkel, string> = {
   'felles.kladd': 'Ciornă',
   'felles.rediger': 'Editează',
   'felles.lagre': 'Salvează',
-  'felles.lagrer': 'Se salvează …',
+  'felles.lagrer': 'Se salvează…',
 
   'dash.under': 'Bine ai revenit! Așa stă site-ul chiar acum.',
   'dash.nytt': 'Articol nou',
   'dash.iDag': 'Azi',
-  'dash.visningerUnike': 'afișări ({unike} unice)',
   'dash.siste7': 'Ultimele 7 zile',
   'dash.visninger': 'afișări de pagină',
   'dash.siste30': 'Ultimele 30 de zile',
-  'dash.unikeBesok': '{antall} vizite unice',
   'dash.seStatistikk': 'Vezi toate statisticile →',
   'dash.sisteInnlegg': 'Ultimele articole',
-  'dash.ingenInnlegg': 'Niciun articol încă. Apasă „Articol nou" și scrie primul!',
+  'dash.ingenInnlegg': 'Niciun articol încă. Apasă „Articol nou” și scrie primul!',
   'dash.snarveier': 'Scurtături',
   'dash.snarveiBlogg': 'Scrie și editează articole',
   'dash.snarveiGalleri': 'Schimbă pozele din galerie',
   'dash.snarveiLenker': 'Creează linkuri de urmărire',
   'dash.snarveiStatistikk': 'Vezi cifrele de trafic',
-  'dash.henter': 'Se încarcă cifrele …',
+  'dash.henter': 'Se încarcă cifrele…',
 
   'liste.under': 'Scrie, editează și publică articole pe site.',
-  'liste.henter': 'Se încarcă articolele …',
+  'liste.henter': 'Se încarcă articolele…',
   'liste.tomTittel': 'Niciun articol încă',
-  'liste.tomTekst': 'Apasă „Articol nou" și scrie primul. Durează doar câteva minute.',
+  'liste.tomTekst': 'Apasă „Articol nou” și scrie primul. Durează doar câteva minute.',
   'liste.tittel': 'Titlu',
   'liste.status': 'Stare',
   'liste.sistEndret': 'Ultima modificare',
@@ -305,7 +302,7 @@ const RO: Record<Nokkel, string> = {
   'red.lagretUte': 'Articolul a fost salvat și este public.',
   'red.lagretSomKladd': 'Salvat ca ciornă.',
   'red.fantIkke': 'Articolul nu a fost găsit.',
-  'red.henter': 'Se încarcă articolul …',
+  'red.henter': 'Se încarcă articolul…',
   'red.tittel': 'Titlu',
   'red.tittelPlassholder': 'De ex. Cum alegi nuanța potrivită de alb',
   'red.slug': 'Adresă (slug)',
@@ -316,7 +313,7 @@ const RO: Record<Nokkel, string> = {
   'red.velgBilde': 'Alege imaginea',
   'red.byttBilde': 'Schimbă imaginea',
   'red.fjern': 'Elimină',
-  'red.lasterOpp': 'Se încarcă …',
+  'red.lasterOpp': 'Se încarcă…',
   'red.innhold': 'Conținut',
   'red.fet': 'Aldin',
   'red.kursiv': 'Cursiv',
@@ -342,8 +339,8 @@ const RO: Record<Nokkel, string> = {
   'gal.bytt': 'Schimbă',
   'gal.original': 'Originalul',
   'gal.byttet': 'Schimbată',
-  'gal.jobber': 'Se lucrează …',
-  'gal.henter': 'Se încarcă galeria …',
+  'gal.jobber': 'Se lucrează…',
+  'gal.henter': 'Se încarcă galeria…',
   'gal.gjelderBegge': 'Modificările se aplică atât versiunii pentru calculator, cât și celei pentru mobil.',
   'gal.plass': 'Poza {nr}: {navn}',
 
@@ -357,7 +354,6 @@ const RO: Record<Nokkel, string> = {
   'stat.unike': 'Vizite unice',
   'stat.unikeDetalj': 'sesiuni, câte una pe vizitator și filă',
   'stat.mestSett': 'Cea mai văzută',
-  'stat.visningerX': '{antall} afișări',
   'stat.ingenBesok': 'nicio vizită încă',
   'stat.fraMobil': 'De pe mobil',
   'stat.andel': 'procent din sesiuni',
@@ -371,18 +367,18 @@ const RO: Record<Nokkel, string> = {
     'Nicio vizită înregistrată în această perioadă. Cifrele încep să apară imediat ce cineva deschide site-ul.',
   'stat.mestSette': 'Cele mai văzute pagini',
   'stat.kilder': 'De unde au venit vizitele',
-  'stat.direkte': 'Direct, a tastat adresa',
+  'stat.direkte': 'Direct / adresă tastată',
   'stat.ingenKilder': 'Nicio sursă înregistrată încă.',
   'stat.enheter': 'Dispozitive',
   'stat.mobil': 'Mobil',
   'stat.datamaskin': 'Calculator',
   'stat.lenketrafikk': 'Trafic din linkurile tale',
   'stat.lenkeTom':
-    'Nicio vizită prin linkuri de urmărire în această perioadă. Creează linkuri la „Linkuri" și distribuie-le, iar cifrele vor apărea aici.',
+    'Nicio vizită prin linkuri de urmărire în această perioadă. Creează linkuri la „Linkuri” și distribuie-le, iar cifrele vor apărea aici.',
   'stat.lenke': 'Link',
   'stat.besok': 'Vizite',
   'stat.visningerKol': 'Afișări',
-  'stat.teller': 'Se numără vizitele …',
+  'stat.teller': 'Se numără vizitele…',
   'stat.ingenting': 'Nimic de arătat încă.',
 
   'side.forsiden': 'Prima pagină',
@@ -397,21 +393,21 @@ const RO: Record<Nokkel, string> = {
     'Creează o adresă separată pentru fiecare distribuire (reclamă, postare, e-mail) și vezi câți vizitatori a adus fiecare.',
   'len.ny': 'Link nou',
   'len.navn': 'Nume',
-  'len.navnHjelp': 'Doar pentru tine, de ex. „Reclamă Facebook august".',
+  'len.navnHjelp': 'Doar pentru tine, de ex. „Reclamă Facebook august”.',
   'len.navnPlassholder': 'Reclamă Facebook august',
   'len.kode': 'Cod',
   'len.kodeHjelp': 'Adresa va fi {vert}/l/{kode}',
   'len.malside': 'Trimite vizitatorii la',
   'len.lag': 'Creează linkul',
-  'len.lager': 'Se creează …',
-  'len.henter': 'Se încarcă linkurile …',
+  'len.lager': 'Se creează…',
+  'len.henter': 'Se încarcă linkurile…',
   'len.giNavn': 'Dă-i linkului un nume. Codul se generează singur.',
   'len.adresse': 'Adresă',
   'len.gaarTil': 'Duce la',
   'len.laget': 'Creat',
   'len.kopier': 'Copiază',
   'len.kopiert': 'Copiat!',
-  'len.slettSporsmal': 'Ștergi linkul „{navn}"? Distribuirile vechi vor duce la prima pagină.',
+  'len.slettSporsmal': 'Ștergi linkul „{navn}”? Distribuirile vechi vor duce la prima pagină.',
   'len.tomTittel': 'Niciun link încă',
   'len.tomTekst':
     'Creează primul mai sus: dă-i un nume, copiază adresa și distribuie-o acolo unde vrei să măsori efectul.',
@@ -427,7 +423,7 @@ const RO: Record<Nokkel, string> = {
   'feil.kodeOpptatt': 'Există deja un link cu acest cod. Alege altul.',
   'feil.ugyldigVerdi': 'Unul dintre câmpuri are o valoare neacceptată. Verifică lungimea și caracterele.',
   'feil.nett': 'Nu s-a putut contacta baza de date. Verifică conexiunea la internet.',
-  'feil.botteMangler': 'Spațiul de stocare „bilder" nu există încă. Rulează întâi scriptul de configurare în Supabase.',
+  'feil.botteMangler': 'Spațiul de stocare „bilder” nu există încă. Rulează întâi scriptul de configurare în Supabase.',
   'feil.tabellerMangler':
     'Tabelele bazei de date nu există încă. Rulează întâi supabase/oppsett.sql în Supabase.',
   'feil.ikkeAdmin':
@@ -439,12 +435,50 @@ const RO: Record<Nokkel, string> = {
 
 const ORDBOK: Record<Sprak, Record<Nokkel, string>> = { no: NO, ro: RO }
 
+/* -------------------------------------------------------------------------
+   Tall og substantiv
+
+   Begge språk bøyer substantivet etter tallet, og rumensk krever i tillegg
+   «de» foran: 1 vizită, 5 vizite, men 20 de vizite. Regelen henger på de to
+   siste sifrene, så 101 vizite (uten «de») og 120 de vizite (med).
+   Derfor settes disse frasene sammen her i stedet for i ordboka.
+   ------------------------------------------------------------------------- */
+
+/** Substantiver som opptrer sammen med et tall i panelet. */
+export type Tellbart = 'visninger' | 'unike'
+
+function ro(n: number, ental: string, flertall: string): string {
+  if (n === 1) return `1 ${ental}`
+  const rest = Math.abs(n) % 100
+  const medDe = Math.abs(n) >= 20 && (rest === 0 || rest >= 20)
+  return `${n} ${medDe ? 'de ' : ''}${flertall}`
+}
+
+function no(n: number, ental: string, flertall: string): string {
+  return `${n} ${n === 1 ? ental : flertall}`
+}
+
+const TELL: Record<Sprak, Record<Tellbart, (n: number) => string>> = {
+  no: {
+    visninger: (n) => no(n, 'sidevisning', 'sidevisninger'),
+    unike: (n) => no(n, 'unikt besøk', 'unike besøk'),
+  },
+  ro: {
+    visninger: (n) => ro(n, 'afișare', 'afișări'),
+    unike: (n) => ro(n, 'vizită unică', 'vizite unice'),
+  },
+}
+
 export type Oversetter = (nokkel: Nokkel, deler?: Record<string, string | number>) => string
+
+/** Tall + substantiv, bøyd riktig: «1 afișare», «5 afișări», «20 de afișări». */
+export type Teller = (antall: number, ord: Tellbart) => string
 
 type SprakVerdi = {
   sprak: Sprak
   sett: (s: Sprak) => void
   t: Oversetter
+  tell: Teller
   /** Datoformat som følger språket: nb-NO eller ro-RO. */
   locale: string
 }
@@ -467,6 +501,7 @@ export function SprakGiver({ children }: { children: ReactNode }) {
     return {
       sprak,
       locale: sprak === 'ro' ? 'ro-RO' : 'nb-NO',
+      tell: (antall, ord) => TELL[sprak][ord](antall),
       sett: (s) => {
         settSprak(s)
         try {

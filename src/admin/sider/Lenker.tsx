@@ -79,7 +79,7 @@ export default function Lenker() {
       .single<Lenke>()
     setLagrer(false)
     if (error) {
-      setFeil(folkeligFeil(error.message, t))
+      setFeil(error.message)
     } else {
       setLenker((l) => [data, ...(l ?? [])])
       setNavn('')
@@ -92,7 +92,7 @@ export default function Lenker() {
   async function slett(l: Lenke) {
     if (!window.confirm(t('len.slettSporsmal', { navn: l.navn }))) return
     const { error } = await supabase!.from('lenker').delete().eq('id', l.id)
-    if (error) setFeil(folkeligFeil(error.message, t))
+    if (error) setFeil(error.message)
     else setLenker((liste) => (liste ?? []).filter((x) => x.id !== l.id))
   }
 
@@ -117,7 +117,7 @@ export default function Lenker() {
     <>
       <Sidetopp tittel={t('meny.lenker')} under={t('len.under')} />
 
-      {feil && <Status type="feil" style={{ marginBottom: 18 }}>{feil}</Status>}
+      {feil && <Status type="feil" style={{ marginBottom: 18 }}>{folkeligFeil(feil, t)}</Status>}
 
       <div className="adm-rute">
         <form className="adm-kort" onSubmit={(e) => void opprett(e)}>

@@ -23,7 +23,7 @@ const PERIODER: ({ nokkel: Nokkel } & ({ dager: number } | { maneder: number }))
 ]
 
 export default function Statistikk() {
-  const { t } = useSprak()
+  const { t, tell } = useSprak()
   const [periode, setPeriode] = useState(1) // 30 dager
   const [stat, setStat] = useState<Stat | null>(null)
   const [lenker, setLenker] = useState<Lenke[]>([])
@@ -120,9 +120,7 @@ export default function Statistikk() {
                 {stat.sider[0] ? sideNavn(stat.sider[0].sti, t) : '–'}
               </span>
               <span className="adm-tall-detalj">
-                {stat.sider[0]
-                  ? t('stat.visningerX', { antall: stat.sider[0].visninger })
-                  : t('stat.ingenBesok')}
+                {stat.sider[0] ? tell(stat.sider[0].visninger, 'visninger') : t('stat.ingenBesok')}
               </span>
             </div>
             <div className="adm-tall-kort">

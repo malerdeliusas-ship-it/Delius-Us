@@ -495,6 +495,11 @@ select.adm-inn {
   animation: adm-inn 0.35s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
+/* ikonet skal aldri klemmes flatt når teksten er lang */
+.adm-status > svg {
+  flex-shrink: 0;
+}
+
 .adm-status--ok {
   background: var(--gronn-bg);
   color: var(--gronn);
@@ -643,6 +648,10 @@ select.adm-inn {
    design-piksler; knappene er store der, og blir passe små etter zoom. */
 .adm-kart-ramme {
   width: 100%;
+  /* på trange skjermer krymper ikke kartet lenger (da blir knappene
+     uspiselig små) – det ruller sidelengs i stedet */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .adm-kart {

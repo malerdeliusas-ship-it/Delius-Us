@@ -42,6 +42,7 @@ const KJENTE_FEIL: [RegExp, Nokkel][] = [
   [/Ingen admin-tilgang/i, 'feil.ikkeAdmin'],
   [/row-level security/i, 'feil.rls'],
   [/ikke et bilde/i, 'feil.ikkeBilde'],
+  [/Supabase er ikke satt opp/i, 'feil.tabellerMangler'],
 ]
 
 export function folkeligFeil(melding: string, t: Oversetter): string {

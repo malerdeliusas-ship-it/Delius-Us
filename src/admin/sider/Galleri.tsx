@@ -32,34 +32,59 @@ const BAND = [
   { l: 0, t: 2874, w: 1432, h: 477, bg: C.pf[4] },
 ]
 
+/** Under dette blir knappene for små til å trykke på. */
+const MINSTE_SKALA = 0.55
+
 const KORT = [
-  { l: 495, t: 460, w: 816, h: 466 },
-  { l: 119, t: 1086, w: 784, h: 453 },
-  { l: 936, t: 1727, w: 715, h: 453 },
-  { l: 119, t: 2310, w: 784, h: 526 },
+  { l: 495, t: 460, w: 816, h: 466, r: 67, bg: C.cardWhite },
+  { l: 119, t: 1086, w: 784, h: 453, r: 67, bg: C.cardWhite },
+  { l: 936, t: 1727, w: 715, h: 453, r: 67, bg: C.cardWhite },
+  { l: 119, t: 2310, w: 784, h: 526, r: 67, bg: C.cardWhite },
+  // de to tallkortene nederst, så bunnen av siden er til å kjenne igjen
+  { l: 732, t: 2983, w: 273, h: 326, r: 67, bg: C.white },
+  { l: 1038, t: 2990, w: 273, h: 326, r: 67, bg: C.white },
 ]
 
 export default function Galleri() {
   const { t } = useSprak()
   const [overstyrt, setOverstyrt] = useState<Record<string, string> | null>(null)
   const [feil, setFeil] = useState<string | null>(null)
-  const [jobber, setJobber] = useState<string | null>(null) // plassen det jobbes med
+  /* Hvilke plasser det jobbes med akkurat nå. Et sett, ikke én verdi:
+     opplastinger tar tid, og starter man en til mens den første er
+     underveis, ville én delt verdi ha slettet markeringen for begge og
+     latt den første plassen stå «ferdig» før den var det. */
+  const [jobber, setJobber] = useState<ReadonlySet<string>>(() => new Set())
+
+  const merkJobber = (plass: string, aktiv: boolean) =>
+    setJobber((forrige) => {
+      const neste = new Set(forrige)
+      if (aktiv) neste.add(plass)
+      else neste.delete(plass)
+      return neste
+    })
   const filRef = useRef<HTMLInputElement>(null)
   const valgtPlass = useRef<string | null>(null)
 
-  // miniatyrens målestokk: fyll bredden på feltet, akkurat som Stage gjør
-  const rammeRef = useRef<HTMLDivElement>(null)
-  const [skala, setSkala] = useState(0.6)
+  /*
+   * Miniatyrens målestokk: fyll bredden på feltet, akkurat som Stage gjør på
+   * nettstedet. Men aldri under MINSTE_SKALA – da blir knappene på bildene
+   * for små til å treffe med fingeren (på en telefon havnet de på ti piksler).
+   * Blir det for trangt, ruller kartet sidelengs i stedet.
+   */
+  /* Callback-ref, ikke useRef: kartet tegnes først når bildene er hentet,
+     så et vanlig oppsett ved montering ville målt et element som ennå ikke
+     fantes – og målestokken hadde blitt stående på startverdien. */
+  const [ramme, setRamme] = useState<HTMLDivElement | null>(null)
+  const [skala, setSkala] = useState(MINSTE_SKALA)
 
   useLayoutEffect(() => {
-    const el = rammeRef.current
-    if (!el) return
-    const oppdater = () => setSkala(Math.max(0.2, el.clientWidth / 1430))
+    if (!ramme) return
+    const oppdater = () => setSkala(Math.max(MINSTE_SKALA, ramme.clientWidth / 1430))
     oppdater()
     const ro = new ResizeObserver(oppdater)
-    ro.observe(el)
+    ro.observe(ramme)
     return () => ro.disconnect()
-  }, [])
+  }, [ramme])
 
   useEffect(() => {
     let aktiv = true
@@ -91,7 +116,7 @@ export default function Galleri() {
     e.target.value = ''
     const plass = valgtPlass.current
     if (!fil || !plass) return
-    setJobber(plass)
+    merkJobber(plass, true)
     setFeil(null)
     try {
       const url = await lastOppBilde(fil, 'galleri')
@@ -104,11 +129,11 @@ export default function Galleri() {
     } catch (f) {
       setFeil((f as Error).message)
     }
-    setJobber(null)
+    merkJobber(plass, false)
   }
 
   async function tilbakestill(plass: string) {
-    setJobber(plass)
+    merkJobber(plass, true)
     setFeil(null)
     const { error } = await supabase!.from('galleri_bilder').delete().eq('plass', plass)
     if (error) {
@@ -121,7 +146,7 @@ export default function Galleri() {
       })
       glemGalleriBufferen()
     }
-    setJobber(null)
+    merkJobber(plass, false)
   }
 
   return (
@@ -148,11 +173,11 @@ export default function Galleri() {
               marginBottom: 14,
             }}
           >
-            <Smartphone size={15} />
+            <Smartphone size={15} style={{ flexShrink: 0 }} />
             {t('gal.gjelderBegge')}
           </div>
 
-          <div ref={rammeRef} className="adm-kart-ramme">
+          <div ref={setRamme} className="adm-kart-ramme">
             <div className="adm-kart" style={{ zoom: skala, height: HOYDE }}>
               {/* kulissene: fargede bånd og hvite kort, som på siden */}
               {BAND.map((b) => (
@@ -178,8 +203,8 @@ export default function Galleri() {
                     top: k.t - TOPP,
                     width: k.w,
                     height: k.h,
-                    borderRadius: 67,
-                    background: C.cardWhite,
+                    borderRadius: k.r,
+                    background: k.bg,
                   }}
                 />
               ))}
@@ -187,7 +212,7 @@ export default function Galleri() {
               {/* bildene, på plassene sine, med knappene rett på */}
               {GALLERI.map((b, i) => {
                 const url = overstyrt[b.plass]
-                const opptatt = jobber === b.plass
+                const opptatt = jobber.has(b.plass)
                 return (
                   <div
                     key={b.plass}

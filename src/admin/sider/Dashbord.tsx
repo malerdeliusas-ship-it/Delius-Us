@@ -10,7 +10,7 @@ import { useSprak } from '../sprak'
 
 /** Oversikten: dagen i dag, siste 30 dager og snarveier til alt. */
 export default function Dashbord() {
-  const { t } = useSprak()
+  const { t, tell } = useSprak()
   const [stat, setStat] = useState<Stat | null>(null)
   const [innlegg, setInnlegg] = useState<BloggInnlegg[] | null>(null)
   const [feil, setFeil] = useState<string | null>(null)
@@ -63,7 +63,7 @@ export default function Dashbord() {
               <span className="adm-tall-navn">{t('dash.iDag')}</span>
               <span className="adm-tall-verdi">{iDag?.visninger ?? 0}</span>
               <span className="adm-tall-detalj">
-                {t('dash.visningerUnike', { unike: iDag?.unike ?? 0 })}
+                {t('dash.visninger')} · {tell(iDag?.unike ?? 0, 'unike')}
               </span>
             </div>
             <div className="adm-tall-kort">
@@ -74,9 +74,7 @@ export default function Dashbord() {
             <div className="adm-tall-kort">
               <span className="adm-tall-navn">{t('dash.siste30')}</span>
               <span className="adm-tall-verdi">{stat.totalt.visninger}</span>
-              <span className="adm-tall-detalj">
-                {t('dash.unikeBesok', { antall: stat.totalt.unike })}
-              </span>
+              <span className="adm-tall-detalj">{tell(stat.totalt.unike, 'unike')}</span>
             </div>
             <div className="adm-tall-kort">
               <span className="adm-tall-navn">{t('dash.siste30')}</span>

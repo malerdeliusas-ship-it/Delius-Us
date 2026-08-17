@@ -51,7 +51,7 @@ function Ramme({ children }: { children: React.ReactNode }) {
           <span className="adm-side-ord">Admin</span>
         </div>
 
-        <nav className="adm-meny" aria-label="Admin">
+        <nav className="adm-meny" aria-label={t('meny.aria')}>
           {MENY.map(({ til, nokkel, Ikon, slutt }) => (
             <NavLink
               key={til}
