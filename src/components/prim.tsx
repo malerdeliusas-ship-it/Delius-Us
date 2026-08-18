@@ -99,6 +99,7 @@ export function Txt({
 export function Img({
   src,
   alt = '',
+  fetchPriority,
   l,
   t,
   w,
@@ -110,6 +111,7 @@ export function Img({
 }: {
   src: string
   alt?: string
+  fetchPriority?: 'high' | 'low' | 'auto'
   l: number
   t: number
   w: number
@@ -124,6 +126,7 @@ export function Img({
     <img
       src={src}
       alt={alt}
+      fetchPriority={fetchPriority}
       loading={loading}
       decoding="async"
       style={{
@@ -152,6 +155,7 @@ export function Img({
 export function CropImg({
   src,
   alt = '',
+  fetchPriority,
   l,
   t,
   w,
@@ -163,6 +167,7 @@ export function CropImg({
 }: {
   src: string
   alt?: string
+  fetchPriority?: 'high' | 'low' | 'auto'
   l: number
   t: number
   w: number
@@ -195,6 +200,7 @@ export function CropImg({
       <img
         src={src}
         alt={alt}
+        fetchPriority={fetchPriority}
         loading={loading}
         decoding="async"
         style={{

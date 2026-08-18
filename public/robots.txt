@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin
+Disallow: /l/
 
 Sitemap: https://www.malerdelius.no/sitemap.xml

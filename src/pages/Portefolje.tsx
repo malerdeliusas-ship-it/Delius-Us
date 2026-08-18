@@ -7,7 +7,7 @@ import { useGalleri } from '../lib/galleri'
 
 import splash from '../assets/figma/splash.webp'
 import anmeldelser from '../assets/figma/mittanbud-anmeldelser.jpg'
-import icTeam from '../assets/figma/ic-team.png'
+import icTeam from '../assets/figma/ic-team.webp'
 import f06530 from '../assets/figma/portefolje-dsc06530-1.jpg'
 import f06515 from '../assets/figma/portefolje-dsc06515-1.jpg'
 import f06535 from '../assets/figma/portefolje-dsc06535-1.jpg'

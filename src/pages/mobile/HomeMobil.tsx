@@ -27,6 +27,7 @@ export default function HomeMobil() {
           className="m-bilde"
           src={heroBilde}
           alt="Malere fra Maler Delius AS i arbeid"
+          fetchPriority="high"
           style={{ marginTop: 28 }}
         />
       </section>
@@ -45,7 +46,7 @@ export default function HomeMobil() {
               padding: '20px var(--kant)',
             }}
           >
-            <img src={b.ic} alt="" width={64} height={64} style={{ opacity: b.op, flexShrink: 0 }} />
+            <img src={b.ic} alt="" width={64} height={64} style={{ opacity: b.op, flexShrink: 0 }} loading="lazy" decoding="async" />
             <div style={{ fontSize: 22, lineHeight: '28px', fontWeight: 600, color: b.farge }}>
               {b.tekst.replace(/\n/g, ' ')}
             </div>
@@ -62,14 +63,28 @@ export default function HomeMobil() {
             MALER DELIUS AS
           </span>
         </div>
-        <img className="m-bilde" src={omOssBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} />
+        <img className="m-bilde" src={omOssBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} loading="lazy" decoding="async" />
         <p style={{ marginTop: 20, fontStyle: 'italic' }}>
           Vi er Maler Delius AS, et team av profesjonelle med over 5 års erfaring, som tilbyr
           høykvalitets maler- og reparasjonstjenester i Oslo. Vårt mål er å gjøre ditt rom mer
           hyggelig, moderne og behagelig for både liv og arbeid.
         </p>
 
-        <h3 style={{ marginTop: 36, fontStyle: 'italic', fontWeight: 600 }}>Hvorfor velge oss?</h3>
+        {/* h2, ikke h3: overskriftene skal gå i rekkefølge for skjermlesere og
+            søkemotorer. Størrelse, vekt og venstrestilling låses her, så det
+            ser ut nøyaktig som før – .m h2 er ellers større og midtstilt. */}
+        <h2
+          style={{
+            marginTop: 36,
+            fontSize: 22,
+            lineHeight: 1.25,
+            fontStyle: 'italic',
+            fontWeight: 600,
+            textAlign: 'left',
+          }}
+        >
+          Hvorfor velge oss?
+        </h2>
         <div style={{ display: 'grid', gap: 24, marginTop: 20 }}>
           {GRUNNER.map((g) => (
             <div key={g.tittel}>
@@ -92,6 +107,8 @@ export default function HomeMobil() {
           {TEAM.map((p) => (
             <div key={p.navn} style={{ textAlign: 'center' }}>
               <img
+                loading="lazy"
+                decoding="async"
                 src={p.bilde}
                 alt={p.navn.trim() + ', maler hos Maler Delius AS i Oslo'}
                 style={{

@@ -34,12 +34,17 @@
     <meta name="twitter:title" content="Maler Delius AS – Profesjonell maling i Oslo" />
     <meta name="twitter:image" content="https://www.malerdelius.no/og-bilde.jpg" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Mukta:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
+    <!--
+      Skriftene ligger hos oss selv, i /fonter (se src/fonter.css). De tre
+      vektene som brukes øverst på siden hentes med én gang, så teksten ikke
+      rekker å blinke i systemskrift før den rette kommer.
+    -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/fonter/montserrat-400-normal-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/fonter/montserrat-600-normal-latin.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+          href="/fonter/montserrat-700-normal-latin.woff2" />
 
     <!-- Bedriftskortet for Google og svarmotorer: leses uten JavaScript. -->
     <script type="application/ld+json">

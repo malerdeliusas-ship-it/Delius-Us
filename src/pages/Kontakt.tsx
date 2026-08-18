@@ -7,9 +7,9 @@ import { Abs, Txt, Rect, CropImg } from '../components/prim'
 import { C, G, FONT, BEDRIFT } from '../lib/theme'
 
 import splash from '../assets/figma/splash.webp'
-import icMarker from '../assets/figma/ic-marker.png'
-import icWeb from '../assets/figma/ic-web.png'
-import icMail from '../assets/figma/ic-mail.png'
+import icMarker from '../assets/figma/ic-marker.webp'
+import icWeb from '../assets/figma/ic-web.webp'
+import icMail from '../assets/figma/ic-mail.webp'
 
 /** Kontaktraden nederst: ikon + tekst, tre grupper på rad. */
 const RAD = [

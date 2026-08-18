@@ -5,7 +5,10 @@ import { useRef, useState } from 'react'
  *
  * Skjemaet sendes til serverfunksjonen `/api/kontakt`, som legger meldingen
  * i e-post via Resend. Feltnavnene er de samme begge steder: navn, epost,
- * melding – pluss honningkrukka `firma`, som bare roboter fyller ut.
+ * melding – pluss honningkrukka `tilleggsinfo`, som bare roboter fyller ut.
+ * Navnet er med vilje uten mening: heter feltet «firma» eller «adresse»,
+ * fyller nettleserens autofyll det ut for kunden, og da hadde en ekte
+ * henvendelse sett ut som en robot.
  */
 
 export type Status = 'klar' | 'sender' | 'sendt' | 'feil'
@@ -60,7 +63,7 @@ export function useKontaktSkjema() {
     const navn = String(data.get('navn') ?? '').trim()
     const epost = String(data.get('epost') ?? '').trim()
     const melding = String(data.get('melding') ?? '').trim()
-    const firma = String(data.get('firma') ?? '')
+    const krukke = String(data.get('tilleggsinfo') ?? '')
 
     if (!navn) return vis(FEIL.navn, 'navn')
     if (!EPOST_MONSTER.test(epost)) return vis(FEIL.epost, 'epost')
@@ -78,7 +81,7 @@ export function useKontaktSkjema() {
           navn,
           epost,
           melding,
-          firma,
+          tilleggsinfo: krukke,
           apnet: forsteTast.current ? Date.now() - forsteTast.current : 0,
           side: window.location.pathname,
         }),

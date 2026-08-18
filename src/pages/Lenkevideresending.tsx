@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
+import { rpc } from '../lib/rest'
 import { huskLenkekode } from '../lib/spor'
 
 /**
@@ -23,19 +23,27 @@ export default function Lenkevideresending() {
     huskLenkekode(kode)
 
     async function videre() {
-      let mal = '/'
-      if (supabase) {
-        const { data } = await supabase.rpc('slaa_opp_lenke', { p_kode: kode })
-        // bare interne stier godtas, så en kode aldri kan sende folk ut av
-        // nettstedet selv om noe skulle stå feil i databasen
-        if (typeof data === 'string' && /^\/[a-z0-9/-]*$/i.test(data)) mal = data
-      }
+      const data = await rpc<string | null>('slaa_opp_lenke', { p_kode: kode })
+      // bare interne stier godtas, så en kode aldri kan sende folk ut av
+      // nettstedet selv om noe skulle stå feil i databasen
+      const mal =
+        typeof data === 'string' && /^\/[a-z0-9/-]*$/i.test(data) ? data : '/'
       if (aktiv) navigate(mal, { replace: true })
     }
 
-    void videre()
+    // Databasen kan være treg eller nede. Etter halvannet sekund gir vi opp
+    // og sender folk til forsiden i stedet for å la dem stå på en blank side.
+    const nodutgang = setTimeout(() => {
+      if (aktiv) {
+        aktiv = false
+        navigate('/', { replace: true })
+      }
+    }, 1500)
+
+    void videre().finally(() => clearTimeout(nodutgang))
     return () => {
       aktiv = false
+      clearTimeout(nodutgang)
     }
   }, [kode]) // eslint-disable-line react-hooks/exhaustive-deps
 

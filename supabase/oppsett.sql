@@ -226,16 +226,78 @@ create index if not exists sidevisninger_lenke_idx
 
 alter table public.sidevisninger enable row level security;
 
--- nettstedet får bare LEGGE TIL rader – aldri lese, endre eller slette
+-- Nettleseren skriver IKKE lenger rett i tabellen. Den offentlige nøkkelen
+-- ligger jo i bunten, og en åpen insert-policy betyr at hvem som helst kan
+-- fylle statistikken med oppdiktede besøk og oppdiktede kampanjeklikk – tall
+-- klienten faktisk tar beslutninger på. All registrering går nå gjennom
+-- funksjonen registrer_visning under, som selv kontrollerer hva som slippes
+-- inn. Den gamle policyen fjernes her, om den finnes fra før.
 drop policy if exists "alle registrerer visninger" on public.sidevisninger;
-create policy "alle registrerer visninger"
-  on public.sidevisninger for insert to anon, authenticated
-  with check (true);
+revoke insert on public.sidevisninger from anon, authenticated;
 
 drop policy if exists "admin leser statistikken" on public.sidevisninger;
 create policy "admin leser statistikken"
   on public.sidevisninger for select to authenticated
   using (public.er_admin());
+
+drop policy if exists "admin rydder statistikken" on public.sidevisninger;
+create policy "admin rydder statistikken"
+  on public.sidevisninger for delete to authenticated
+  using (public.er_admin());
+
+-- Registrering av én sidevisning. SECURITY DEFINER, så den skriver på vegne
+-- av databasen og ikke av den besøkende, og den slipper bare gjennom det som
+-- gir mening:
+--   · stien må være en av nettstedets egne sider (samme liste som spor.ts)
+--   · kampanjekoden må finnes i lenker – ellers lagres den ikke
+--   · maks 200 visninger per økt per time, så ingen kan pumpe inn tusenvis
+-- Funksjonen sier aldri fra om noe ble avvist: en teller skal ikke fortelle
+-- en robot hvordan den skal oppføre seg for å slippe forbi.
+create or replace function public.registrer_visning(
+  p_sti text,
+  p_kilde text default null,
+  p_lenke_kode text default null,
+  p_enhet text default 'desktop',
+  p_okt uuid default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_kode text;
+begin
+  if p_okt is null then
+    return;
+  end if;
+
+  if p_sti not in ('/', '/om-oss', '/portefolje', '/malertjenester', '/kontakt', '/blogg', '/personvern')
+     and p_sti !~ '^/blogg/[a-z0-9-]{1,120}$' then
+    return;
+  end if;
+
+  if (select count(*) from public.sidevisninger
+       where okt_id = p_okt and tidspunkt > now() - interval '1 hour') >= 200 then
+    return;
+  end if;
+
+  -- En kode som ikke finnes hos oss, lagres ikke. Ellers kunne hvem som helst
+  -- dikte opp kampanjer som aldri har eksistert.
+  select kode into v_kode from public.lenker where kode = lower(coalesce(p_lenke_kode, ''));
+
+  insert into public.sidevisninger (sti, kilde, lenke_kode, enhet, okt_id)
+  values (
+    left(p_sti, 200),
+    nullif(left(coalesce(p_kilde, ''), 120), ''),
+    v_kode,
+    case when p_enhet = 'mobil' then 'mobil' else 'desktop' end,
+    p_okt
+  );
+end $$;
+
+revoke execute on function public.registrer_visning(text, text, text, text, uuid) from public;
+grant execute on function public.registrer_visning(text, text, text, text, uuid) to anon, authenticated;
 
 
 -- ---------------------------------------------------------------------------

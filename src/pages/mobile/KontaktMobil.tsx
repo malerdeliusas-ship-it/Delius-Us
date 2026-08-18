@@ -4,9 +4,9 @@ import MobilSkjema from '../../components/mobile/MobilSkjema'
 import { C, G, BEDRIFT } from '../../lib/theme'
 
 import splash from '../../assets/figma/splash.webp'
-import icMarker from '../../assets/figma/ic-marker.png'
-import icWeb from '../../assets/figma/ic-web.png'
-import icMail from '../../assets/figma/ic-mail.png'
+import icMarker from '../../assets/figma/ic-marker.webp'
+import icWeb from '../../assets/figma/ic-web.webp'
+import icMail from '../../assets/figma/ic-mail.webp'
 
 const RAD = [
   { ikon: icMarker, tekst: BEDRIFT.adresse, href: BEDRIFT.kart, alt: 'Adresse' },
@@ -23,6 +23,8 @@ export default function KontaktMobil() {
     <MobilSide>
       <div style={{ background: G.kontakt }}>
         <img
+          loading="lazy"
+          decoding="async"
           src={splash}
           alt=""
           style={{ display: 'block', width: '100%', height: 90, objectFit: 'cover', objectPosition: 'top' }}
@@ -58,7 +60,7 @@ export default function KontaktMobil() {
                 rel="noreferrer"
                 style={{ display: 'flex', alignItems: 'center', gap: 14 }}
               >
-                <img src={r.ikon} alt={r.alt} style={{ width: 44, height: 32, objectFit: 'contain', flexShrink: 0 }} />
+                <img src={r.ikon} alt={r.alt} style={{ width: 44, height: 32, objectFit: 'contain', flexShrink: 0 }} loading="lazy" decoding="async" />
                 <span style={{ fontWeight: 800, fontSize: 17, color: C.black }}>{r.tekst}</span>
               </a>
             ))}

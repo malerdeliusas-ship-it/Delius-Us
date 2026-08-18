@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { supabase } from './supabase'
+import { les } from './rest'
 
 import f06530 from '../assets/figma/portefolje-dsc06530-1.jpg'
 import f06515 from '../assets/figma/portefolje-dsc06515-1.jpg'
@@ -59,24 +59,18 @@ async function hentOverstyringer(): Promise<Record<string, string>> {
   if (!henting) {
     henting = (async () => {
       const kart: Record<string, string> = {}
-      if (!supabase) {
-        hentet = kart
-        return kart
-      }
-      try {
-        const { data, error } = await supabase.from('galleri_bilder').select('plass, bilde_url')
-        if (error) {
-          // Et mislykket forsøk skal ikke huskes: da ville originalbildene
-          // blitt låst for resten av besøket, også etter at nettet er
-          // tilbake. Neste side som spør, prøver på nytt.
-          henting = null
-          return kart
-        }
-        for (const rad of data ?? []) kart[rad.plass] = rad.bilde_url
-      } catch {
+      const data = await les<{ plass: string; bilde_url: string }>(
+        'galleri_bilder',
+        'select=plass,bilde_url',
+      )
+      if (!data) {
+        // Et mislykket forsøk skal ikke huskes: da ville originalbildene
+        // blitt låst for resten av besøket, også etter at nettet er
+        // tilbake. Neste side som spør, prøver på nytt.
         henting = null
         return kart
       }
+      for (const rad of data) kart[rad.plass] = rad.bilde_url
       hentet = kart
       return kart
     })()

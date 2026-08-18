@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { supabase } from './supabase'
+import { harBase, rpc, settInn } from './rest'
 
 /**
  * Egen, personvernvennlig besøksteller: én rad i Supabase per sidevisning.
@@ -87,6 +87,7 @@ const KJENTE_SIDER = new Set([
   '/malertjenester',
   '/kontakt',
   '/blogg',
+  '/personvern',
 ])
 
 function erEgenSide(sti: string): boolean {
@@ -94,7 +95,7 @@ function erEgenSide(sti: string): boolean {
 }
 
 function registrer(sti: string) {
-  if (!supabase) return
+  if (!harBase) return
   if (!erEgenSide(sti)) return
   // egne besøk (admin-maskinen) skal ikke inn i statistikken
   try {
@@ -103,19 +104,32 @@ function registrer(sti: string) {
     /* uten localStorage sporer vi som vanlig */
   }
 
-  void supabase
-    .from('sidevisninger')
-    .insert({
-      sti: sti.slice(0, 200),
-      kilde: kilde(),
-      lenke_kode: lagretLenkekode(),
-      enhet: window.innerWidth < 1000 ? 'mobil' : 'desktop',
-      okt_id: oktId(),
+  const rad = {
+    p_sti: sti.slice(0, 200),
+    p_kilde: kilde(),
+    p_lenke_kode: lagretLenkekode(),
+    p_enhet: window.innerWidth < 1000 ? 'mobil' : 'desktop',
+    p_okt: oktId(),
+  }
+
+  // Registreringen går gjennom databasefunksjonen registrer_visning, som
+  // kontrollerer at stien er en av våre egne sider og setter et tak per økt.
+  // Skrev nettleseren rett i tabellen, kunne hvem som helst med den
+  // offentlige nøkkelen fylle statistikken med oppdiktede besøk.
+  //
+  // Er funksjonen ennå ikke lagt inn (supabase/oppsett.sql ikke kjørt på
+  // nytt), faller vi tilbake til den gamle måten, så tellingen ikke stopper
+  // i mellomtiden. Etter at skriptet er kjørt, er den veien stengt uansett.
+  void rpc<null>('registrer_visning', rad).then((svar) => {
+    if (svar !== undefined) return
+    void settInn('sidevisninger', {
+      sti: rad.p_sti,
+      kilde: rad.p_kilde,
+      lenke_kode: rad.p_lenke_kode,
+      enhet: rad.p_enhet,
+      okt_id: rad.p_okt,
     })
-    .then(({ error }) => {
-      // statistikk skal aldri forstyrre nettstedet – logg og gå videre
-      if (error) console.warn('sporing:', error.message)
-    })
+  })
 }
 
 /** Kobles på i App: teller hver sidevisning ved rutebytte. */

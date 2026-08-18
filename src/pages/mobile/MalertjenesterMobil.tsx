@@ -10,6 +10,8 @@ export default function MalertjenesterMobil() {
   return (
     <MobilSide>
       <img
+        loading="lazy"
+        decoding="async"
         src={splash}
         alt=""
         style={{ display: 'block', width: '100%', height: 90, objectFit: 'cover', objectPosition: 'top' }}

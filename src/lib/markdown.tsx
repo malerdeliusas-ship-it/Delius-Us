@@ -16,7 +16,10 @@ import type { ReactNode } from 'react'
 const INLINE = /(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|(\[([^\]]+)\]\(([^)\s]+)\))/g
 
 function trygLenke(url: string): string | null {
-  if (url.startsWith('/') && !url.startsWith('//')) return url
+  // «/\evil.com» ser ut som en intern sti, men nettleseren leser skråstreken
+  // baklengs som en vanlig en og sender folk til evil.com. Derfor må begge
+  // tegnene sperres, ikke bare dobbel skråstrek.
+  if (url.startsWith('/') && !/^\/[/\\]/.test(url)) return url
   try {
     const u = new URL(url)
     return u.protocol === 'https:' || u.protocol === 'http:' ? u.href : null

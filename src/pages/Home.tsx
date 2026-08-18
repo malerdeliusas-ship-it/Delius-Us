@@ -9,9 +9,9 @@ import { TEAM, TJENESTER } from '../lib/site'
 
 import heroBilde from '../assets/figma/hero-echipa.jpg'
 import omOssBilde from '../assets/figma/omoss-team.jpg'
-import icTeam from '../assets/figma/ic-team.png'
-import icKvalitet from '../assets/figma/ic-kvalitet.png'
-import icGaranti from '../assets/figma/ic-garanti.png'
+import icTeam from '../assets/figma/ic-team.webp'
+import icKvalitet from '../assets/figma/ic-kvalitet.webp'
+import icGaranti from '../assets/figma/ic-garanti.webp'
 
 /** Maskeformen over hero-bildet, fra vektoren i Figma (796.5 x 534.5). */
 const HERO_MASK = 'polygon(20.213% 41.722%, 0% 100%, 100% 100%, 100% 0%, 43.692% 0%)'
@@ -64,6 +64,7 @@ export default function Home() {
               src={heroBilde}
               alt="Malere fra Maler Delius AS i arbeid"
               loading="eager"
+              fetchPriority="high"
               l={-50}
               t={-4}
               w={833}

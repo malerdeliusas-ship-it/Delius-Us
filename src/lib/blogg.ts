@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { supabase, type BloggInnlegg } from './supabase'
+import { les } from './rest'
+import type { BloggInnlegg } from './supabase'
 
 /** Felles datahenting for bloggen (samme på desktop og mobil). */
 
@@ -19,16 +20,14 @@ export function useInnleggListe() {
   useEffect(() => {
     let aktiv = true
     async function hent() {
-      if (!supabase) {
-        if (aktiv) setListe([])
-        return
-      }
-      const { data, error } = await supabase
-        .from('blogg_innlegg')
-        .select('id, tittel, slug, ingress, bilde_url, publisert, publisert_dato, opprettet, oppdatert, innhold')
-        .eq('publisert', true)
-        .order('publisert_dato', { ascending: false, nullsFirst: false })
-      if (aktiv) setListe(error ? [] : ((data ?? []) as BloggInnlegg[]))
+      // Listesiden viser tittel, ingress og bilde. Selve brødteksten hentes
+      // ikke: den kan være lang, og på oversikten vises den aldri.
+      const data = await les<BloggInnlegg>(
+        'blogg_innlegg',
+        'select=id,tittel,slug,ingress,bilde_url,publisert,publisert_dato,opprettet,oppdatert' +
+          '&publisert=eq.true&order=publisert_dato.desc.nullslast',
+      )
+      if (aktiv) setListe(data ?? [])
     }
     void hent()
     return () => {
@@ -46,17 +45,16 @@ export function useInnlegg(slug: string) {
   useEffect(() => {
     let aktiv = true
     async function hent() {
-      if (!supabase) {
-        if (aktiv) setInnlegg(null)
-        return
-      }
-      const { data } = await supabase
-        .from('blogg_innlegg')
-        .select('*')
-        .eq('slug', slug)
-        .eq('publisert', true)
-        .maybeSingle<BloggInnlegg>()
-      if (aktiv) setInnlegg(data ?? null)
+      const rader = await les<BloggInnlegg>(
+        'blogg_innlegg',
+        `select=*&slug=eq.${encodeURIComponent(slug)}&publisert=eq.true&limit=1`,
+      )
+      // rader === null betyr at spørringen feilet (nett nede, database nede).
+      // Da er svaret «vet ikke», ikke «finnes ikke»: siden fortsetter å laste
+      // i stedet for å påstå at innlegget er borte og be Google glemme det.
+      if (!aktiv) return
+      if (rader === null) setInnlegg(undefined)
+      else setInnlegg(rader[0] ?? null)
     }
     setInnlegg(undefined)
     void hent()

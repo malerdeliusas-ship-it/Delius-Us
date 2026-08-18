@@ -14,6 +14,7 @@ import Kontakt from './pages/Kontakt'
 import Blogg from './pages/Blogg'
 import BloggInnleggSide from './pages/BloggInnleggSide'
 import Lenkevideresending from './pages/Lenkevideresending'
+import Personvern from './pages/Personvern'
 
 import HomeMobil from './pages/mobile/HomeMobil'
 import OmOssMobil from './pages/mobile/OmOssMobil'
@@ -61,6 +62,7 @@ export default function App() {
         <Route path="/kontakt" element={sider.kontakt} />
         <Route path="/blogg" element={sider.blogg} />
         <Route path="/blogg/:slug" element={sider.innlegg} />
+        <Route path="/personvern" element={<Personvern />} />
         {/* sporingslenker: teller besøket og sender videre */}
         <Route path="/l/:kode" element={<Lenkevideresending />} />
         <Route

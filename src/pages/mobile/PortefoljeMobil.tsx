@@ -4,7 +4,7 @@ import { KORT } from '../Portefolje'
 import { useGalleri } from '../../lib/galleri'
 
 import splash from '../../assets/figma/splash.webp'
-import icTeam from '../../assets/figma/ic-team.png'
+import icTeam from '../../assets/figma/ic-team.webp'
 import anmeldelser from '../../assets/figma/mittanbud-anmeldelser.jpg'
 import f06530 from '../../assets/figma/portefolje-dsc06530-1.jpg'
 import f06515 from '../../assets/figma/portefolje-dsc06515-1.jpg'
@@ -68,6 +68,8 @@ export default function PortefoljeMobil() {
   return (
     <MobilSide>
       <img
+        loading="lazy"
+        decoding="async"
         src={splash}
         alt=""
         style={{ display: 'block', width: '100%', height: 90, objectFit: 'cover', objectPosition: 'top' }}
@@ -79,14 +81,14 @@ export default function PortefoljeMobil() {
 
       {BLOKKER.map((b, i) => (
         <section key={i} className="m-seksjon m-inn" style={{ background: b.bg }}>
-          <img src={icTeam} alt="" width={72} height={71} style={{ opacity: 0.86 }} />
+          <img src={icTeam} alt="" width={72} height={71} style={{ opacity: 0.86 }} loading="lazy" decoding="async" />
           <h3 style={{ marginTop: 16, fontSize: 26, color: C.panelBlue }}>{KORT[i].tittel.tekst}</h3>
           <p style={{ marginTop: 12, fontFamily: FONT_MUKTA, fontSize: 18, lineHeight: '24px' }}>
             {KORT[i].brod.tekst}
           </p>
           <div style={{ display: 'grid', gap: 14, marginTop: 22 }}>
             {b.bilder.map((bilde) => (
-              <img key={bilde.plass} className="m-bilde" src={g(bilde.plass) ?? bilde.org} alt={bilde.alt} />
+              <img key={bilde.plass} className="m-bilde" src={g(bilde.plass) ?? bilde.org} alt={bilde.alt} loading="lazy" decoding="async" />
             ))}
           </div>
         </section>
@@ -94,7 +96,7 @@ export default function PortefoljeMobil() {
 
       {/* ---------- Tall og anmeldelser ---------- */}
       <section className="m-seksjon m-inn" style={{ background: C.pf[4] }}>
-        <img className="m-bilde" src={g('pf-13') ?? f02620} alt="Skilt fra Maler Delius AS på byggeplass" />
+        <img className="m-bilde" src={g('pf-13') ?? f02620} alt="Skilt fra Maler Delius AS på byggeplass" loading="lazy" decoding="async" />
 
         <div className="m-rutenett m-rutenett--2" style={{ marginTop: 18 }}>
           {TALL.map((t) => (
@@ -122,6 +124,8 @@ export default function PortefoljeMobil() {
           aria-label="Se vurderingene våre på Mittanbud"
         >
           <img
+            loading="lazy"
+            decoding="async"
             className="m-bilde"
             src={anmeldelser}
             alt="Kundevurderinger av Maler Delius AS på Mittanbud"

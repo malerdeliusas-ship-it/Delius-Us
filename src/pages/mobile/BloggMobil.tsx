@@ -27,10 +27,11 @@ export default function BloggMobil() {
             <Link key={i.id} to={`/blogg/${i.slug}`} className="m-kort" style={{ display: 'block' }}>
               {i.bilde_url && (
                 <img
+                  loading="lazy"
+                  decoding="async"
                   className="m-bilde"
                   src={i.bilde_url}
                   alt=""
-                  loading="lazy"
                   style={{ aspectRatio: '3 / 2', objectFit: 'cover', marginBottom: 16 }}
                 />
               )}

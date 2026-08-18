@@ -88,13 +88,15 @@ export default function ContactForm({
         style={felt(t + 188, 163, C.placeholder)}
       />
 
-      {/* Honningkrukke: usynlig for folk, fylt ut av roboter. */}
+      {/* Honningkrukke: usynlig for folk, fylt ut av roboter. Navnet må
+          ikke ligne på et ekte felt, ellers fyller autofyllen det for
+          kunden – og da hadde meldingen blitt stemplet som robot. */}
       <input
         className="honning"
         type="text"
-        name="firma"
+        name="tilleggsinfo"
         tabIndex={-1}
-        autoComplete="off"
+        autoComplete="new-password"
         aria-hidden="true"
       />
 

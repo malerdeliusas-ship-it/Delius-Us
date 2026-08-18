@@ -13,6 +13,23 @@ function apiIUtvikling(): Plugin {
     name: 'malerdelius-api-i-utvikling',
     apply: 'serve',
     configureServer(server) {
+      server.middlewares.use('/sitemap.xml', async (_req, res) => {
+        const { default: handler } = await server.ssrLoadModule('/api/sitemap.ts')
+        await handler(
+          {},
+          {
+            setHeader: (navn: string, verdi: string) => res.setHeader(navn, verdi),
+            status(kode: number) {
+              res.statusCode = kode
+              return this
+            },
+            send(kropp: string) {
+              res.end(kropp)
+            },
+          },
+        )
+      })
+
       server.middlewares.use('/api/kontakt', async (req, res) => {
         const biter: Buffer[] = []
         for await (const bit of req) biter.push(bit as Buffer)

@@ -34,6 +34,14 @@ export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
           </a>
         </div>
         <div>{BEDRIFT.orgnr}</div>
+        {/* Personvernerklæringen. Lovpålagt så snart nettstedet teller besøk
+            og tar imot skjemaer, og lagt her fordi kontaktspalten er den
+            eneste med ledig plass under seg – resten av designet står urørt. */}
+        <div style={{ marginTop: 6 }}>
+          <Link to="/personvern" style={u}>
+            Personvern
+          </Link>
+        </div>
       </div>
 
       <div style={{ ...col, left: 628, width: 140 }}>

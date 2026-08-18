@@ -21,6 +21,8 @@ export default function OmOssMobil() {
   return (
     <MobilSide>
       <img
+        loading="lazy"
+        decoding="async"
         src={splash}
         alt=""
         style={{ display: 'block', width: '100%', height: 90, objectFit: 'cover', objectPosition: 'top' }}
@@ -33,7 +35,7 @@ export default function OmOssMobil() {
             MALER DELIUS AS
           </span>
         </div>
-        <img className="m-bilde" src={teamBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} />
+        <img className="m-bilde" src={teamBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} loading="lazy" decoding="async" />
         <p style={{ marginTop: 20, fontWeight: 500, letterSpacing: '0.04em' }}>
           Vi er Maler Delius AS, et team av profesjonelle med over 5 års erfaring, som tilbyr
           høykvalitets maler- og reparasjonstjenester i Oslo. Vårt mål er å gjøre ditt rom mer
@@ -60,6 +62,8 @@ export default function OmOssMobil() {
         <div className="m-rutenett m-rutenett--2" style={{ marginTop: 36 }}>
           {GALLERI.map((f) => (
             <img
+              loading="lazy"
+              decoding="async"
               key={f.alt}
               src={f.src}
               alt={f.alt}

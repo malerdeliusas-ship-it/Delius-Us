@@ -29,15 +29,44 @@ type Res = {
 
 const EPOST_MONSTER = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
-/** Enkel bremse per IP. Lever bare så lenge instansen lever, men stopper de verste. */
-const TAK = 5
+/**
+ * Enkel bremse per IP. Den lever bare så lenge instansen lever, så den er
+ * ingen garanti mot en fordelt flom – men den stopper det som faktisk skjer:
+ * én og samme avsender som trykker igjen og igjen. Et ekte tak på tvers av
+ * alle instanser krever delt lagring (Vercel KV eller en tabell i Supabase).
+ */
+const TAK = 3
 const VINDU_MS = 10 * 60 * 1000
 const sett = new Map<string, number[]>()
+
+/**
+ * Nettstedene skjemaet har lov til å komme fra: det ekte nettstedet, Vercels
+ * forhåndsvisninger (så et utkast kan prøves før det legges ut) og maskinen
+ * til den som utvikler. Alt annet er en fremmed side som sender på vegne av
+ * en besøkende.
+ */
+const OPPHAV = [
+  /^https:\/\/(www\.)?malerdelius\.no$/,
+  /^https:\/\/[a-z0-9-]+\.vercel\.app$/,
+  /^http:\/\/localhost(:\d+)?$/,
+  /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+]
+
+/** Hvor lenge vi venter på Resend før vi gir opp. */
+const SENDE_FRIST_MS = 10_000
 
 export default async function handler(req: Req, res: Res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ feil: 'Bruk POST' })
+  }
+
+  // Skjemaet vårt sender alltid Origin, fordi det er en fetch fra samme
+  // nettsted. Kommer det noe fra et annet opphav, er det en fremmed side som
+  // sender på vegne av en besøkende, og da er det ikke en kunde som skriver.
+  const opphav = forsteVerdi(req.headers.origin)
+  if (opphav && !OPPHAV.some((m) => m.test(opphav))) {
+    return res.status(403).json({ feil: 'Ugyldig opphav' })
   }
 
   const kropp = (typeof req.body === 'string' ? tryggParse(req.body) : req.body) as
@@ -49,29 +78,35 @@ export default async function handler(req: Req, res: Res) {
   const navn = enLinje(tekst(kropp?.navn, 120))
   const epost = tekst(kropp?.epost, 200)
   const melding = tekst(kropp?.melding, 5000)
-  const firma = tekst(kropp?.firma, 200)
+  const krukke = tekst(kropp?.tilleggsinfo, 200)
   const apnet = Number(kropp?.apnet ?? 0)
   const side = enLinje(tekst(kropp?.side, 100)) || '/'
 
-  // Honningkrukka er fylt ut: det gjør bare roboter. Vi svarer OK og sender
-  // ingenting, slik at roboten ikke lærer noe av svaret. Loggen beholder sporet.
-  if (firma) {
-    console.log('Droppet innsending: honningkrukke', { navn, epost })
+  // To uavhengige robottegn: det skjulte feltet er fylt ut, og skrivetiden
+  // mangler eller er under to sekunder. Hver for seg tar de av og til feil –
+  // en nettleser kan finne på å fylle ut skjulte felt automatisk, og et
+  // menneske kan lime inn en ferdigskrevet melding. Derfor slukes ingenting
+  // med mindre BEGGE slår ut. Ett tegn alene gir en merket e-post i stedet,
+  // så en ekte kunde aldri forsvinner i stillhet.
+  const krukkeSlo = Boolean(krukke)
+  const fortSlo = !Number.isFinite(apnet) || apnet <= 0 || apnet < 2000
+
+  if (krukkeSlo && fortSlo) {
+    console.log('Droppet innsending: robot (skjult felt + ingen skrivetid)')
     return res.status(200).json({ ok: true })
   }
 
-  // Ingen målt skrivetid, eller innsending under to sekunder etter første
-  // tastetrykk, lukter robot – men kan i sjeldne tilfeller være et ekte
-  // menneske. Meldingen sendes derfor likevel, tydelig merket i emnet,
-  // i stedet for å kaste en mulig kunde.
-  const mistenkt = !Number.isFinite(apnet) || apnet <= 0 || apnet < 2000
-  if (mistenkt) console.log('Mistenkt robot, sender merket', { navn, epost, apnet })
+  const mistenkt = krukkeSlo || fortSlo
+  if (mistenkt) console.log('Mistenkt robot, sender merket', { krukkeSlo, apnet })
 
   if (!navn) return res.status(400).json({ feil: 'Navn mangler' })
   if (!EPOST_MONSTER.test(epost)) return res.status(400).json({ feil: 'Ugyldig e-post' })
   if (melding.length < 5) return res.status(400).json({ feil: 'Meldingen er for kort' })
 
-  const ip = forsteVerdi(req.headers['x-forwarded-for']) ?? 'ukjent'
+  const ip =
+    forsteVerdi(req.headers['x-real-ip']) ??
+    forsteVerdi(req.headers['x-forwarded-for']) ??
+    'ukjent'
   if (forMange(ip)) return res.status(429).json({ feil: 'For mange forsøk. Prøv igjen senere.' })
 
   const nokkel = process.env.RESEND_API_KEY
@@ -84,8 +119,11 @@ export default async function handler(req: Req, res: Res) {
   }
 
   try {
+    const avbryt = new AbortController()
+    const frist = setTimeout(() => avbryt.abort(), SENDE_FRIST_MS)
     const svar = await fetch('https://api.resend.com/emails', {
       method: 'POST',
+      signal: avbryt.signal,
       headers: {
         Authorization: `Bearer ${nokkel}`,
         'Content-Type': 'application/json',
@@ -100,6 +138,8 @@ export default async function handler(req: Req, res: Res) {
         html: epostHtml(navn, epost, melding, side),
       }),
     })
+
+    clearTimeout(frist)
 
     if (!svar.ok) {
       console.error('Resend svarte', svar.status, await svar.text())
@@ -148,13 +188,14 @@ function forMange(ip: string) {
 
 /** Hvilken side skjemaet sto på, med navnet fra menyen. */
 function sidenavn(sti: string) {
-  const navn: Record<string, string> = {
+  const navn: Record<string, string> = Object.assign(Object.create(null), {
     '/': 'Forsiden',
     '/kontakt': 'Kontakt oss',
     '/om-oss': 'Om oss',
     '/portefolje': 'Portefølje',
     '/malertjenester': 'Malertjenester',
-  }
+    '/blogg': 'Blogg',
+  })
   return navn[sti] ?? sti
 }
 

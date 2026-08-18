@@ -40,6 +40,11 @@ const SIDER: Record<string, { tittel: string; beskrivelse: string }> = {
     beskrivelse:
       'Nytt fra Maler Delius AS: maletips, ferdige prosjekter og små glimt fra hverdagen til malerne våre i Oslo.',
   },
+  '/personvern': {
+    tittel: 'Personvern – Maler Delius AS',
+    beskrivelse:
+      'Hva malerdelius.no lagrer om deg, og hvorfor. Ingen informasjonskapsler, ingen IP-adresser og ingen sporing fra tredjepart.',
+  },
 }
 
 /**

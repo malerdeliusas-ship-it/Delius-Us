@@ -40,6 +40,8 @@ export default function BloggInnleggMobil() {
             </div>
             {innlegg.bilde_url && (
               <img
+                loading="lazy"
+                decoding="async"
                 className="m-bilde"
                 src={innlegg.bilde_url}
                 alt=""

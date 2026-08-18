@@ -75,6 +75,10 @@ function MobilFooter() {
           <a href={`mailto:${BEDRIFT.epost}`}>{BEDRIFT.epost}</a>
         </div>
         <div>{BEDRIFT.orgnr}</div>
+        {/* Personvernerklæringen, samme plass som på desktop. */}
+        <div style={{ marginTop: 6 }}>
+          <Link to="/personvern">Personvern</Link>
+        </div>
       </div>
 
       <div>

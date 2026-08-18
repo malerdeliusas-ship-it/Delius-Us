@@ -1,5 +1,5 @@
 -- ============================================================================
--- Maler Delius – lag (eller nullstill) en admin-bruker
+-- Maler Delius – lag (eller nullstill) admin-brukeren
 -- ============================================================================
 -- Kjør supabase/oppsett.sql FØRST. Deretter denne, i SQL Editor.
 --
@@ -11,29 +11,38 @@
 --
 -- Skriptet er trygt å kjøre flere ganger: finnes brukeren, får den bare nytt
 -- passord. E-posten legges samtidig inn i admin_epost, som er det som faktisk
--- gir tilgang til panelet.
+-- gir tilgang til panelet. Samtidig fjernes den gamle testbrukeren, både fra
+-- innloggingen og fra admin-lista.
 --
--- Denne filen inneholder med vilje INGENTING annet enn innloggingen. SQL-
--- editoren kjører hele filen som én transaksjon, så en feil hvor som helst
--- ville rullet tilbake alt – og da hadde ingen hatt tilgang. Demoinnhold og
--- annet opprydding ligger i supabase/demo-innhold.sql.
+-- ----------------------------------------------------------------------------
+--   PASSORDET SKAL ALDRI STÅ I DENNE FILA.
 --
---   >>> BYTT DE TO LINJENE UNDER FØR DU KJØRER. <<<
---   Et testpassord er greit mens du prøver panelet lokalt. Før nettstedet
---   legges ut: kjør denne på nytt med et ordentlig passord, og slett
---   testbrukeren (Authentication → Users → … → Delete user).
--- ============================================================================
+--   Kodelageret på GitHub er offentlig. Et passord som blir lagt inn her og
+--   sjekket inn, er dermed lest av hvem som helst, og hele panelet står åpent.
+--   Derfor: lim inn passordet på linja under RETT FØR du trykker Run i SQL
+--   Editor, og la fila på disk beholde plassholderen. Skriptet nekter å kjøre
+--   med plassholderen eller med et passord kortere enn 12 tegn.
+-- ----------------------------------------------------------------------------
 
 set search_path = public, extensions;
 
 do $$
 declare
-  -- ↓↓↓ ENDRE DISSE TO ↓↓↓
-  v_epost   text := 'test@malerdelius.no';
-  v_passord text := 'test1234';
-  -- ↑↑↑ ENDRE DISSE TO ↑↑↑
+  -- ↓↓↓ SETT PASSORDET HER, BARE I SQL-EDITOREN ↓↓↓
+  v_epost   text := 'malerdelius@gmail.com';
+  v_passord text := 'SETT-PASSORD-HER';
+  -- ↑↑↑ SETT PASSORDET HER, BARE I SQL-EDITOREN ↑↑↑
+
+  -- Gammel testbruker som skal bort. Sett til null om det ikke finnes noen.
+  v_gammel  text := 'test@malerdelius.no';
+
   v_id uuid;
+  v_gammel_id uuid;
 begin
+  if v_passord = 'SETT-PASSORD-HER' or length(v_passord) < 12 then
+    raise exception 'Sett et ekte passord på minst 12 tegn før du kjører skriptet.';
+  end if;
+
   select id into v_id from auth.users where lower(email) = lower(v_epost);
 
   if v_id is null then
@@ -92,10 +101,30 @@ begin
   -- dette er det som gir admin-tilgang
   insert into public.admin_epost (epost) values (lower(v_epost))
     on conflict (epost) do nothing;
+
+  -- ---------------------------------------------------------------------
+  -- Bort med testbrukeren: først admin-retten, så selve innloggingen.
+  -- Rekkefølgen er med vilje – mister vi tilgangen halvveis, står vi igjen
+  -- med en bruker uten rettigheter, ikke med en rettighet uten eier.
+  -- ---------------------------------------------------------------------
+  if v_gammel is not null and lower(v_gammel) <> lower(v_epost) then
+    delete from public.admin_epost where lower(epost) = lower(v_gammel);
+
+    select id into v_gammel_id from auth.users where lower(email) = lower(v_gammel);
+    if v_gammel_id is not null then
+      delete from auth.identities where user_id = v_gammel_id;
+      delete from auth.users where id = v_gammel_id;
+      raise notice 'Testbrukeren % er slettet.', v_gammel;
+    end if;
+  end if;
 end $$;
 
 -- Sjekkliste
 select 'Brukere i auth' as sjekk, count(*)::text as resultat from auth.users
 union all
 select 'E-poster med admin-tilgang', coalesce(string_agg(epost, ', '), 'INGEN')
-from public.admin_epost;
+from public.admin_epost
+union all
+select 'Testbrukeren finnes ennå',
+       case when exists (select 1 from auth.users where lower(email) = 'test@malerdelius.no')
+            then 'JA – slett den manuelt' else 'nei' end;

@@ -1,10 +1,10 @@
 // Innhold og eksakte Figma-koordinater. Tekstene er ordrett fra designet.
-import icReparasjon from '../assets/figma/ic-reparasjon.png'
-import icDekorative from '../assets/figma/ic-dekorative.png'
-import icEco from '../assets/figma/ic-eco.png'
-import icInterior from '../assets/figma/ic-interior.png'
-import icFargevalg from '../assets/figma/ic-fargevalg.png'
-import icFasade from '../assets/figma/ic-fasade.png'
+import icReparasjon from '../assets/figma/ic-reparasjon.webp'
+import icDekorative from '../assets/figma/ic-dekorative.webp'
+import icEco from '../assets/figma/ic-eco.webp'
+import icInterior from '../assets/figma/ic-interior.webp'
+import icFargevalg from '../assets/figma/ic-fargevalg.webp'
+import icFasade from '../assets/figma/ic-fasade.webp'
 
 import bildeLucia from '../assets/figma/team-lucia.jpg'
 import bildeNicolae from '../assets/figma/team-nicolae.jpg'
