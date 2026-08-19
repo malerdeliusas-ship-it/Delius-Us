@@ -48,15 +48,23 @@ begin
   if v_id is null then
     v_id := gen_random_uuid();
 
+    -- Tekstfeltene under MÅ settes til tom tekst, ikke stå igjen som NULL.
+    -- Innloggingstjenesten leser dem inn i vanlige tekstvariabler som ikke
+    -- tåler NULL, og da svarer innloggingen «Database error querying schema»
+    -- selv om både brukeren og passordet er riktige.
     insert into auth.users (
       instance_id, id, aud, role, email, encrypted_password,
       email_confirmed_at, created_at, updated_at,
-      raw_app_meta_data, raw_user_meta_data
+      raw_app_meta_data, raw_user_meta_data,
+      confirmation_token, recovery_token,
+      email_change, email_change_token_new
     ) values (
       '00000000-0000-0000-0000-000000000000', v_id, 'authenticated', 'authenticated',
       lower(v_epost), crypt(v_passord, gen_salt('bf')),
       now(), now(), now(),
-      '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb
+      '{"provider":"email","providers":["email"]}'::jsonb, '{}'::jsonb,
+      '', '',
+      '', ''
     );
 
     -- GoTrue krever en identitetsrad for at passordinnlogging skal virke.
@@ -92,7 +100,12 @@ begin
     update auth.users
        set encrypted_password = crypt(v_passord, gen_salt('bf')),
            email_confirmed_at = coalesce(email_confirmed_at, now()),
-           updated_at = now()
+           updated_at = now(),
+           -- se kommentaren over: NULL her velter innloggingen
+           confirmation_token = coalesce(confirmation_token, ''),
+           recovery_token = coalesce(recovery_token, ''),
+           email_change = coalesce(email_change, ''),
+           email_change_token_new = coalesce(email_change_token_new, '')
      where id = v_id;
 
     raise notice 'Brukeren % fantes alt – passordet er satt på nytt.', v_epost;

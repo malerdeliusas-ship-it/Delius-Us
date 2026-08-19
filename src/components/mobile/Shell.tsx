@@ -18,11 +18,15 @@ function MobilHeader() {
   // lukk menyen når man bytter side
   useEffect(() => setApen(false), [sted.pathname])
 
-  // ikke la siden bak scrolle mens menyen er åpen
+  // Ikke la siden bak scrolle mens menyen er åpen. Låsen settes på <html>,
+  // ikke på <body>: rullingen ligger på html (overflow-y: scroll), så en
+  // «overflow: hidden» på body ville gjort body til et nytt rullefelt – og da
+  // hopper den klistrede headeren (logo + menyknapp) brått oppover, fordi den
+  // fester seg til body i stedet for til html. Låst på html blir alt stående.
   useEffect(() => {
-    document.body.style.overflow = apen ? 'hidden' : ''
+    document.documentElement.style.overflow = apen ? 'hidden' : ''
     return () => {
-      document.body.style.overflow = ''
+      document.documentElement.style.overflow = ''
     }
   }, [apen])
 
