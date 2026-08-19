@@ -233,7 +233,7 @@ export type Nokkel = keyof typeof NO
 
 /** Rumensk. Typen tvinger fram nøyaktig de samme nøklene som i den norske. */
 const RO: Record<Nokkel, string> = {
-  'meny.oversikt': 'Tablou de bord',
+  'meny.oversikt': 'Panou',
   'meny.blogg': 'Blog',
   'meny.galleri': 'Galerie',
   'meny.statistikk': 'Statistici',

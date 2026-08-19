@@ -260,6 +260,58 @@ export default function Galleri() {
               })}
             </div>
           </div>
+
+          {/* Telefonutgaven: kartet over er tegnet for brede skjermer, og på
+              en telefon ble bare halvparten synlig. Her er de samme tretten
+              plassene som en enkel liste – bilde, nummer, navn og de samme
+              knappene. CSS-en avgjør hvilken av de to som vises; bildene er
+              «lazy», så den skjulte utgaven laster ingenting ekstra. */}
+          <div className="adm-galleri-liste">
+            {GALLERI.map((b, i) => {
+              const url = overstyrt[b.plass]
+              const opptatt = jobber.has(b.plass)
+              return (
+                <div key={b.plass} className="adm-galleri-rad">
+                  <div className="adm-galleri-rad-info">
+                    <span className="adm-galleri-nr">{i + 1}</span>
+                    {b.navn}
+                    {url && <span className="adm-merke adm-merke--gronn">{t('gal.byttet')}</span>}
+                  </div>
+                  <div style={{ padding: '10px 14px 0' }}>
+                    <img
+                      src={url ?? b.original}
+                      alt={b.navn}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ borderRadius: 12, opacity: opptatt ? 0.5 : 1 }}
+                    />
+                  </div>
+                  <div className="adm-galleri-rad-knapper">
+                    <button
+                      type="button"
+                      className="adm-knapp adm-knapp--liten"
+                      onClick={() => velgFil(b.plass)}
+                      disabled={opptatt}
+                    >
+                      <ImagePlus size={16} />
+                      {opptatt ? t('gal.jobber') : t('gal.bytt')}
+                    </button>
+                    {url && (
+                      <button
+                        type="button"
+                        className="adm-knapp adm-knapp--liten adm-knapp--stille"
+                        onClick={() => void tilbakestill(b.plass)}
+                        disabled={opptatt}
+                      >
+                        <Undo2 size={16} />
+                        {t('gal.original')}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 

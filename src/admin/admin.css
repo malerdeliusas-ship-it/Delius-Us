@@ -895,6 +895,12 @@ select.adm-inn {
     gap: 8px;
     padding: 10px 14px;
     overflow-x: auto;
+    /* stripa kan rulle, men uten synlig rullefelt under seg */
+    scrollbar-width: none;
+  }
+
+  .adm-side::-webkit-scrollbar {
+    display: none;
   }
 
   /* den kremhvite toppen blir en liten plate i den lave stripa */
@@ -954,6 +960,180 @@ select.adm-inn {
 
   .adm-redigering {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Galleriet som liste (telefon) ---------- */
+.adm-galleri-liste {
+  display: none; /* telefonblokka over slår den på */
+  gap: 14px;
+}
+
+.adm-galleri-rad {
+  border: 1.5px solid var(--strek);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--hvit);
+}
+
+.adm-galleri-rad img {
+  display: block;
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+}
+
+.adm-galleri-rad-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--marine);
+}
+
+.adm-galleri-nr {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--marine);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.adm-galleri-rad-info .adm-merke {
+  margin-left: auto;
+}
+
+.adm-galleri-rad-knapper {
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px 14px;
+  flex-wrap: wrap;
+}
+
+/* ---------- Telefon ----------
+   Under 600px er panelet en app: menyen ligger som en fast stolpe i bunnen
+   av skjermen – fem knapper med ikon og navn, alle synlige hele tiden, i
+   tommelens rekkevidde. Toppstripa beholder bare logoen, språkvalget,
+   nettsted-lenken og utloggingen, som alle får plass uten sidelengs rulling.
+   (940-blokka over la menyen i toppstripa; der ble halvparten liggende
+   utenfor skjermen, og NO/RO-knappen sto kappet i kanten.) */
+@media (max-width: 600px) {
+  .adm-side {
+    overflow: visible;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+
+  .adm-side-topp {
+    margin-right: auto;
+  }
+
+  /* menyen: fast i bunnen, fem like felt */
+  .adm-meny {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    background: linear-gradient(180deg, var(--marine) 0%, var(--marine-dyp) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -8px 24px rgba(2, 34, 105, 0.28);
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .adm-meny a {
+    flex-direction: column;
+    gap: 3px;
+    padding: 7px 2px 5px;
+    border-radius: 12px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-align: center;
+  }
+
+  /* navnene under ikonene skal synes igjen (940-blokka gjemte dem) */
+  .adm-meny a span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* innholdet må aldri gjemme seg bak bunnstolpen */
+  .adm-hoved {
+    padding: 18px 14px calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .adm-topp h1 {
+    font-size: 25px;
+  }
+
+  .adm-kort {
+    padding: 18px 16px;
+  }
+
+  .adm-tall {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .adm-tall-kort {
+    padding: 16px 16px;
+  }
+
+  .adm-tall-kort .adm-tall-verdi {
+    font-size: 27px;
+  }
+
+  /* periodevalget i statistikken: fire like felt over hele bredden,
+     i stedet for en pillerad som stakk utenfor skjermen */
+  .adm-perioder {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: 100%;
+    border-radius: 18px;
+  }
+
+  .adm-perioder button {
+    padding: 8px 2px;
+    font-size: 12.5px;
+    line-height: 1.25;
+    border-radius: 13px;
+  }
+
+  .adm-stolpe {
+    grid-template-columns: minmax(70px, 110px) 1fr 44px;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+
+  .adm-tabell {
+    font-size: 13.5px;
+  }
+
+  .adm-tabell th,
+  .adm-tabell td {
+    padding: 10px 10px;
+  }
+
+  /* galleriet: kartet er tegnet for brede skjermer – på telefonen vises
+     lista under i stedet (samme bilder, samme knapper, under hverandre) */
+  .adm-kart-ramme {
+    display: none;
+  }
+
+  .adm-galleri-liste {
+    display: grid;
   }
 }
 
