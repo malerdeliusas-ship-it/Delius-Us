@@ -10,8 +10,10 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js'
  * og alt som bruker den faller stille tilbake: bloggen viser ingenting,
  * galleriet bruker originalbildene, statistikken hopper over.
  */
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
-const nokkel = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+import { BASE_NOKKEL, BASE_URL } from './basekonfig'
+
+const url = BASE_URL
+const nokkel = BASE_NOKKEL
 
 export const supabase: SupabaseClient | null =
   url && nokkel ? createClient(url, nokkel) : null

@@ -10,8 +10,10 @@
  * Sikkerheten er den samme: det er den offentlige anon-nøkkelen som brukes,
  * og alt den får lov til styres av Row Level Security (supabase/oppsett.sql).
  */
-const base = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\/$/, '')
-const nokkel = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+import { BASE_NOKKEL, BASE_URL } from './basekonfig'
+
+const base = BASE_URL.replace(/\/$/, '')
+const nokkel = BASE_NOKKEL
 
 /** Er databasen i det hele tatt satt opp? Uten nøkler faller alt stille tilbake. */
 export const harBase = Boolean(base && nokkel)
