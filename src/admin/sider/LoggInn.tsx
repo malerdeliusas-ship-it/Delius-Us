@@ -3,7 +3,7 @@ import { loggInn } from '../auth'
 import { Felt, Status } from '../deler'
 import { folkeligFeil } from '../verktoy'
 import { SprakVelger, useSprak } from '../sprak'
-import logo from '../../assets/figma/logo.png'
+import logo from '../../assets/figma/logo-tett.webp'
 
 /** Innloggingssiden. Én bruker, opprettet i Supabase-dashbordet. */
 export default function LoggInn() {

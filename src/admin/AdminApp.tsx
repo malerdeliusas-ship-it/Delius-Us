@@ -13,7 +13,11 @@ import './admin.css'
 import { supabase } from '../lib/supabase'
 import { useOkt, useErAdmin, loggUt, Vakt } from './auth'
 import { SprakGiver, SprakVelger, useSprak, type Nokkel } from './sprak'
-import logo from '../assets/figma/logo.png'
+// Egen, tettbeskåret utgave: original-PNG-en har så mye gjennomsiktig luft
+// rundt seg at logoen bare fyller halve bredden av sin egen boks, og ble
+// stående liten uansett hvor stor boksen var. Nettstedets logo røres ikke –
+// den er plassert etter Figma-koordinater som forutsetter luften.
+import logo from '../assets/figma/logo-tett.webp'
 
 import LoggInn from './sider/LoggInn'
 import Dashbord from './sider/Dashbord'

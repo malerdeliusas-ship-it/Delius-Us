@@ -50,32 +50,33 @@
  */
 .adm-side-topp {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 9px;
   margin: 0 -18px 22px;
-  padding: 20px 20px 16px;
+  padding: 24px 18px 16px;
   background: var(--krem);
   border-bottom: 3px solid var(--gull);
 }
 
+/* Logoen er tettbeskåret, så høyden her er logoen selv – ikke en boks med
+   luft i. 60px her tilsvarer det den gamle utgaven trengte 74px for. */
 .adm-side-topp img {
   display: block;
-  height: 48px;
+  height: 60px;
   width: auto;
-  /* PNG-en har innbakt gjennomsiktig luft til venstre */
-  margin-left: -9px;
+  max-width: 100%;
 }
 
 .adm-side-ord {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--marine);
   background: var(--gull);
   border-radius: 20px;
-  padding: 5px 11px;
+  padding: 4px 14px;
 }
 
 /* Språkvalget: to små knapper, NO | RO */
@@ -547,9 +548,10 @@ select.adm-inn {
 }
 
 .adm-inngang-kort img {
-  height: 58px;
-  margin: 0 auto 6px;
-  border-radius: 12px;
+  display: block;
+  height: 62px;
+  width: auto;
+  margin: 0 auto 14px;
 }
 
 .adm-inngang-kort h1 {
@@ -905,16 +907,16 @@ select.adm-inn {
 
   /* den kremhvite toppen blir en liten plate i den lave stripa */
   .adm-side-topp {
+    flex-direction: row;
     margin: 0 8px 0 0;
-    padding: 5px 10px 6px 4px;
+    padding: 6px 12px;
     border-bottom: none;
-    border-radius: 11px;
+    border-radius: 12px;
     flex-shrink: 0;
   }
 
   .adm-side-topp img {
-    height: 26px;
-    margin-left: -5px;
+    height: 30px;
   }
 
   .adm-side-ord {
@@ -1033,6 +1035,11 @@ select.adm-inn {
 
   .adm-side-topp {
     margin-right: auto;
+    padding: 6px 13px;
+  }
+
+  .adm-side-topp img {
+    height: 32px;
   }
 
   /* menyen: fast i bunnen, fem like felt */
