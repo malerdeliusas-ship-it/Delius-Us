@@ -272,7 +272,7 @@ begin
     return;
   end if;
 
-  if p_sti not in ('/', '/om-oss', '/portefolje', '/malertjenester', '/kontakt', '/blogg', '/personvern')
+  if p_sti not in ('/', '/om-oss', '/portefolje', '/malertjenester', '/kontakt', '/tilbud', '/blogg', '/personvern')
      and p_sti !~ '^/blogg/[a-z0-9-]{1,120}$' then
     return;
   end if;

@@ -225,7 +225,7 @@ export default function Home() {
           Profesjonelle arbeidere
         </Txt>
       </Abs>
-      <ContactForm l={432} t={4666} w={578} btnL={633} btnW={176} />
+      <ContactForm l={432} t={4666} w={578} btnL={633} btnW={176} tilbud="lys" />
 
       <SiteFooter t={5244} />
     </Stage>

@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { Link } from 'react-router-dom'
 import { C, FONT } from '../lib/theme'
 import { useKontaktSkjema } from '../lib/kontakt'
 import SkjemaStatus from './SkjemaStatus'
@@ -12,6 +13,12 @@ import SkjemaStatus from './SkjemaStatus'
  * Kvitteringen og feilene står absolutt plassert under knappen, så resten
  * av siden ikke flytter seg når de dukker opp. Feltet som stoppet
  * innsendingen får rød ring (`felt-feil`).
+ *
+ * `tilbud` legger en linje under knappen som peker til tilbudsskjemaet
+ * (/tilbud): «lys» er hvit tekst på den blå forsiden, «mork» er marineblå
+ * tekst på den lyse Kontakt-siden, med en annen ordlyd fordi teksten over
+ * skjemaet der alt nevner tilbud. Kvitteringen og feilmeldingen tar lenkens
+ * plass når de vises, så ingenting skyves ned i footeren.
  */
 export default function ContactForm({
   l,
@@ -19,14 +26,17 @@ export default function ContactForm({
   w,
   btnL,
   btnW,
+  tilbud,
 }: {
   l: number
   t: number
   w: number
   btnL: number
   btnW: number
+  tilbud?: 'lys' | 'mork'
 }) {
   const { status, feil, feilFelt, send, merk, knappetekst } = useKontaktSkjema()
+  const lenkeTop = t + 383 + 74
 
   const felt = (top: number, h: number, phFarge: string): CSSProperties =>
     ({
@@ -55,7 +65,7 @@ export default function ContactForm({
   const statusBoks: CSSProperties = {
     position: 'absolute',
     left: l,
-    top: t + 383 + 74,
+    top: lenkeTop,
     width: w,
     fontFamily: FONT,
   }
@@ -122,6 +132,32 @@ export default function ContactForm({
       >
         {knappetekst}
       </button>
+
+      {/* Lenken viker for kvitteringen og feilmeldingen, som står på samme plass */}
+      {tilbud && status !== 'sendt' && status !== 'feil' && (
+        <div
+          style={{
+            position: 'absolute',
+            left: l,
+            top: lenkeTop,
+            width: w,
+            textAlign: 'center',
+            fontFamily: FONT,
+            fontSize: 16,
+            lineHeight: '24px',
+            color: tilbud === 'lys' ? C.white : C.navy,
+          }}
+        >
+          {tilbud === 'lys' ? 'Ønsker du et pristilbud?' : 'Vil du legge ved bilder og mål?'}{' '}
+          <Link
+            to="/tilbud"
+            className="tilbud-lenke"
+            style={{ color: tilbud === 'lys' ? C.gold : C.panelBlue }}
+          >
+            {tilbud === 'lys' ? 'Be om tilbud her' : 'Bruk tilbudsskjemaet'}
+          </Link>
+        </div>
+      )}
 
       {status === 'sendt' && (
         <div style={statusBoks}>

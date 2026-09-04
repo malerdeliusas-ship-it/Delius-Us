@@ -6,9 +6,12 @@
 export default function SkjemaStatus({
   type,
   tekst,
+  tittel = 'Meldingen ble sendt!',
 }: {
   type: 'ok' | 'feil'
   tekst?: string
+  /** Overskriften i den grønne kvitteringen. */
+  tittel?: string
 }) {
   if (type === 'ok') {
     return (
@@ -25,8 +28,8 @@ export default function SkjemaStatus({
           />
         </svg>
         <div>
-          <strong>Meldingen ble sendt!</strong>
-          Takk for henvendelsen. Vi kommer tilbake til deg så snart som mulig.
+          <strong>{tittel}</strong>
+          {tekst ?? 'Takk for henvendelsen. Vi kommer tilbake til deg så snart som mulig.'}
         </div>
       </div>
     )

@@ -1,9 +1,11 @@
 /**
- * Serverfunksjon for kontaktskjemaene på malerdelius.no.
+ * Serverfunksjon for skjemaene på malerdelius.no.
  *
- * Tar imot POST fra `src/lib/kontakt.ts` og sender meldingen videre på e-post
- * gjennom Resend (https://resend.com). Funksjonen kjører på Vercel; nøkler og
- * adresser står i miljøvariabler, ikke i koden:
+ * Tar imot POST fra `src/lib/kontakt.ts` (det korte kontaktskjemaet) og fra
+ * `src/lib/tilbud.ts` (tilbudsskjemaet med telefon, adresse, areal og bilder)
+ * og sender innholdet videre på e-post gjennom Resend (https://resend.com).
+ * Bildene fra tilbudsskjemaet følger med som vedlegg. Funksjonen kjører på
+ * Vercel; nøkler og adresser står i miljøvariabler, ikke i koden:
  *
  *   RESEND_API_KEY   nøkkelen fra Resend
  *   KONTAKT_TIL      adressen meldingene skal til (kan være flere, komma mellom)
@@ -27,7 +29,15 @@ type Res = {
   setHeader: (navn: string, verdi: string) => void
 }
 
+/** Én linje i e-posten: etikett til venstre, verdi til høyre. */
+type Rad = { etikett: string; tekst: string; html?: string }
+
+type Vedlegg = { filename: string; content: string }
+
 const EPOST_MONSTER = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+
+/** Kontrolltegn (linjeskift, tab, osv.), byttes med mellomrom i enlinjefelt. */
+const KONTROLLTEGN = /[\x00-\x1f\x7f]/g
 
 /**
  * Enkel bremse per IP. Den lever bare så lenge instansen lever, så den er
@@ -52,8 +62,42 @@ const OPPHAV = [
   /^http:\/\/127\.0\.0\.1(:\d+)?$/,
 ]
 
-/** Hvor lenge vi venter på Resend før vi gir opp. */
-const SENDE_FRIST_MS = 10_000
+/**
+ * Hvor lenge vi venter på Resend før vi gir opp. Serverfunksjonen hos Vercel
+ * får høyst ti sekunder, så vår egen frist ligger under den: da får kunden
+ * en ordentlig feilmelding i stedet for et avbrutt svar.
+ */
+const SENDE_FRIST_MS = 9_000
+
+/**
+ * Bildene fra tilbudsskjemaet. Nettleseren krymper dem før sending (se
+ * `src/lib/tilbud.ts`), og her settes taket en gang til, så ingen kan sende
+ * oss noe annet enn små bilder. Vercel avviser uansett alt over 4,5 MB.
+ */
+const MAKS_BILDER = 6
+const MAKS_BASE64_PER_BILDE = 1_000_000
+const MAKS_BASE64_TOTALT = 4_200_000
+
+/**
+ * Hva slags fil det egentlig er, lest av de første bytene. Typen nettleseren
+ * oppgir er bare et ord i en JSON og kan si hva som helst; bytene lyver ikke.
+ */
+function bildetype(b: Uint8Array): 'jpg' | 'png' | 'webp' | null {
+  if (b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return 'jpg'
+  if (
+    b.length >= 8 &&
+    b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 &&
+    b[4] === 0x0d && b[5] === 0x0a && b[6] === 0x1a && b[7] === 0x0a
+  )
+    return 'png'
+  if (
+    b.length >= 12 &&
+    b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
+    b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50
+  )
+    return 'webp'
+  return null
+}
 
 export default async function handler(req: Req, res: Res) {
   if (req.method !== 'POST') {
@@ -61,17 +105,19 @@ export default async function handler(req: Req, res: Res) {
     return res.status(405).json({ feil: 'Bruk POST' })
   }
 
-  // Skjemaet vårt sender alltid Origin, fordi det er en fetch fra samme
-  // nettsted. Kommer det noe fra et annet opphav, er det en fremmed side som
-  // sender på vegne av en besøkende, og da er det ikke en kunde som skriver.
+  // Nettlesere sender alltid Origin på en POST, også fra samme nettsted.
+  // Mangler den, eller peker den på et annet opphav, er det ikke skjemaet
+  // vårt som sender, og da er det ikke en kunde som skriver.
   const opphav = forsteVerdi(req.headers.origin)
-  if (opphav && !OPPHAV.some((m) => m.test(opphav))) {
+  if (!opphav || !OPPHAV.some((m) => m.test(opphav))) {
     return res.status(403).json({ feil: 'Ugyldig opphav' })
   }
 
   const kropp = (typeof req.body === 'string' ? tryggParse(req.body) : req.body) as
     | Record<string, unknown>
     | undefined
+
+  const skjema: 'kontakt' | 'tilbud' = kropp?.skjema === 'tilbud' ? 'tilbud' : 'kontakt'
 
   // Navn og side skal være én linje: kontrolltegn (deriblant \r\n) byttes med
   // mellomrom, så ingen kan smugle egne linjer inn i emnefeltet eller e-posten.
@@ -81,6 +127,13 @@ export default async function handler(req: Req, res: Res) {
   const krukke = tekst(kropp?.tilleggsinfo, 200)
   const apnet = Number(kropp?.apnet ?? 0)
   const side = enLinje(tekst(kropp?.side, 100)) || '/'
+
+  // Feltene som bare tilbudsskjemaet har
+  const telefon = enLinje(tekst(kropp?.telefon, 40))
+  const adresse = enLinje(tekst(kropp?.adresse, 200))
+  const areal = enLinje(tekst(kropp?.areal, 10)).replace(/\D/g, '').slice(0, 6)
+  const tidspunkt = enLinje(tekst(kropp?.tidspunkt, 60))
+  const jobbtyper = liste(kropp?.jobbtyper, 8, 60)
 
   // To uavhengige robottegn: det skjulte feltet er fylt ut, og skrivetiden
   // mangler eller er under to sekunder. Hver for seg tar de av og til feil –
@@ -101,7 +154,16 @@ export default async function handler(req: Req, res: Res) {
 
   if (!navn) return res.status(400).json({ feil: 'Navn mangler' })
   if (!EPOST_MONSTER.test(epost)) return res.status(400).json({ feil: 'Ugyldig e-post' })
-  if (melding.length < 5) return res.status(400).json({ feil: 'Meldingen er for kort' })
+
+  if (skjema === 'tilbud') {
+    if (!gyldigTelefon(telefon)) return res.status(400).json({ feil: 'Ugyldig telefonnummer' })
+    if (adresse.length < 3) return res.status(400).json({ feil: 'Adresse mangler' })
+  } else if (melding.length < 5) {
+    return res.status(400).json({ feil: 'Meldingen er for kort' })
+  }
+
+  const bilder = skjema === 'tilbud' ? lesBilder(kropp?.bilder) : { vedlegg: [] as Vedlegg[] }
+  if ('feil' in bilder && bilder.feil) return res.status(400).json({ feil: bilder.feil })
 
   const ip =
     forsteVerdi(req.headers['x-real-ip']) ??
@@ -118,6 +180,21 @@ export default async function handler(req: Req, res: Res) {
     return res.status(500).json({ feil: 'Skjemaet er ikke ferdig satt opp' })
   }
 
+  const innhold =
+    skjema === 'tilbud'
+      ? tilbudEpost({
+          navn,
+          epost,
+          telefon,
+          adresse,
+          areal,
+          tidspunkt,
+          jobbtyper,
+          melding,
+          antallBilder: bilder.vedlegg.length,
+        })
+      : kontaktEpost({ navn, epost, melding, side })
+
   try {
     const avbryt = new AbortController()
     const frist = setTimeout(() => avbryt.abort(), SENDE_FRIST_MS)
@@ -133,9 +210,10 @@ export default async function handler(req: Req, res: Res) {
         to: til,
         // Svar-knappen i e-postklienten går rett til kunden.
         reply_to: epost,
-        subject: `${mistenkt ? '[Mistenkt robot] ' : ''}Ny melding fra malerdelius.no – ${navn}`,
-        text: epostTekst(navn, epost, melding, side),
-        html: epostHtml(navn, epost, melding, side),
+        subject: `${mistenkt ? '[Mistenkt robot] ' : ''}${innhold.emne}`,
+        text: innhold.tekst,
+        html: innhold.html,
+        ...(bilder.vedlegg.length ? { attachments: bilder.vedlegg } : {}),
       }),
     })
 
@@ -157,9 +235,53 @@ function tekst(verdi: unknown, maks: number) {
   return typeof verdi === 'string' ? verdi.trim().slice(0, maks) : ''
 }
 
+/** En liste av korte tekster (valgene i tilbudsskjemaet). Alt annet forkastes. */
+function liste(verdi: unknown, maksAntall: number, maksLengde: number): string[] {
+  if (!Array.isArray(verdi)) return []
+  return verdi
+    .slice(0, maksAntall)
+    .map((v) => enLinje(tekst(v, maksLengde)))
+    .filter(Boolean)
+}
+
 /** Bytter kontrolltegn (linjeskift, tab, osv.) med mellomrom. */
 function enLinje(s: string) {
-  return s.replace(/[\u0000-\u001f\u007f]/g, ' ').trim()
+  return s.replace(KONTROLLTEGN, ' ').trim()
+}
+
+/** Norske og utenlandske numre: 8 til 15 sifre, eventuelt med + foran. */
+function gyldigTelefon(s: string) {
+  const sifre = s.replace(/[\s().-]/g, '')
+  return /^\+?\d{8,15}$/.test(sifre)
+}
+
+/**
+ * Bildene kommer som base64-tekst. Hvert bilde og summen av dem har et tak,
+ * og bare JPEG, PNG og WebP slipper gjennom, avgjort av bytene i filen og
+ * ikke av hva nettleseren påstår. Filnavnet lages her, så det aldri kommer
+ * noe rart fra nettleseren inn i vedlegget.
+ */
+function lesBilder(verdi: unknown): { vedlegg: Vedlegg[]; feil?: string } {
+  if (verdi == null) return { vedlegg: [] }
+  if (!Array.isArray(verdi)) return { vedlegg: [], feil: 'Ugyldige bilder' }
+  if (verdi.length > MAKS_BILDER) return { vedlegg: [], feil: 'For mange bilder' }
+
+  const vedlegg: Vedlegg[] = []
+  let totalt = 0
+  for (let i = 0; i < verdi.length; i++) {
+    const bilde = (verdi[i] ?? {}) as Record<string, unknown>
+    const data = typeof bilde.data === 'string' ? bilde.data : ''
+    if (!data || data.length > MAKS_BASE64_PER_BILDE) return { vedlegg: [], feil: 'Bildet er for stort' }
+    if (data.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(data)) {
+      return { vedlegg: [], feil: 'Ugyldig bildedata' }
+    }
+    const endelse = bildetype(Buffer.from(data.slice(0, 64), 'base64'))
+    if (!endelse) return { vedlegg: [], feil: 'Ukjent bildetype' }
+    totalt += data.length
+    if (totalt > MAKS_BASE64_TOTALT) return { vedlegg: [], feil: 'Bildene er for store til sammen' }
+    vedlegg.push({ filename: `bilde-${i + 1}.${endelse}`, content: data })
+  }
+  return { vedlegg }
 }
 
 function tryggParse(s: string) {
@@ -195,6 +317,7 @@ function sidenavn(sti: string) {
     '/portefolje': 'Portefølje',
     '/malertjenester': 'Malertjenester',
     '/blogg': 'Blogg',
+    '/tilbud': 'Be om tilbud',
   })
   return navn[sti] ?? sti
 }
@@ -228,18 +351,103 @@ function esc(s: string) {
     .replace(/"/g, '&quot;')
 }
 
-function epostTekst(navn: string, epost: string, melding: string, side: string) {
-  return [
-    'Ny melding fra kontaktskjemaet på malerdelius.no',
+/** E-postadressen som lenke. Prosentkodet, så ?/&/% i adressen ikke blir parametre. */
+function epostLenke(epost: string) {
+  return `<a href="mailto:${encodeURIComponent(epost)}" style="color:#0051ff;text-decoration:none;">${esc(epost)}</a>`
+}
+
+/** Nummeret er alt kontrollert til +?sifre, og plusstegnet skal stå ukodet i tel: (RFC 3966). */
+function telefonLenke(telefon: string) {
+  const sifre = telefon.replace(/[\s().-]/g, '')
+  if (!/^\+?\d{8,15}$/.test(sifre)) return esc(telefon)
+  return `<a href="tel:${sifre}" style="color:#0051ff;text-decoration:none;">${esc(telefon)}</a>`
+}
+
+/** Det korte kontaktskjemaet (forsiden og Kontakt-siden). */
+function kontaktEpost(d: { navn: string; epost: string; melding: string; side: string }) {
+  const rader: Rad[] = [
+    { etikett: 'Navn', tekst: d.navn },
+    { etikett: 'E-post', tekst: d.epost, html: epostLenke(d.epost) },
+    { etikett: 'Side', tekst: sidenavn(d.side) },
+  ]
+  return byggEpost({
+    emne: `Ny melding fra malerdelius.no – ${d.navn}`,
+    overskrift: 'Ny melding fra nettsiden',
+    ingress: 'Sendt fra kontaktskjemaet på malerdelius.no',
+    smakebit: d.melding,
+    rader,
+    melding: d.melding,
+    navn: d.navn,
+    epost: d.epost,
+  })
+}
+
+/** Tilbudsskjemaet (/tilbud): flere felt, og bildene som vedlegg. */
+function tilbudEpost(d: {
+  navn: string
+  epost: string
+  telefon: string
+  adresse: string
+  areal: string
+  tidspunkt: string
+  jobbtyper: string[]
+  melding: string
+  antallBilder: number
+}) {
+  const ikkeOppgitt = 'Ikke oppgitt'
+  const bilder =
+    d.antallBilder === 0
+      ? 'Ingen'
+      : d.antallBilder === 1
+        ? '1 bilde vedlagt'
+        : `${d.antallBilder} bilder vedlagt`
+  const rader: Rad[] = [
+    { etikett: 'Navn', tekst: d.navn },
+    { etikett: 'Telefon', tekst: d.telefon, html: telefonLenke(d.telefon) },
+    { etikett: 'E-post', tekst: d.epost, html: epostLenke(d.epost) },
+    { etikett: 'Adresse', tekst: d.adresse },
+    { etikett: 'Type jobb', tekst: d.jobbtyper.join(', ') || ikkeOppgitt },
+    { etikett: 'Areal', tekst: d.areal ? `ca. ${d.areal} m²` : ikkeOppgitt },
+    { etikett: 'Ønsket oppstart', tekst: d.tidspunkt || ikkeOppgitt },
+    { etikett: 'Bilder', tekst: bilder },
+  ]
+  const smakebit = [d.jobbtyper.join(', '), d.adresse].filter(Boolean).join(' · ')
+  return byggEpost({
+    emne: `Ny tilbudsforespørsel fra malerdelius.no – ${d.navn}`,
+    overskrift: 'Ny tilbudsforespørsel',
+    ingress: 'Sendt fra tilbudsskjemaet på malerdelius.no',
+    smakebit,
+    rader,
+    melding: d.melding || 'Kunden skrev ingen beskrivelse.',
+    navn: d.navn,
+    epost: d.epost,
+  })
+}
+
+type Epost = {
+  emne: string
+  overskrift: string
+  ingress: string
+  smakebit: string
+  rader: Rad[]
+  melding: string
+  navn: string
+  epost: string
+}
+
+function byggEpost(d: Epost) {
+  const tekst = [
+    d.overskrift,
+    d.ingress,
     '',
-    `Navn:    ${navn}`,
-    `E-post:  ${epost}`,
-    `Side:    ${sidenavn(side)}`,
+    ...d.rader.map((r) => `${r.etikett}: ${r.tekst}`),
     '',
-    melding,
+    d.melding,
     '',
     'Svar på denne e-posten for å svare kunden direkte.',
   ].join('\n')
+
+  return { emne: d.emne, tekst, html: epostHtml(d) }
 }
 
 /**
@@ -247,24 +455,24 @@ function epostTekst(navn: string, epost: string, melding: string, side: string) 
  * e-postklienter vil ha det. Fargene er designets egne: marineblå #022269,
  * gull #ffc717, krem #fef5e9 (se `src/lib/theme.ts`).
  */
-export function epostHtml(navn: string, epost: string, melding: string, side: string) {
+export function epostHtml(d: Omit<Epost, 'emne'>) {
   const base = bildeBase()
-  const fornavn = esc(navn.split(/\s+/)[0] || navn)
+  const fornavn = esc(d.navn.split(/\s+/)[0] || d.navn)
   const svarEmne = encodeURIComponent('Sv: Henvendelsen din til Maler Delius')
   // RFC 6068 tillater prosentkodet adresse i mailto, og kodingen hindrer at
   // tegn som ?/&/% i adressen tolkes som egne parametre i lenken.
-  const epostHref = encodeURIComponent(epost)
+  const epostHref = encodeURIComponent(d.epost)
   const skrift = "'Montserrat', Helvetica, Arial, sans-serif"
   // Forhåndsvisningen kuttes på hele tegn (ikke midt i et emoji-par).
-  const smakebit = esc([...melding].slice(0, 140).join(''))
+  const smakebit = esc([...d.smakebit].slice(0, 140).join(''))
   // Outlook for Windows forstår ikke white-space:pre-wrap, så linjeskiftene
   // legges inn som <br> etter at teksten er escapet.
-  const meldingHtml = esc(melding).replace(/\r?\n/g, '<br>')
+  const meldingHtml = esc(d.melding).replace(/\r?\n/g, '<br>')
 
-  const rad = (etikett: string, verdi: string) => `
+  const rad = (r: Rad) => `
     <tr>
-      <td style="padding:11px 0;border-bottom:1px solid #eef1f9;font-family:${skrift};font-size:11px;letter-spacing:1.5px;color:#8b93b8;text-transform:uppercase;white-space:nowrap;vertical-align:top;">${etikett}</td>
-      <td align="right" style="padding:11px 0 11px 24px;border-bottom:1px solid #eef1f9;font-family:${skrift};font-size:15px;font-weight:600;color:#022269;word-break:break-word;">${verdi}</td>
+      <td style="padding:11px 0;border-bottom:1px solid #eef1f9;font-family:${skrift};font-size:11px;letter-spacing:1.5px;color:#8b93b8;text-transform:uppercase;white-space:nowrap;vertical-align:top;">${esc(r.etikett)}</td>
+      <td align="right" style="padding:11px 0 11px 24px;border-bottom:1px solid #eef1f9;font-family:${skrift};font-size:15px;font-weight:600;color:#022269;word-break:break-word;">${r.html ?? esc(r.tekst)}</td>
     </tr>`
 
   return `<!DOCTYPE html>
@@ -274,7 +482,7 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-<title>Ny melding fra malerdelius.no</title>
+<title>${esc(d.overskrift)}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#fef5e9;">
   <!-- Forhåndsvisningen i innboksen: begynnelsen av meldingen, ikke overskriften -->
@@ -302,22 +510,20 @@ export function epostHtml(navn: string, epost: string, melding: string, side: st
                 </tr>
                 <tr>
                   <td align="center" style="padding:26px 48px 8px;font-family:${skrift};font-size:23px;line-height:30px;font-weight:700;color:#022269;">
-                    Ny melding fra nettsiden
+                    ${esc(d.overskrift)}
                   </td>
                 </tr>
                 <tr>
                   <td align="center" style="padding:0 48px 26px;font-family:${skrift};font-size:14px;line-height:21px;color:#8b93b8;">
-                    Sendt fra kontaktskjemaet på malerdelius.no
+                    ${esc(d.ingress)}
                   </td>
                 </tr>
 
-                <!-- Hvem det er fra -->
+                <!-- Hvem det er fra, og hva det gjelder -->
                 <tr>
                   <td style="padding:0 48px;">
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-top:1px solid #eef1f9;">
-                      ${rad('Navn', esc(navn))}
-                      ${rad('E-post', `<a href="mailto:${epostHref}" style="color:#0051ff;text-decoration:none;">${esc(epost)}</a>`)}
-                      ${rad('Side', esc(sidenavn(side)))}
+                      ${d.rader.map(rad).join('')}
                     </table>
                   </td>
                 </tr>

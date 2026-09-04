@@ -9,6 +9,7 @@ const LENKER = [
   { til: '/malertjenester', tekst: 'Malertjenester' },
   { til: '/blogg', tekst: 'Blogg' },
   { til: '/kontakt', tekst: 'Kontakt oss' },
+  { til: '/tilbud', tekst: 'Be om tilbud' },
 ]
 
 function MobilHeader() {

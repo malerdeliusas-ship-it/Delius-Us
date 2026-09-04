@@ -12,7 +12,7 @@ import useIsMobile from '../lib/useIsMobile'
  * Innholdet skal stemme med koden. Endres sporingen i src/lib/spor.ts eller
  * skjemaet i api/kontakt.ts, må teksten her endres i samme slengen.
  */
-const OPPDATERT = '18. august 2026'
+const OPPDATERT = '3. september 2026'
 
 type Bolk = { tittel: string; avsnitt: string[] }
 
@@ -27,6 +27,7 @@ const BOLKER: Bolk[] = [
     tittel: 'Når du bruker kontaktskjemaet',
     avsnitt: [
       'Skjemaet sender navnet, e-postadressen og meldingen din videre til vår egen e-postkasse, slik at vi kan svare deg. Opplysningene brukes ikke til noe annet, og de deles ikke med noen for markedsføring.',
+      'Bruker du tilbudsskjemaet, sendes på samme måte også telefonnummeret, adressen, det omtrentlige arealet og bildene du selv legger ved. Bildene krympes i nettleseren din før de sendes, de lagres ikke på nettstedet, og de finnes bare i e-posten vi får.',
       'E-posten sendes gjennom leverandøren Resend, som håndterer selve utsendingen på våre vegne. Meldingen blir liggende i e-postkassen vår så lenge det er saklig grunn til det, normalt så lenge kundeforholdet varer. Du kan når som helst be oss slette henvendelsen din.',
     ],
   },

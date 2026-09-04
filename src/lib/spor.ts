@@ -86,6 +86,7 @@ const KJENTE_SIDER = new Set([
   '/portefolje',
   '/malertjenester',
   '/kontakt',
+  '/tilbud',
   '/blogg',
   '/personvern',
 ])

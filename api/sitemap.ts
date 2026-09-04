@@ -26,6 +26,7 @@ const FASTE: Array<[sti: string, prioritet: string]> = [
   ['/portefolje', '0.8'],
   ['/om-oss', '0.7'],
   ['/kontakt', '0.7'],
+  ['/tilbud', '0.8'],
   ['/blogg', '0.6'],
   ['/personvern', '0.2'],
 ]

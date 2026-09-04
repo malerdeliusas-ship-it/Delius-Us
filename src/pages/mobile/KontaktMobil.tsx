@@ -37,7 +37,7 @@ export default function KontaktMobil() {
             deg.
           </p>
           <div style={{ marginTop: 24 }}>
-            <MobilSkjema />
+            <MobilSkjema tilbudTekst="bilder" />
           </div>
 
           <div className="m-kort m-kort--hvit" style={{ marginTop: 32, textAlign: 'center' }}>

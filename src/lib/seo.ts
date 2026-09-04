@@ -35,6 +35,11 @@ const SIDER: Record<string, { tittel: string; beskrivelse: string }> = {
     beskrivelse:
       'Ta kontakt med Maler Delius AS for et uforpliktende tilbud eller gratis befaring i Oslo. Ring 966 93 780 eller send skjemaet.',
   },
+  '/tilbud': {
+    tittel: 'Be om tilbud – Maler Delius AS',
+    beskrivelse:
+      'Fortell oss om jobben, legg ved bilder og få et uforpliktende tilbud fra Maler Delius AS i Oslo. Gratis befaring.',
+  },
   '/blogg': {
     tittel: 'Blogg – Maler Delius AS',
     beskrivelse:

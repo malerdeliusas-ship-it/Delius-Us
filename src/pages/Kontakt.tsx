@@ -44,7 +44,7 @@ export default function Kontakt() {
       <Txt l={102.5} t={458} w={751} size={16} weight={400} lh={24} color={C.white} align="center">
         Har du spørsmål eller ønsker du et tilbud? Send oss en melding, så tar vi kontakt med deg.
       </Txt>
-      <ContactForm l={119} t={508} w={718} btnL={359} btnW={238} />
+      <ContactForm l={119} t={508} w={718} btnL={359} btnW={238} tilbud="mork" />
 
       {/* ---------- «Derfor velger kundene oss» ---------- */}
       <Rect l={936} t={458} w={376} h={491} r={67} bg="rgba(255,255,255,0.99)" />

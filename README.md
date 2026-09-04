@@ -77,6 +77,45 @@ Lokalt kobler `vite.config.ts` den samme funksjonen inn som mellomvare, så
 `npm run dev` oppfører seg som produksjon. Uten `RESEND_API_KEY` svarer den
 med feil, og skjemaet viser feilmeldingen – det er forventet.
 
+## Tilbudsskjemaet (`/tilbud`)
+
+Lagt til i september 2026 etter ønske fra kunden: det korte kontaktskjemaet ga
+for lite å regne pris på. Siden finnes ikke i Figma, men er satt sammen av
+delene designet allerede har (sølet og tittelen fra bloggsidene, den blå
+skjemaflaten fra forsiden, det hvite kortet fra Kontakt-siden).
+
+- Felt: navn, telefon, e-post, type jobb (flervalg), adresse, omtrentlig
+  areal, ønsket oppstart, inntil seks bilder og en beskrivelse.
+- Bildene krympes i nettleseren (`src/lib/tilbud.ts`, JPEG, lengste side
+  1600px, rundt en halv megabyte hver) og følger med e-posten som vedlegg.
+  Vercel tar imot høyst 4,5 MB per innsending, så summen holdes under 3 MB.
+- Sendingen går til den samme serverfunksjonen `api/kontakt.ts` med
+  `skjema: 'tilbud'`; e-posten får en rad per felt og bildene vedlagt.
+- Under begge de korte skjemaene står en lenke «Be om tilbud her», og siden
+  ligger i mobilmenyen og mobilfooteren. Footeren på desktop er urørt: en
+  sjuende lenke fikk ikke plass i de 244 pikslene fra Figma.
+- Kjør `supabase/oppsett.sql` på nytt: `registrer_visning` har en liste over
+  sider som telles, og `/tilbud` er lagt til der.
+
+## Bakgrunnsmusikk
+
+Kunden ønsket ett rolig jazzspor på nettstedet (Pixabay, «Piano Jazz with
+Saxophone», gratis lisens). `src/lib/musikk.ts` og `src/components/Musikk.tsx`:
+
+- Starter fra stille og glir opp til 7 % volum over fem sekunder
+  (`MAAL_VOLUM` i `musikk.ts` er det eneste tallet å justere), går i sløyfe
+  med en myk overgang, og kan skrus av med knappen nede til høyre. Valget
+  huskes i nettleseren.
+- Nettleserne tillater ikke lyd før besøkeren har trykket eller tastet noe
+  på siden. Vi prøver ved lasting; sier nettleseren nei, starter musikken
+  ved første trykk hvor som helst på siden. Det gjelder alle nettlesere og
+  kan ikke omgås.
+- Filen er kodet om fra 10,6 MB (256 kbps MP3) til 2,9 MB AAC (64 kbps) med
+  en MP3 på 4 MB som reserve for nettlesere uten AAC. Den hentes først når
+  resten av siden er lastet, så den forsinker aldri bilder og tekst.
+- Volumet går gjennom Web Audio (GainNode), fordi iPhone ignorerer
+  `audio.volume`. Skjules fanen, settes musikken på pause.
+
 ## Sider
 
 | Rute              | Side           | Høyde i designet |
@@ -86,6 +125,7 @@ med feil, og skjemaet viser feilmeldingen – det er forventet.
 | `/portefolje`     | Portefølje     | 4050px           |
 | `/malertjenester` | Malertjenester | 2838px           |
 | `/kontakt`        | Kontakt oss    | 2025px           |
+| `/tilbud`         | Be om tilbud   | måles (ikke i Figma) |
 
 ## Kontroll mot designet
 

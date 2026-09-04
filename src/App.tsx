@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import ScrollToTop from './components/ScrollToTop'
 import useIsMobile from './lib/useIsMobile'
 import useSeo from './lib/seo'
@@ -15,6 +15,8 @@ import Blogg from './pages/Blogg'
 import BloggInnleggSide from './pages/BloggInnleggSide'
 import Lenkevideresending from './pages/Lenkevideresending'
 import Personvern from './pages/Personvern'
+import Tilbud from './pages/Tilbud'
+import Musikk from './components/Musikk'
 
 import HomeMobil from './pages/mobile/HomeMobil'
 import OmOssMobil from './pages/mobile/OmOssMobil'
@@ -40,6 +42,11 @@ export default function App() {
   useSeo()
   useMykScroll()
   useSporing()
+  const { pathname } = useLocation()
+
+  // Bakgrunnsmusikken hører til nettstedet, ikke til admin-panelet og
+  // ikke til sporingslenkene som bare sender videre.
+  const medMusikk = !pathname.startsWith('/admin') && !pathname.startsWith('/l/')
 
   const sider = {
     forside: mobil ? <HomeMobil /> : <Home />,
@@ -63,6 +70,7 @@ export default function App() {
         <Route path="/blogg" element={sider.blogg} />
         <Route path="/blogg/:slug" element={sider.innlegg} />
         <Route path="/personvern" element={<Personvern />} />
+        <Route path="/tilbud" element={<Tilbud />} />
         {/* sporingslenker: teller besøket og sender videre */}
         <Route path="/l/:kode" element={<Lenkevideresending />} />
         <Route
@@ -77,6 +85,7 @@ export default function App() {
             egne kopier av forsiden (myk 404) i søkemotorene. */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      {medMusikk && <Musikk />}
     </>
   )
 }

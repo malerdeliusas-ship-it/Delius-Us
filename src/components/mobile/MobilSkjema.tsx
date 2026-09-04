@@ -1,9 +1,17 @@
+import { Link } from 'react-router-dom'
 import { C } from '../../lib/theme'
 import { useKontaktSkjema } from '../../lib/kontakt'
 import SkjemaStatus from '../SkjemaStatus'
 
 /** Kontaktskjemaet på mobil. Meldingen går til `/api/kontakt` og videre på e-post. */
-export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: string }) {
+export default function MobilSkjema({
+  knappFarge = C.goldAlt,
+  tilbudTekst = 'pris',
+}: {
+  knappFarge?: string
+  /** «pris» på forsiden; «bilder» på Kontakt-siden, der teksten over alt nevner tilbud */
+  tilbudTekst?: 'pris' | 'bilder'
+}) {
   const { status, feil, feilFelt, send, merk, knappetekst } = useKontaktSkjema()
 
   const klasse = (navn: 'navn' | 'epost' | 'melding', ekstra = '') =>
@@ -61,6 +69,17 @@ export default function MobilSkjema({ knappFarge = C.goldAlt }: { knappFarge?: s
       >
         {knappetekst}
       </button>
+
+      {/* Lenken til tilbudsskjemaet. Fargen arves fra seksjonen rundt:
+          hvit på den blå forsiden, marineblå på Kontakt-siden. */}
+      {status !== 'sendt' && status !== 'feil' && (
+        <p style={{ textAlign: 'center', fontSize: 15, lineHeight: '22px', color: 'inherit' }}>
+          {tilbudTekst === 'pris' ? 'Ønsker du et pristilbud?' : 'Vil du legge ved bilder og mål?'}{' '}
+          <Link to="/tilbud" className="tilbud-lenke">
+            {tilbudTekst === 'pris' ? 'Be om tilbud her' : 'Bruk tilbudsskjemaet'}
+          </Link>
+        </p>
+      )}
 
       {status === 'sendt' && <SkjemaStatus type="ok" />}
       {status === 'feil' && feil && <SkjemaStatus type="feil" tekst={feil} />}

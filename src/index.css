@@ -578,3 +578,577 @@ textarea {
   pointer-events: none;
 }
 
+
+/* ---------- Lenke til tilbudsskjemaet under kontaktskjemaene ---------- */
+.tilbud-lenke {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.15s ease;
+}
+.tilbud-lenke:hover {
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   Tilbudsskjemaet (/tilbud)
+   Flytende layout, samme komponent på desktop (inne i Stage) og mobil
+   (inne i .m). Fargene og formene er designets egne: den blå kontakt-
+   flaten, hvite pilleformede felt, gule knapper.
+   ========================================================================== */
+
+.tb-panel {
+  background: var(--kontakt-blue);
+  color: #fff;
+  border-radius: 48px;
+  padding: 48px;
+}
+
+.tb-del + .tb-del {
+  margin-top: 40px;
+}
+
+.tb-tittel {
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #fff;
+  text-align: left;
+}
+
+.tb-valgfritt {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gold);
+  vertical-align: 2px;
+}
+
+.tb-hjelp {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 22px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.tb-rad {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.tb-rad--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.tb-felt {
+  width: 100%;
+  height: 62px;
+  border: none;
+  outline: none;
+  border-radius: 43px;
+  background: #fff;
+  padding: 0 32px;
+  font-family: inherit;
+  font-size: 18px;
+  color: var(--navy);
+}
+
+.tb-felt::placeholder {
+  color: rgba(2, 3, 105, 0.46);
+  opacity: 1;
+}
+
+.tb-felt:focus {
+  box-shadow: 0 0 0 2px rgba(255, 195, 0, 0.9);
+}
+
+/* Feltet som stoppet innsendingen får fokus; den røde ringen skal vinne */
+.tb-felt.felt-feil:focus {
+  box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.85);
+}
+
+.tb-felt--stor {
+  height: auto;
+  min-height: 150px;
+  border-radius: 28px;
+  padding: 18px 32px;
+  line-height: 28px;
+  resize: none;
+}
+
+.tb-suffiks {
+  position: relative;
+}
+
+.tb-suffiks span {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #9a9ac3;
+  pointer-events: none;
+}
+
+.tb-suffiks .tb-felt {
+  padding-right: 64px;
+}
+
+/* Brikkene: valgene for type jobb og tidspunkt */
+.tb-brikker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.tb-brikke {
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.tb-brikke:hover {
+  border-color: #fff;
+  transform: translateY(-1px);
+}
+
+.tb-brikke[aria-checked='true'],
+.tb-brikke[aria-pressed='true'] {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--navy);
+}
+
+.tb-brikke:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Ingen jobbtype valgt: brikkene får en rød kant til noe velges */
+.tb-brikker--feil .tb-brikke[aria-checked='false'] {
+  border-color: #ff9d94;
+  animation: felt-rist 0.35s ease-in-out;
+}
+
+/* Bildene: slipp-sonen og miniatyrene */
+/* Barna slipper museevents gjennom, ellers blinker rammen mens man drar over teksten */
+.tb-slipp > * {
+  pointer-events: none;
+}
+
+.tb-slipp {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 30px 20px;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-align: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.tb-slipp:hover,
+.tb-slipp--over {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: #fff;
+}
+
+.tb-slipp:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.tb-slipp svg {
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.tb-slipp strong {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.tb-slipp small {
+  font-size: 14px;
+  line-height: 20px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.tb-bilder {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+  padding: 0;
+}
+
+.tb-bilde {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+  animation: skjema-inn 0.3s ease both;
+}
+
+.tb-bilde img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tb-bilde button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease;
+}
+
+.tb-bilde button:hover {
+  transform: scale(1.08);
+}
+
+.tb-feltfeil,
+.tb-bildefeil {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: #ffd166;
+}
+
+/* Sending */
+.tb-send {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.tb-knapp {
+  min-width: 280px;
+  height: 58px;
+  padding: 0 40px;
+  border-radius: 65px;
+  background: var(--gold-alt);
+  color: #002f96;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.tb-note {
+  max-width: 520px;
+  font-size: 14px;
+  line-height: 21px;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: center;
+}
+
+.tb-note a {
+  text-decoration: underline;
+}
+
+.tb-status:not(:empty) {
+  margin-top: 20px;
+}
+
+/* Kortet ved siden av: slik foregår det */
+.tb-kort {
+  background: #fff;
+  border-radius: 48px;
+  padding: 40px 36px;
+  color: var(--navy);
+}
+
+.tb-kort h2 {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+  text-align: left;
+}
+
+.tb-steg {
+  list-style: none;
+  display: grid;
+  gap: 22px;
+  margin-top: 24px;
+  padding: 0;
+}
+
+.tb-steg li {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.tb-steg i {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  font-style: normal;
+  font-weight: 800;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tb-steg strong {
+  display: block;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  padding-top: 8px;
+}
+
+.tb-steg p {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--brown);
+}
+
+.tb-kort hr {
+  border: 0;
+  border-top: 1px solid rgba(2, 34, 105, 0.12);
+  margin: 26px 0;
+}
+
+.tb-ring {
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.tb-ring a {
+  display: block;
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.tb-ring a:hover {
+  color: var(--panel-blue);
+}
+
+/* Mobil: samme skjema, uten hjørner, fulle bredder */
+.m .tb-panel {
+  border-radius: 0;
+  padding: 36px var(--kant) 40px;
+}
+
+.m .tb-del + .tb-del {
+  margin-top: 32px;
+}
+
+.m .tb-tittel {
+  font-size: 19px;
+  line-height: 1.3;
+  font-weight: 700;
+  text-align: left;
+}
+
+/* .m p og .m h2 setter egne størrelser; skjemaets tekster skal ha sine */
+.m .tb-hjelp {
+  font-size: 15px;
+  line-height: 22px;
+}
+
+.m .tb-feltfeil,
+.m .tb-bildefeil {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.m .tb-note {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+/* «dra bildene hit» gir ikke mening på en berøringsskjerm */
+.m .tb-dra {
+  display: none;
+}
+
+.m .tb-rad--2 {
+  grid-template-columns: 1fr;
+}
+
+.m .tb-felt {
+  height: 54px;
+  font-size: 17px;
+  padding: 0 22px;
+}
+
+.m .tb-felt--stor {
+  height: auto;
+  padding: 14px 22px;
+  line-height: 26px;
+}
+
+.m .tb-suffiks span {
+  right: 20px;
+}
+
+.m .tb-brikke {
+  height: 42px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+.m .tb-bilder {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.m .tb-knapp {
+  width: 100%;
+  min-width: 0;
+}
+
+.m .tb-kort {
+  border-radius: 28px;
+  padding: 28px 22px;
+}
+
+.m .tb-kort h2 {
+  font-size: 22px;
+  text-align: left;
+}
+
+.m .tb-steg p {
+  font-size: 15px;
+  line-height: 23px;
+}
+
+/* ---------- Bakgrunnsmusikk: knappen i hjørnet ---------- */
+.musikk {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 30;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(2, 34, 105, 0.28);
+  transition: transform 0.18s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  animation: musikk-inn 0.6s 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.musikk:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.musikk:active {
+  transform: scale(0.96);
+}
+
+.musikk:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.musikk--av {
+  background: #fff;
+  color: var(--navy);
+  box-shadow: 0 6px 18px rgba(2, 34, 105, 0.16);
+}
+
+.musikk-stolpe {
+  transform-origin: 50% 100%;
+  transform: scaleY(0.4);
+}
+
+.musikk-stolpe--2 {
+  transform: scaleY(0.7);
+}
+
+.musikk-stolpe--3 {
+  transform: scaleY(0.5);
+}
+
+.musikk--spiller .musikk-stolpe {
+  animation: musikk-stolpe 1.15s ease-in-out infinite;
+}
+
+.musikk--spiller .musikk-stolpe--2 {
+  animation-delay: -0.4s;
+}
+
+.musikk--spiller .musikk-stolpe--3 {
+  animation-delay: -0.75s;
+}
+
+@keyframes musikk-stolpe {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes musikk-inn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 1000px) {
+  .musikk {
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .musikk {
+    animation: none;
+  }
+  .musikk--spiller .musikk-stolpe {
+    animation: none;
+    transform: scaleY(0.75);
+  }
+}
