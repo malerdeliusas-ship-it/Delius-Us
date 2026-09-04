@@ -112,13 +112,38 @@ function lydKontekst(): AudioContext | null {
   return ctx
 }
 
+const vent = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
 /**
- * Kobler lydelementet gjennom en GainNode som står på 0, før avspillingen
- * starter. Gjøres bare én gang: et element kan bare kobles til én kontekst,
- * og etterpå går all lyd fra det gjennom grafen.
+ * Er lydkonteksten i gang på ordentlig? `state` sier «running» også i
+ * tilfeller der klokka står stille (nettleseren har ikke fått lov ennå,
+ * eller lydenheten er opptatt). Vi måler derfor at klokka faktisk går.
+ * Dette er viktig: et element som kobles til en kontekst som står stille,
+ * slutter å spille, og da blir det stille uten at noe ser galt ut.
+ */
+async function kontekstKlar() {
+  const k = lydKontekst()
+  if (!k) return false
+  if (k.state !== 'running') {
+    try {
+      await Promise.race([k.resume(), vent(1200)])
+    } catch {
+      /* ikke lov ennå */
+    }
+  }
+  if (k.state !== 'running') return false
+  const for0 = k.currentTime
+  await vent(120)
+  return k.currentTime > for0
+}
+
+/**
+ * Kobler lydelementet gjennom en GainNode. Gjøres bare én gang, og bare når
+ * konteksten er i gang: et element kan bare kobles til én kontekst, og
+ * koblingen kan ikke angres.
  */
 function kobleGraf() {
-  const k = lydKontekst()
+  const k = ctx
   if (!k || gain) return
   try {
     const el = element()
@@ -134,21 +159,23 @@ function kobleGraf() {
 }
 
 /**
- * Ber konteksten starte og svarer om den faktisk kjører. resume() svarer
- * først når nettleseren gir lov, og det kan ta evig, så vi venter høyst
- * litt over ett sekund.
+ * Sørger for at vi kan styre nivået, og setter det til null. Svarer false
+ * hvis vi ikke kan det: da skal musikken bli værende stum heller enn å
+ * brake ut på fullt volum. (På iPhone er `audio.volume` låst til 1, så der
+ * er GainNode-veien den eneste som duger.)
  */
-async function kontekstKjorer() {
-  const k = ctx
-  if (!k) return false
-  if (k.state !== 'running') {
-    try {
-      await Promise.race([k.resume(), new Promise((r) => setTimeout(r, 1200))])
-    } catch {
-      /* ikke lov ennå */
-    }
+async function nivaaNull() {
+  if (gain) {
+    gli(0, 0, 'ut')
+    return true
   }
-  return k.state === 'running'
+  if (await kontekstKlar()) {
+    kobleGraf()
+    if (gain) return true
+  }
+  const el = element()
+  el.volume = 0
+  return el.volume === 0
 }
 
 /** Glir volumet fra der det er til `til` over `sek` sekunder. */
@@ -195,50 +222,60 @@ function gli(til: number, sek: number, kurve: 'inn' | 'ut') {
 }
 
 /**
- * Starter avspillingen og glir inn. Alt som må skje inne i berøringen,
- * skjer synkront her: konteksten lages og bes starte, grafen kobles, og
- * play() kalles. Svarer false når nettleseren nekter, eller når forsøket
- * ble uaktuelt underveis (besøkeren skrudde av, fanen ble skjult).
+ * Starter avspillingen og glir inn.
+ *
+ * Elementet starter alltid stumt (`muted`), og lyden slippes først på når
+ * vi vet at vi kan styre nivået. Slik hører ingen et brak i det musikken
+ * begynner, heller ikke på iPhone, der volumet ellers står låst på fullt.
+ * `muted` lar seg sette overalt.
+ *
+ * Konteksten bes starte synkront her, mens berøringen fortsatt gjelder.
+ * Selve koblingen skjer først etter at avspillingen er i gang, og bare hvis
+ * konteksten virkelig kjører.
+ *
+ * Svarer false når nettleseren nekter, når vi ikke kan styre nivået, eller
+ * når forsøket ble uaktuelt underveis (besøkeren skrudde av, fanen ble
+ * skjult). Svarer play() aldri, gir vi opp etter fem sekunder, så knappen
+ * ikke blir stående og påstå at noe er på vei.
  */
 function start(innSek: number): Promise<boolean> {
   const nr = ++startNr
   const el = element()
   clearTimeout(pauseTimer)
+  el.muted = true
 
   const k = lydKontekst()
   if (k && k.state !== 'running') void k.resume().catch(() => undefined)
-  kobleGraf()
 
-  let løfte: Promise<void>
+  let løfte: Promise<unknown>
   try {
-    løfte = el.play()
+    løfte = el.play() ?? Promise.resolve()
   } catch (e) {
     løfte = Promise.reject(e)
   }
 
   const gyldig = () => nr === startNr && aktiv && tilstand !== 'av' && !document.hidden
+  const gi_opp = () => {
+    el.pause()
+    el.muted = false
+    return false
+  }
 
-  return løfte
+  return Promise.race([løfte, vent(5000).then(() => Promise.reject(new Error('tidsavbrudd')))])
     .then(async () => {
-      if (!gyldig()) {
-        el.pause()
-        return false
-      }
-      // Går elementet gjennom en kontekst som ikke får kjøre ennå, er vi
-      // like langt som før berøringen. Da venter vi på den neste.
-      if (gain && !(await kontekstKjorer())) {
-        el.pause()
-        return false
-      }
-      if (!gyldig()) {
-        el.pause()
-        return false
-      }
+      if (!gyldig()) return gi_opp()
+      if (!(await nivaaNull())) return gi_opp()
+      if (!gyldig()) return gi_opp()
+      el.muted = false
       gli(MAAL_VOLUM, innSek, 'inn')
       sett('spiller')
       return true
     })
-    .catch(() => false)
+    .catch(() => {
+      el.pause()
+      el.muted = false
+      return false
+    })
 }
 
 /** Glir ut og setter på pause når det er stille. */
