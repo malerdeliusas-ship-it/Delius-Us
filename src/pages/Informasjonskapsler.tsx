@@ -9,90 +9,114 @@ import { apneValg, trekkSamtykke, useSamtykke } from '../lib/samtykke'
  * lenge, og knappene for å endre eller trekke tilbake svaret. Kravet står i
  * ekomloven § 3-15 og i personvernforordningen artikkel 7 nr. 3 (samtykke
  * skal kunne trekkes like lett som det ble gitt).
+ *
+ * Innholdet sto først i en tabell med de tekniske navnene i første kolonne.
+ * Alt sto der, men siden så ut som en utskrift fra en database. Nå er den
+ * bygget som kort, ett per formål: det leseren faktisk lurer på står som
+ * overskrift på hver linje, og det tekniske navnet står smått under. Ingen
+ * opplysninger er tatt bort – bare snudd, så mennesket kommer først.
  */
 export const KAPSLER_OPPDATERT = '8. september 2026'
 
-type Rad = {
-  navn: string
+/** Én ting som lagres: hva den gjør (i klartekst), navnet, og hvor lenge. */
+type Ting = { hva: string; navn: string; varighet: string }
+
+type Gruppe = {
+  tittel: string
+  /** Hva hele gruppen er til for, i én setning. */
+  ingress: string
   hvem: string
-  formaal: string
-  type: 'Nødvendig' | 'Statistikk' | 'Markedsføring' | 'Innhold fra Google' | 'Bare admin'
-  varighet: string
+  ting: Ting[]
+  /** «Alltid på», «På» eller «Av» – vises som merke øverst til høyre. */
+  status: 'alltid' | 'paa' | 'av'
 }
 
 const strommen = GA_ID ? GA_ID.replace(/^G-/, '') : 'XXXXXXXX'
 
-const RADER: Rad[] = [
-  {
-    navn: 'md-samtykke',
-    hvem: 'malerdelius.no (localStorage)',
-    formaal: 'Husker svaret ditt i banneret om informasjonskapsler, så vi ikke spør på hver side.',
-    type: 'Nødvendig',
-    varighet: '12 måneder',
-  },
-  {
-    navn: 'md-musikk',
-    hvem: 'malerdelius.no (localStorage)',
-    formaal: 'Husker at du har skrudd bakgrunnsmusikken av eller på. Settes bare når du trykker på musikkknappen.',
-    type: 'Nødvendig',
-    varighet: 'Til du sletter den',
-  },
-  ...(harAnalyse
-    ? ([
-        {
-          navn: '_ga',
-          hvem: 'Google Analytics (informasjonskapsel)',
-          formaal: 'Et tilfeldig nummer som skiller nettleseren din fra andre, så besøk kan telles.',
-          type: 'Statistikk',
-          varighet: '2 år',
-        },
-        {
-          navn: `_ga_${strommen}`,
-          hvem: 'Google Analytics (informasjonskapsel)',
-          formaal: 'Holder sidene i ett og samme besøk sammen for Google Analytics.',
-          type: 'Statistikk',
-          varighet: '2 år',
-        },
-        {
-          navn: '_gcl_au, _gcl_aw, _gcl_gs',
-          hvem: 'Google Ads (informasjonskapsler)',
-          formaal:
-            'Husker at besøket kom fra en Google-annonse, så Google Ads kan se om annonsen førte til en henvendelse. Brukes ikke til personlig tilpassede annonser.',
-          type: 'Markedsføring',
-          varighet: '90 dager',
-        },
-      ] as Rad[])
-    : []),
-  {
-    navn: 'NID, CONSENT, SOCS m.fl.',
-    hvem: 'google.com (informasjonskapsler fra tredjepart)',
-    formaal:
-      'Settes av Google når kartet på kontaktsiden vises. Google bruker dem til egne innstillinger og sikkerhet.',
-    type: 'Innhold fra Google',
-    varighet: '6 måneder til 2 år, styrt av Google',
-  },
-  {
-    navn: 'sb-…-auth-token, md-ikke-spor, md-innlogging-forsok',
-    hvem: 'malerdelius.no (localStorage)',
-    formaal:
-      'Bare for ansatte som logger inn i admin-panelet: holder innloggingen, holder egne besøk utenfor statistikken og bremser gjentatte innloggingsforsøk.',
-    type: 'Bare admin',
-    varighet: 'Til utlogging, ellers til du sletter dem',
-  },
-]
-
 export default function Informasjonskapsler() {
   const samtykke = useSamtykke()
 
+  const grupper: Gruppe[] = [
+    {
+      tittel: 'Nødvendige',
+      ingress:
+        'Husker et valg du selv har gjort på nettstedet. Disse trenger vi ikke spørre om, og de forteller oss ingenting om deg.',
+      hvem: 'Nettstedet vårt',
+      status: 'alltid',
+      ting: [
+        {
+          hva: 'Husker svaret ditt i banneret, så vi ikke spør på hver eneste side.',
+          navn: 'md-samtykke',
+          varighet: '12 måneder',
+        },
+        {
+          hva: 'Husker om du har skrudd av bakgrunnsmusikken. Lagres bare hvis du trykker på musikknappen.',
+          navn: 'md-musikk',
+          varighet: 'Til du sletter den',
+        },
+      ],
+    },
+    ...(harAnalyse
+      ? ([
+          {
+            tittel: 'Statistikk',
+            ingress:
+              'Lar oss se hvor mange som besøker sidene og hva folk leser, så vi vet hva som er nyttig. Vi ser tall, ikke personer.',
+            hvem: 'Google Analytics (Google Ireland Limited)',
+            status: samtykke?.statistikk ? 'paa' : 'av',
+            ting: [
+              {
+                hva: 'Skiller nettleseren din fra andre, så det samme besøket ikke telles to ganger.',
+                navn: '_ga',
+                varighet: '2 år',
+              },
+              {
+                hva: 'Holder sidene du ser i ett og samme besøk sammen.',
+                navn: `_ga_${strommen}`,
+                varighet: '2 år',
+              },
+            ],
+          },
+          {
+            tittel: 'Markedsføring',
+            ingress:
+              'Lar oss se om en annonse faktisk førte til at noen tok kontakt. Vi bruker det aldri til personlig tilpassede annonser, og vi følger deg ikke rundt på andre nettsteder.',
+            hvem: 'Google Ads (Google Ireland Limited)',
+            status: samtykke?.markedsforing ? 'paa' : 'av',
+            ting: [
+              {
+                hva: 'Husker at besøket kom fra en av annonsene våre.',
+                navn: '_gcl_au, _gcl_aw, _gcl_gs',
+                varighet: '90 dager',
+              },
+            ],
+          },
+        ] as Gruppe[])
+      : []),
+    {
+      tittel: 'Kartet på kontaktsiden',
+      ingress:
+        'Kartet hentes fra Google Maps, og da setter Google sine egne informasjonskapsler. Derfor viser vi det ikke før du sier ja.',
+      hvem: 'google.com',
+      status: samtykke?.eksternt ? 'paa' : 'av',
+      ting: [
+        {
+          hva: 'Googles egne innstillinger og sikkerhet mens kartet vises.',
+          navn: 'NID, CONSENT, SOCS med flere',
+          varighet: '6 måneder til 2 år, bestemt av Google',
+        },
+      ],
+    },
+  ]
+
+  const merke = (s: Gruppe['status']) =>
+    s === 'alltid' ? 'Alltid på' : s === 'paa' ? 'På nå' : 'Av nå'
+
   const status = !samtykke
-    ? 'Du har ikke svart på banneret ennå. Da er bare det nødvendige på.'
-    : [
-        harAnalyse ? `Statistikk (Google Analytics): ${samtykke.statistikk ? 'på' : 'av'}` : null,
-        harAnalyse ? `Markedsføring (Google Ads): ${samtykke.markedsforing ? 'på' : 'av'}` : null,
-        `Innhold fra Google (kartet): ${samtykke.eksternt ? 'på' : 'av'}`,
-      ]
-        .filter(Boolean)
-        .join('. ') + `. Svart ${new Date(samtykke.dato).toLocaleDateString('nb-NO')}.`
+    ? 'Du har ikke svart på banneret ennå. Da er bare det nødvendige på, og ingenting sendes til Google.'
+    : samtykke.statistikk || samtykke.markedsforing || samtykke.eksternt
+      ? 'Du har gjort et valg. Merkene under viser hva som er på akkurat nå.'
+      : 'Du har valgt bare det nødvendige. Ingenting sendes til Google.'
 
   return (
     <JuridiskSide
@@ -100,10 +124,9 @@ export default function Informasjonskapsler() {
       oppdatert={KAPSLER_OPPDATERT}
       ingress={
         <>
-          Informasjonskapsler (cookies) og lignende lagring er små biter informasjon et nettsted
-          legger igjen i nettleseren din. Etter ekomloven § 3-15 må vi ha samtykket ditt før vi
-          lagrer noe som ikke er strengt nødvendig for det du selv har bedt om. Her står alt vi
-          bruker, og du kan endre svaret ditt når som helst.
+          Informasjonskapsler (cookies) er små notater et nettsted legger igjen i nettleseren din.
+          Etter ekomloven § 3-15 må vi ha ditt ja før vi lagrer noe som ikke er strengt nødvendig.
+          Her står alt vi bruker, i klartekst, og du kan ombestemme deg når som helst.
         </>
       }
     >
@@ -112,72 +135,67 @@ export default function Informasjonskapsler() {
         <div className="jus-boks">
           <p>{status}</p>
         </div>
-        <p style={{ marginTop: 18, display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        <div className="kapsel-knapper">
           <button type="button" className="jus-knapp" onClick={apneValg}>
             Endre valgene mine
           </button>
           {samtykke && (
-            <button
-              type="button"
-              className="jus-knapp"
-              style={{ background: '#fff', boxShadow: 'inset 0 0 0 2px #022269' }}
-              onClick={trekkSamtykke}
-            >
+            <button type="button" className="jus-knapp jus-knapp--hvit" onClick={trekkSamtykke}>
               Trekk tilbake alt
             </button>
           )}
-        </p>
-        <p>
-          Trekker du tilbake et samtykke, slutter vi å bruke det med en gang, og
-          {harAnalyse ? ' informasjonskapslene fra Google Analytics slettes fra nettleseren din' : ' ingenting nytt hentes fra Google'}
-          . Informasjonskapsler som Google selv har satt på google.com, må du slette i nettleserens
-          innstillinger.
+        </div>
+        <p style={{ marginTop: 16 }}>
+          Trekker du tilbake et samtykke, slutter vi å bruke det med en gang, og informasjonskapslene
+          fra Google slettes fra nettleseren din. Kapsler som Google selv har satt på google.com, må
+          du slette i nettleserens innstillinger.
         </p>
       </section>
 
       <section>
         <h2>Alt som lagres, og hvor lenge</h2>
-        <div className="jus-tabell">
-          <table>
-            <thead>
-              <tr>
-                <th>Navn</th>
-                <th>Hvem setter den</th>
-                <th>Hva den gjør</th>
-                <th>Type</th>
-                <th>Varighet</th>
-              </tr>
-            </thead>
-            <tbody>
-              {RADER.map((r) => (
-                <tr key={r.navn}>
-                  <td>
-                    <code>{r.navn}</code>
-                  </td>
-                  <td>{r.hvem}</td>
-                  <td>{r.formaal}</td>
-                  <td>{r.type}</td>
-                  <td>{r.varighet}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="kapsel-kort">
+          {grupper.map((g) => (
+            <article key={g.tittel} className="kapsel-gruppe">
+              <header className="kapsel-topp">
+                <h3>{g.tittel}</h3>
+                <span className={`kapsel-merke kapsel-merke--${g.status}`}>{merke(g.status)}</span>
+              </header>
+              <p className="kapsel-ingress">{g.ingress}</p>
+
+              <ul className="kapsel-liste">
+                {g.ting.map((t) => (
+                  <li key={t.navn}>
+                    <p className="kapsel-hva">{t.hva}</p>
+                    <p className="kapsel-detalj">
+                      <span className="kapsel-navn">{t.navn}</span>
+                      <span className="kapsel-varighet">{t.varighet}</span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="kapsel-hvem">Settes av: {g.hvem}</p>
+            </article>
+          ))}
         </div>
-        <p style={{ marginTop: 14 }}>
-          «Nødvendig» betyr at lagringen bare husker et valg du selv har gjort, og er unntatt
-          kravet om samtykke. «Statistikk», «Markedsføring» og «Innhold fra Google» skjer bare
-          når du har sagt ja. Før du har svart, lagrer Google-taggen ingenting og setter ingen
-          kapsler. Vår egen besøkstelling lagrer aldri noe i nettleseren din, se{' '}
-          <Link to="/personvern">personvernerklæringen</Link>.
+
+        <p className="kapsel-fotnote">
+          Besøkstellingen vi har laget selv, lagrer ingenting i nettleseren din og bruker ingen
+          informasjonskapsler. Den er forklart i{' '}
+          <Link to="/personvern">personvernerklæringen</Link>. Logger noen av oss seg inn i
+          administrasjonspanelet, lagrer nettleseren i tillegg innloggingen og et par
+          arbeidsinnstillinger på den maskinen. Det gjelder bare oss som jobber her, aldri
+          besøkende på nettstedet.
         </p>
       </section>
 
       <section>
         <h2>Slette informasjonskapsler selv</h2>
         <p>
-          Du kan alltid slette informasjonskapsler og lagrede data i nettleserens innstillinger,
-          som regel under «Personvern og sikkerhet» eller «Nettstedsdata». Gjør du det, spør
-          banneret på nytt neste gang du besøker oss.
+          Du kan alltid slette informasjonskapsler og lagrede data i nettleserens innstillinger, som
+          regel under «Personvern og sikkerhet» eller «Nettstedsdata». Gjør du det, spør banneret på
+          nytt neste gang du besøker oss.
         </p>
       </section>
     </JuridiskSide>
