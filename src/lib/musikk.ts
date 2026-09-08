@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import lydM4a from '../assets/lyd/piano-jazz.m4a'
-import lydMp3 from '../assets/lyd/piano-jazz.mp3'
+import lydFil from '../assets/lyd/piano-jazz.m4a'
 
 /**
  * Bakgrunnsmusikk på nettstedet.
@@ -82,16 +81,14 @@ function element(): HTMLAudioElement {
   audio = document.createElement('audio')
   audio.loop = true
   audio.preload = 'none'
-  // AAC først (mindre fil), MP3 for nettlesere som ikke spiller AAC
-  for (const [src, type] of [
-    [lydM4a, 'audio/mp4'],
-    [lydMp3, 'audio/mpeg'],
-  ]) {
-    const kilde = document.createElement('source')
-    kilde.src = src
-    kilde.type = type
-    audio.appendChild(kilde)
-  }
+  // Én fil: AAC-LC i MP4, som alle nettlesere med <audio> spiller. Sporet er
+  // klippet til én runde av sløyfa på 72 sekunder, mono, 48 kbit/s – 442 kB
+  // mot 2,8 MB før. Kildepunktet er valgt der bølgeformen møter seg selv, med
+  // en kort krysstoning, så gjentakelsen ikke høres.
+  const kilde = document.createElement('source')
+  kilde.src = lydFil
+  kilde.type = 'audio/mp4'
+  audio.appendChild(kilde)
   audio.volume = 0
   // Legges i dokumentet, så elementet er lett å finne ved feilsøking.
   document.body.appendChild(audio)
@@ -308,6 +305,8 @@ function vedGest(e: Event) {
   // Musikk-knappen bestemmer selv (se veksle).
   const mål = e.target as Element | null
   if (mål?.closest?.('.musikk')) return
+  // Første berøring: nå er avspilling tillatt, så det er nå filen skal hentes.
+  forhaandslast()
   starter = true
   void start(INN_SEK).then((ok) => {
     starter = false
@@ -375,8 +374,11 @@ export function aktiver() {
   armer()
   naarLastet(() => {
     if (!aktiv || tilstand !== 'venter' || starter) return
-    // Hent filen nå som resten av siden er på plass, og prøv å starte
-    forhaandslast()
+    // Vi henter IKKE filen på forhånd her. Nettleseren nekter uansett å spille
+    // lyd før besøkeren har trykket et sted, så en forhåndshenting ville i de
+    // aller fleste tilfellene lastet ned en fil ingen får høre. `start()`
+    // henter den selv i det øyeblikket avspilling faktisk er tillatt, og
+    // `vedGest` varmer den opp ved første berøring.
     starter = true
     void start(INN_SEK).then((ok) => {
       starter = false

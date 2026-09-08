@@ -31,14 +31,9 @@ const SIDER: Record<string, { tittel: string; beskrivelse: string }> = {
       'Innvendig og utvendig maling, reparasjon og sparkling, dekorative teknikker og fargevalg – se alle tjenestene våre.',
   },
   '/kontakt': {
-    tittel: 'Kontakt oss – Maler Delius AS',
+    tittel: 'Få et uforpliktende tilbud – Maler Delius AS',
     beskrivelse:
-      'Ta kontakt med Maler Delius AS for et uforpliktende tilbud eller gratis befaring i Oslo. Ring 966 93 780 eller send skjemaet.',
-  },
-  '/tilbud': {
-    tittel: 'Be om tilbud – Maler Delius AS',
-    beskrivelse:
-      'Fortell oss om jobben, legg ved bilder og få et uforpliktende tilbud fra Maler Delius AS i Oslo. Gratis befaring.',
+      'Fortell oss om jobben, legg ved bilder og få et uforpliktende tilbud fra Maler Delius AS i Oslo. Gratis befaring. Ring 966 93 780.',
   },
   '/blogg': {
     tittel: 'Blogg – Maler Delius AS',
@@ -46,9 +41,24 @@ const SIDER: Record<string, { tittel: string; beskrivelse: string }> = {
       'Nytt fra Maler Delius AS: maletips, ferdige prosjekter og små glimt fra hverdagen til malerne våre i Oslo.',
   },
   '/personvern': {
-    tittel: 'Personvern – Maler Delius AS',
+    tittel: 'Personvernerklæring – Maler Delius AS',
     beskrivelse:
-      'Hva malerdelius.no lagrer om deg, og hvorfor. Ingen informasjonskapsler, ingen IP-adresser og ingen sporing fra tredjepart.',
+      'Hva malerdelius.no samler inn om deg, hvorfor, hvor lenge, og hvilke rettigheter du har. Statistikk og kart fra Google bare med ditt samtykke.',
+  },
+  '/informasjonskapsler': {
+    tittel: 'Informasjonskapsler – Maler Delius AS',
+    beskrivelse:
+      'Alt malerdelius.no lagrer i nettleseren din, hvem som setter det, hvor lenge det lever, og hvordan du endrer eller trekker tilbake samtykket.',
+  },
+  '/vilkar': {
+    tittel: 'Vilkår for bruk – Maler Delius AS',
+    beskrivelse:
+      'Vilkår for bruk av malerdelius.no, opplysninger om Maler Delius AS (org.nr. 934 409 256), tilbud, priser, reklamasjon og tvisteløsning.',
+  },
+  '/angrerett': {
+    tittel: 'Angrerett og reklamasjon – Maler Delius AS',
+    beskrivelse:
+      '14 dagers angrerett, tilbakebetaling og hvordan du reklamerer på malerarbeid, etter angrerettloven og håndverkertjenesteloven.',
   },
 }
 

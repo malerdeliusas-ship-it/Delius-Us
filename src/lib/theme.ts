@@ -98,9 +98,31 @@ export const BEDRIFT = {
   epost: 'malerdelius@gmail.com',
   nettsted: 'malerdelius.no',
   orgnr: 'Org nr. 934 409 256',
+  /** Bare tallet, til juridiske sider og strukturerte data. */
+  orgnrTall: '934 409 256',
+  /** Registrert i Merverdiavgiftsregisteret (Enhetsregisteret, 27.11.2024). */
+  mva: true,
+  /**
+   * Forretningsadressen i Enhetsregisteret (Brønnøysundregistrene, hentet
+   * 8. september 2026). Den skiller seg fra besøksadressen i designet, og
+   * begge står derfor på de juridiske sidene.
+   */
+  forretningsadresse: 'Nedre Ullevål 3C, 0850 Oslo',
+  /** Registrert i Foretaksregisteret 11. november 2024, stiftet 14. oktober 2024. */
+  registrert: '11. november 2024',
+  dagligLeder: 'Nicolae Secara',
   facebook: 'https://www.facebook.com/share/1CPdfc8UBm/',
   instagram: 'https://www.instagram.com/malerdelius',
   tiktok: 'https://www.tiktok.com/@malerdelius',
   mittanbud: 'https://mittanbud.no/bedrift/9061904',
+  /**
+   * Tallene fra Mittanbud-profilen, lest av 8. september 2026. De står på
+   * Portefølje-siden og må oppdateres for hånd når de endrer seg; siden
+   * lenker til profilen, så alle kan kontrollere dem.
+   */
+  mittanbudVurderinger: 58,
+  mittanbudSnitt: '5,0',
+  mittanbudJobber: 75,
+  mittanbudLest: '8. september 2026',
   kart: 'https://www.google.com/maps/search/?api=1&query=Ullev%C3%A5lsveien+76,+0454+Oslo',
 }

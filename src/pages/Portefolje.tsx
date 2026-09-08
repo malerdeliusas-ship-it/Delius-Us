@@ -1,26 +1,27 @@
 import Stage from '../components/Stage'
 import SiteHeader from '../components/SiteHeader'
-import SiteFooter from '../components/SiteFooter'
+import SiteFooter, { FOOTER_EKSTRA } from '../components/SiteFooter'
 import { Txt, Img, Rect, CropImg } from '../components/prim'
 import { C, FONT_MUKTA, BEDRIFT } from '../lib/theme'
+import { KORT } from '../lib/site'
+import MittanbudKort from '../components/MittanbudKort'
 import { useGalleri } from '../lib/galleri'
 
 import splash from '../assets/figma/splash.webp'
-import anmeldelser from '../assets/figma/mittanbud-anmeldelser.jpg'
 import icTeam from '../assets/figma/ic-team.webp'
-import f06530 from '../assets/figma/portefolje-dsc06530-1.jpg'
-import f06515 from '../assets/figma/portefolje-dsc06515-1.jpg'
-import f06535 from '../assets/figma/portefolje-dsc06535-1.jpg'
-import f05791 from '../assets/figma/portefolje-dsc05791-1.jpg'
-import f07386 from '../assets/figma/portefolje-dsc07386-1.jpg'
-import f07295 from '../assets/figma/portefolje-dsc07295-1.jpg'
-import f05793 from '../assets/figma/portefolje-dsc05793-1.jpg'
-import f05812 from '../assets/figma/portefolje-dsc05812-1.jpg'
-import f05797 from '../assets/figma/portefolje-dsc05797-1.jpg'
-import f02723 from '../assets/figma/portefolje-dsc02723-1.jpg'
-import f02756 from '../assets/figma/portefolje-dsc02756-1.jpg'
-import f02672 from '../assets/figma/portefolje-dsc02672-1.jpg'
-import f02620 from '../assets/figma/portefolje-dsc02620-1.jpg'
+import f06530 from '../assets/figma/portefolje-dsc06530-1.webp'
+import f06515 from '../assets/figma/portefolje-dsc06515-1.webp'
+import f06535 from '../assets/figma/portefolje-dsc06535-1.webp'
+import f05791 from '../assets/figma/portefolje-dsc05791-1.webp'
+import f07386 from '../assets/figma/portefolje-dsc07386-1.webp'
+import f07295 from '../assets/figma/portefolje-dsc07295-1.webp'
+import f05793 from '../assets/figma/portefolje-dsc05793-1.webp'
+import f05812 from '../assets/figma/portefolje-dsc05812-1.webp'
+import f05797 from '../assets/figma/portefolje-dsc05797-1.webp'
+import f02723 from '../assets/figma/portefolje-dsc02723-1.webp'
+import f02756 from '../assets/figma/portefolje-dsc02756-1.webp'
+import f02672 from '../assets/figma/portefolje-dsc02672-1.webp'
+import f02620 from '../assets/figma/portefolje-dsc02620-1.webp'
 
 const BAND = [
   { l: -5, t: 376, w: 1435, h: 669, bg: C.pf[0] },
@@ -28,29 +29,6 @@ const BAND = [
   { l: 0, t: 1609, w: 1432, h: 669, bg: C.pf[2] },
   { l: 0, t: 2246, w: 1427, h: 669, bg: C.pf[3] },
   { l: 0, t: 2874, w: 1432, h: 932, bg: C.pf[4] },
-]
-
-export const KORT = [
-  {
-    boks: { l: 495, t: 460, w: 816, h: 466 }, ikon: { l: 1107.5, t: 487 },
-    tittel: { l: 1004, t: 683, w: 273, tekst: 'Profesjonell interiørmaling' },
-    brod: { l: 1004, t: 780, w: 295, tekst: 'Med nøye fargevalg og profesjonelt håndverk skaper vi harmoniske rom med et elegant og varig resultat.' },
-  },
-  {
-    boks: { l: 119, t: 1086, w: 784, h: 453 }, ikon: { l: 273.5, t: 1113 },
-    tittel: { l: 170, t: 1284, w: 273, tekst: 'Renovering av rom' },
-    brod: { l: 170, t: 1396, w: 295, tekst: 'Vi oppgraderer eksisterende rom for å forbedre funksjonalitet, estetikk og komfort.' },
-  },
-  {
-    boks: { l: 936, t: 1727, w: 715, h: 453 }, ikon: { l: 1141.5, t: 1754 },
-    tittel: { l: 1038, t: 1904, w: 273, tekst: 'Restaurering av detaljer' },
-    brod: { l: 1038, t: 2016, w: 295, tekst: 'Med presist håndverk bevarer og fremhever vi historiske takdetaljer, rosetter og dekorative elementer.' },
-  },
-  {
-    boks: { l: 119, t: 2310, w: 784, h: 526 }, ikon: { l: 320.5, t: 2337 },
-    tittel: { l: 217, t: 2487, w: 273, tekst: 'Materialer av høy kvalitet' },
-    brod: { l: 217, t: 2599, w: 295, tekst: 'Vi bruker nøye utvalgte produkter og materialer av høy kvalitet for å sikre et jevnt, slitesterkt og profesjonelt resultat.' },
-  },
 ]
 
 /**
@@ -70,7 +48,7 @@ export default function Portefolje() {
   const g = useGalleri()
 
   return (
-    <Stage height={4050}>
+    <Stage height={4050 + FOOTER_EKSTRA}>
       {BAND.map((b) => (
         <Rect key={b.t} l={b.l} t={b.t} w={b.w} h={b.h} r={83} bg={b.bg} />
       ))}
@@ -131,22 +109,31 @@ export default function Portefolje() {
       )}
 
       {/* ---------- Tall og anmeldelser ---------- */}
+      {/* Vurderingene fra Mittanbud, tegnet med de samme tallene som kortene
+          ved siden av (se MittanbudKort). Lenker til profilen, så tallene
+          kan kontrolleres. */}
       <a
         href={BEDRIFT.mittanbud}
         target="_blank"
         rel="noreferrer"
         aria-label="Se vurderingene våre på Mittanbud"
-        style={{ display: 'contents' }}
+        style={{ position: 'absolute', left: 449, top: 3395, display: 'block' }}
       >
-        <Img src={anmeldelser} alt="Kundevurderinger av Maler Delius AS på Mittanbud" l={449} t={3395} w={862} h={326} r={67} />
+        <MittanbudKort />
       </a>
 
       <Rect l={1038} t={2990} w={273} h={326} r={67} bg={C.white} />
+      {/* Tallene er de som kan kontrolleres på Mittanbud-profilen (lenket
+          under). «+300 utførte arbeider» og «+7 år i bransjen» fra designet
+          lot seg ikke dokumentere (selskapet ble stiftet i oktober 2024), og
+          markedsføringsloven § 3 krever at tall i markedsføring kan
+          dokumenteres. Se README, «Tekst som avviker». */}
       <Txt l={1074} t={3088} w={201} size={48} weight={700} lh={72} color={C.black} align="center">
-        +300
+        {BEDRIFT.mittanbudJobber}
       </Txt>
       <Txt l={1074} t={3160} w={201} size={24} weight={700} lh={36} color={C.black} align="center">
-        utførte arbeider
+        {'jobber vunnet på '}
+        <span style={{ color: C.mittanbud }}>Mittanbud</span>
       </Txt>
 
       <Rect l={732} t={2983} w={273} h={326} r={67} bg={C.white} />
@@ -154,12 +141,12 @@ export default function Portefolje() {
         +7
       </Txt>
       <Txt l={768} t={3153} w={201} size={24} weight={700} lh={36} color={C.black} align="center">
-        År i Bransjen
+        års erfaring per maler
       </Txt>
 
       <Rect l={119} t={3395} w={259} h={329} r={67} bg={C.white} />
       <Txt l={148} t={3485} w={201} size={48} weight={700} lh={72} color={C.black} align="center">
-        57
+        {BEDRIFT.mittanbudVurderinger}
       </Txt>
       <Txt l={148} t={3557} w={201} size={24} weight={700} lh={36} color={C.black} align="center">
         {'vurderinger på '}

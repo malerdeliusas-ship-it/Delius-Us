@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import Stage from './Stage'
 import SiteHeader from './SiteHeader'
-import SiteFooter from './SiteFooter'
+import SiteFooter, { FOOTER_HOYDE } from './SiteFooter'
 import { Txt, CropImg } from './prim'
 import { C } from '../lib/theme'
 import splash from '../assets/figma/splash.webp'
@@ -38,7 +38,7 @@ export default function BloggStage({
   }, [])
 
   return (
-    <Stage height={hoyde + 244}>
+    <Stage height={hoyde + FOOTER_HOYDE}>
       <div ref={ref} style={{ position: 'absolute', left: 0, top: 0, width: 1430 }}>
         <div style={{ position: 'relative', height: 345 }}>
           <CropImg

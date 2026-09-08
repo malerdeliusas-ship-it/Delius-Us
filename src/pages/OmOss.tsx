@@ -1,9 +1,10 @@
 import Stage from '../components/Stage'
 import SiteHeader from '../components/SiteHeader'
-import SiteFooter from '../components/SiteFooter'
+import SiteFooter, { FOOTER_EKSTRA } from '../components/SiteFooter'
 import GoldButton from '../components/GoldButton'
 import { Txt, Img, Rect, CropImg } from '../components/prim'
 import { C } from '../lib/theme'
+import { GRUNNER_OMOSS } from '../lib/site'
 
 /** Figmas beskjæringer (imageTransform). */
 const TF_TEAM: [[number, number, number], [number, number, number]] =
@@ -12,20 +13,11 @@ const TF_SPRUT: [[number, number, number], [number, number, number]] =
   [[0.9979108572006226, 0, 0], [0, 0.47440609335899353, 0.00016262807184830308]]
 
 import splash from '../assets/figma/splash-omoss.webp'
-import teamBilde from '../assets/figma/omoss-team.jpg'
-import foto1 from '../assets/figma/omoss-dsc06303-1.jpg'
-import foto2 from '../assets/figma/omoss-dsc07360-1.jpg'
-import foto3 from '../assets/figma/omoss-1-119-1.jpg'
-import foto4 from '../assets/figma/omoss-dsc05502-1.jpg'
-
-/** «Hvorfor velge oss?» – to spalter, med egne rammer fra Figma. */
-export const GRUNNER = [
-  { l: 734, t: 607, w: 274, bT: 649, bW: 274, farge: C.gold, tittel: 'Individuell tilnærming', brod: 'Vi lytter til våre kunder og tilbyr løsninger som passer perfekt til dine behov.' },
-  { l: 734, t: 758, w: 295, bT: 800, bW: 286, farge: C.gold, tittel: 'Miljøansvar', brod: 'Vi bruker kun miljøvennlige materialer og tar hensyn til både din helse og miljøet.' },
-  { l: 734, t: 908, w: 281, bT: 950, bW: 281, farge: C.gold, tittel: 'Kvalitet og pålitelighet', brod: 'Vi garanterer høy kvalitet og varighet på vårt.' },
-  { l: 1040, t: 607, w: 256, bT: 649, bW: 256, farge: C.goldAlt, tittel: 'Garantier og støtte', brod: 'Vi tilbyr garantier på alt vårt arbeid og er alltid klare til å gi støtte etter prosjektets avslutning.' },
-  { l: 1040, t: 800, w: 256, bT: 842, bW: 256, farge: C.goldAlt, tittel: 'Lokal erfaring', brod: 'Som et selskap som opererer i Oslo, har vi god kjennskap til de lokale forholdene og kan tilby de mest effektive løsningene for ditt prosjekt.' },
-]
+import teamBilde from '../assets/figma/omoss-team.webp'
+import foto1 from '../assets/figma/omoss-dsc06303-1.webp'
+import foto2 from '../assets/figma/omoss-dsc07360-1.webp'
+import foto3 from '../assets/figma/omoss-1-119-1.webp'
+import foto4 from '../assets/figma/omoss-dsc05502-1.webp'
 
 const GALLERI = [
   { src: foto1, l: 124, w: 249, alt: 'Maler ruller maling på vegg' },
@@ -36,7 +28,7 @@ const GALLERI = [
 
 export default function OmOss() {
   return (
-    <Stage height={1858}>
+    <Stage height={1858 + FOOTER_EKSTRA}>
       <Rect l={0} t={514} w={1430} h={1100} bg={C.panelBlue} />
 
       <SiteHeader />
@@ -66,7 +58,7 @@ export default function OmOss() {
       <Txt l={734} t={546} w={279} size={28} weight={600} lh={42} color={C.white} italic>
         Hvorfor velge oss?
       </Txt>
-      {GRUNNER.map((g) => (
+      {GRUNNER_OMOSS.map((g) => (
         <div key={g.tittel}>
           <Txt l={g.l} t={g.t} w={g.w} size={20} weight={700} lh={30} color={g.farge}>
             {g.tittel}

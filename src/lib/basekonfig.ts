@@ -46,3 +46,32 @@ export const BASE_URL =
 export const BASE_NOKKEL =
   fraMiljo(import.meta.env.VITE_SUPABASE_ANON_KEY, /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/) ??
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1Znppb2FxbmJiaXl6aHN3amFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5MTMwNDQsImV4cCI6MjEwMjQ4OTA0NH0.ig6ViCf1C4S9BuG2ufHcd8BPNBwLhEYr_JNWiejCvQ8'
+
+/**
+ * Målings-ID-en til Google Analytics 4 (formen G-XXXXXXXXXX).
+ *
+ * Kilden er tag-elementet i index.html (Google Ads sjekker kildekoden for
+ * det, så taggen må stå statisk der). Her leses ID-en fra det elementet, så
+ * den bare står ett sted; miljøvariabelen VITE_GA_ID kan overstyre.
+ *
+ * G-82M65MEYRW er eiendommen Google Ads laget for kunden da han satte opp en
+ * lokal annonsekampanje (sendt til Artiom 8. september 2026 kl. 21:30). Den
+ * ligger på kundens egen Google-konto, og Ads-kontoen er knyttet til den.
+ * Eiendommen «malerdelius.no» (G-F8F8B1R8N8, datastrøm 15741881042) som ble
+ * opprettet samme kveld på malerdeliusas@gmail.com er overflødig og kan
+ * slettes; den får ingen data.
+ *
+ * En tom streng betyr at Analytics ikke er i bruk: banneret nevner det da
+ * ikke. Se src/lib/analyse.ts for hva som skjer før og etter samtykke.
+ */
+function idFraTaggen(): string | undefined {
+  if (typeof document === 'undefined') return undefined
+  const tag = document.querySelector<HTMLScriptElement>(
+    'script[src^="https://www.googletagmanager.com/gtag/js?id="]',
+  )
+  const treff = tag && /[?&]id=(G-[A-Z0-9]{6,14})/.exec(tag.getAttribute('src') ?? '')
+  return treff?.[1]
+}
+
+export const GA_ID =
+  fraMiljo(import.meta.env.VITE_GA_ID, /^G-[A-Z0-9]{6,14}$/) ?? idFraTaggen() ?? ''

@@ -1,4 +1,10 @@
-// Innhold og eksakte Figma-koordinater. Tekstene er ordrett fra designet.
+// Innhold og eksakte Figma-koordinater. Tekstene er ordrett fra designet,
+// med fire unntak fra 8. september 2026 (se README, «Tekst som avviker»):
+// den avkuttede setningen «… varighet på vår» er fullført, og tre absolutte
+// miljøpåstander («kun miljøvennlige materialer», «sertifiserte
+// miljømaterialer») er gjort konkrete, fordi markedsføringsloven krever at
+// slike påstander kan dokumenteres.
+import { C } from './theme'
 import icReparasjon from '../assets/figma/ic-reparasjon.webp'
 import icDekorative from '../assets/figma/ic-dekorative.webp'
 import icEco from '../assets/figma/ic-eco.webp'
@@ -6,12 +12,15 @@ import icInterior from '../assets/figma/ic-interior.webp'
 import icFargevalg from '../assets/figma/ic-fargevalg.webp'
 import icFasade from '../assets/figma/ic-fasade.webp'
 
-import bildeLucia from '../assets/figma/team-lucia.jpg'
-import bildeNicolae from '../assets/figma/team-nicolae.jpg'
-import bildeSergiu from '../assets/figma/team-sergiu.jpg'
-import bildeLilia from '../assets/figma/team-lilia.jpg'
-import bildeVictoria from '../assets/figma/team-victoria.jpg'
-import bildeGhita from '../assets/figma/team-ghita.jpg'
+import bildeLucia from '../assets/figma/team-lucia.webp'
+import bildeNicolae from '../assets/figma/team-nicolae.webp'
+import bildeSergiu from '../assets/figma/team-sergiu.webp'
+import bildeLilia from '../assets/figma/team-lilia.webp'
+import bildeVictoria from '../assets/figma/team-victoria.webp'
+import bildeGhita from '../assets/figma/team-ghita.webp'
+import icTeam from '../assets/figma/ic-team.webp'
+import icKvalitet from '../assets/figma/ic-kvalitet.webp'
+import icGaranti from '../assets/figma/ic-garanti.webp'
 
 export type Tf = [[number, number, number], [number, number, number]]
 
@@ -83,7 +92,7 @@ export const TJENESTER: {
       { l: 1020, t: 3390, w: 208, align: 'center', tekst: 'løsninger' },
     ],
     bL: 993, bT: 3447, bW: 262,
-    brod: '– Bruk av sertifiserte miljømaterialer.\n– Støtte for en bærekraftig og sunn livsstil.\n– Rådgivning om valg av helsevennlige materialer.',
+    brod: '– Miljømerkede produkter når du ønsker det.\n– Støtte for en bærekraftig og sunn livsstil.\n– Rådgivning om valg av helsevennlige materialer.',
   },
   {
     id: 'interior', ikon: icInterior, iL: 228, iT: 3813, iW: 136, iH: 79,
@@ -111,11 +120,84 @@ export const TJENESTER: {
   },
 ]
 
-/** «Hvorfor velge oss?»-punktene. Brukes på forsiden og på Om oss. */
+export const BADGES = [
+  { l: 100, bg: C.gold, ic: icTeam, icL: 146.5, op: 0.86, txtL: 280.5, w: 183, farge: C.navy, tekst: 'Profesjonelt \nTeam' },
+  { l: 510, bg: C.navy, ic: icKvalitet, icL: 593.5, op: 1, txtL: 727.5, w: 109, farge: C.goldText, tekst: 'Høy \nKvalitet' },
+  { l: 920, bg: C.gold, ic: icGaranti, icL: 974.5, op: 0.86, txtL: 1108.5, w: 167, farge: C.navy, tekst: 'Garanti og \nPålitelighet' },
+]
+
+/** «Hvorfor velge oss?» – tittel og brødtekst med hver sin ramme fra Figma. */
 export const GRUNNER = [
-  { tittel: 'Individuell tilnærming', brod: 'Vi lytter til våre kunder og tilbyr løsninger som passer perfekt til dine behov.' },
-  { tittel: 'Miljøansvar', brod: 'Vi bruker kun miljøvennlige materialer og tar hensyn til både din helse og miljøet.' },
-  { tittel: 'Kvalitet og pålitelighet', brod: 'Vi garanterer høy kvalitet og varighet på vårt.' },
-  { tittel: 'Garantier og støtte', brod: 'Vi tilbyr garantier på alt vårt arbeid og er alltid klare til å gi støtte etter prosjektets avslutning.' },
-  { tittel: 'Lokal erfaring', brod: 'Som et selskap som opererer i Oslo, har vi god kjennskap til de lokale forholdene og kan tilby de mest effektive løsningene for ditt prosjekt.' },
+  { l: 716, t: 1161, w: 295, bT: 1203, bW: 295, tittel: 'Individuell tilnærming', brod: 'Vi lytter til våre kunder og tilbyr løsninger som passer perfekt til dine behov.', farge: C.reasonBody },
+  { l: 716, t: 1321, w: 295, bT: 1363, bW: 295, tittel: 'Miljøansvar', brod: 'Vi tar hensyn til både din helse og miljøet når vi velger materialer og arbeidsmåte.', farge: C.navy },
+  { l: 716, t: 1471, w: 281, bT: 1513, bW: 281, tittel: 'Kvalitet og pålitelighet', brod: 'Vi garanterer høy kvalitet og varighet på vårt arbeid.', farge: C.navy },
+  { l: 1033, t: 1161, w: 277, bT: 1203, bW: 277, tittel: 'Garantier og støtte', brod: 'Vi tilbyr garantier på alt vårt arbeid og er alltid klare til å gi støtte etter prosjektets avslutning.', farge: C.navy },
+  { l: 1033, t: 1354, w: 277, bT: 1396, bW: 277, tittel: 'Lokal erfaring', brod: 'Som et selskap som opererer i Oslo, har vi god kjennskap til de lokale forholdene og kan tilby de mest effektive løsningene for ditt prosjekt.', farge: C.navy },
+]
+
+/** «Hvorfor velge oss?» – to spalter, med egne rammer fra Figma. */
+export const GRUNNER_OMOSS = [
+  { l: 734, t: 607, w: 274, bT: 649, bW: 274, farge: C.gold, tittel: 'Individuell tilnærming', brod: 'Vi lytter til våre kunder og tilbyr løsninger som passer perfekt til dine behov.' },
+  { l: 734, t: 758, w: 295, bT: 800, bW: 286, farge: C.gold, tittel: 'Miljøansvar', brod: 'Vi tar hensyn til både din helse og miljøet når vi velger materialer og arbeidsmåte.' },
+  { l: 734, t: 908, w: 281, bT: 950, bW: 281, farge: C.gold, tittel: 'Kvalitet og pålitelighet', brod: 'Vi garanterer høy kvalitet og varighet på vårt arbeid.' },
+  { l: 1040, t: 607, w: 256, bT: 649, bW: 256, farge: C.goldAlt, tittel: 'Garantier og støtte', brod: 'Vi tilbyr garantier på alt vårt arbeid og er alltid klare til å gi støtte etter prosjektets avslutning.' },
+  { l: 1040, t: 800, w: 256, bT: 842, bW: 256, farge: C.goldAlt, tittel: 'Lokal erfaring', brod: 'Som et selskap som opererer i Oslo, har vi god kjennskap til de lokale forholdene og kan tilby de mest effektive løsningene for ditt prosjekt.' },
+]
+
+export const TRINN = [
+  {
+    kort: 125,
+    tittel: { l: 189, t: 1796, w: 363, tekst: 'Konsultasjon og planlegging' },
+    punkter: [
+      { l: 189, t: 1923, w: 262, tekst: 'Gratis innledende konsultasjon' },
+      { l: 189, t: 1997, w: 217, tekst: 'Vurdering av rommet' },
+      { l: 189, t: 2041, w: 277, tekst: 'Valg av farger og materialer' },
+      { l: 189, t: 2077, w: 267, tekst: 'Utarbeidelse av forslag og kostnadsoverslag' },
+    ],
+    merke: { l: 222, t: 2181, w: 159, tekst: 'TRINN 1' },
+  },
+  {
+    kort: 531,
+    tittel: { l: 604, t: 1797, w: 260, tekst: 'Forberedelse og utførelse' },
+    punkter: [
+      { l: 600, t: 1916, w: 262, tekst: 'Forberedelse av overflater' },
+      { l: 599, t: 1953, w: 259, tekst: 'Beskyttelse av tilstøtende områder' },
+      { l: 600, t: 2012, w: 277, tekst: 'Utførelse av malerarbeid' },
+      { l: 600, t: 2052, w: 267, tekst: 'Kvalitetskontroll under arbeidet' },
+    ],
+    merke: { l: 639, t: 2180, w: 164, tekst: 'TRINN 2' },
+  },
+  {
+    kort: 945,
+    tittel: { l: 1001, t: 1796, w: 263, tekst: 'Fullføring og støtte' },
+    punkter: [
+      { l: 1001, t: 1896, w: 262, tekst: 'Endelig kvalitetskontroll' },
+      { l: 1001, t: 1930, w: 320, tekst: 'Rydding og overlevering av prosjektet — vi rydder alltid etter oss' },
+      { l: 1001, t: 2033, w: 201, tekst: 'Sikring av garantier' },
+      { l: 1000, t: 2076, w: 235, tekst: 'Støtte etter prosjektets avslutning' },
+    ],
+    merke: { l: 1053, t: 2181, w: 158, tekst: 'TRINN 3' },
+  },
+]
+export const KORT = [
+  {
+    boks: { l: 495, t: 460, w: 816, h: 466 }, ikon: { l: 1107.5, t: 487 },
+    tittel: { l: 1004, t: 683, w: 273, tekst: 'Profesjonell interiørmaling' },
+    brod: { l: 1004, t: 780, w: 295, tekst: 'Med nøye fargevalg og profesjonelt håndverk skaper vi harmoniske rom med et elegant og varig resultat.' },
+  },
+  {
+    boks: { l: 119, t: 1086, w: 784, h: 453 }, ikon: { l: 273.5, t: 1113 },
+    tittel: { l: 170, t: 1284, w: 273, tekst: 'Renovering av rom' },
+    brod: { l: 170, t: 1396, w: 295, tekst: 'Vi oppgraderer eksisterende rom for å forbedre funksjonalitet, estetikk og komfort.' },
+  },
+  {
+    boks: { l: 936, t: 1727, w: 715, h: 453 }, ikon: { l: 1141.5, t: 1754 },
+    tittel: { l: 1038, t: 1904, w: 273, tekst: 'Restaurering av detaljer' },
+    brod: { l: 1038, t: 2016, w: 295, tekst: 'Med presist håndverk bevarer og fremhever vi historiske takdetaljer, rosetter og dekorative elementer.' },
+  },
+  {
+    boks: { l: 119, t: 2310, w: 784, h: 526 }, ikon: { l: 320.5, t: 2337 },
+    tittel: { l: 217, t: 2487, w: 273, tekst: 'Materialer av høy kvalitet' },
+    brod: { l: 217, t: 2599, w: 295, tekst: 'Vi bruker nøye utvalgte produkter og materialer av høy kvalitet for å sikre et jevnt, slitesterkt og profesjonelt resultat.' },
+  },
 ]

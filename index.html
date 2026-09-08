@@ -35,16 +35,24 @@
     <meta name="twitter:image" content="https://www.malerdelius.no/og-bilde.jpg" />
 
     <!--
-      Skriftene ligger hos oss selv, i /fonter (se src/fonter.css). De tre
-      vektene som brukes øverst på siden hentes med én gang, så teksten ikke
-      rekker å blinke i systemskrift før den rette kommer.
+      Skriftene ligger hos oss selv, i /fonter (se src/fonter.css). Montserrat
+      er en variabel skrift: én fil dekker alle vektene fra 300 til 800, så
+      det holder å hente denne ene med én gang. Teksten rekker da ikke å
+      blinke i systemskrift før den rette kommer.
     -->
     <link rel="preload" as="font" type="font/woff2" crossorigin
-          href="/fonter/montserrat-400-normal-latin.woff2" />
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-          href="/fonter/montserrat-600-normal-latin.woff2" />
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-          href="/fonter/montserrat-700-normal-latin.woff2" />
+          href="/fonter/montserrat-var-normal-latin.woff2" />
+
+    <!--
+      Google-taggen (Analytics 4, eiendommen Google Ads laget på kundens konto).
+      Den står statisk her fordi Google Ads leser kildekoden for å finne den.
+      Den lagrer ingenting før besøkeren sier ja i banneret: analyse-start.js
+      setter samtykkemodusen til «nei» på alt, og src/lib/analyse.ts åpner
+      det besøkeren har godtatt. Målings-ID-en står i de to linjene under, og
+      må være lik begge steder; basekonfig.ts leser den fra tag-elementet.
+    -->
+    <script src="/analyse-start.js" data-id="G-82M65MEYRW"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-82M65MEYRW"></script>
 
     <!-- Bedriftskortet for Google og svarmotorer: leses uten JavaScript. -->
     <script type="application/ld+json">
@@ -58,6 +66,8 @@
         "telephone": "+4796693780",
         "email": "malerdelius@gmail.com",
         "taxID": "934409256",
+        "vatID": "NO934409256MVA",
+        "foundingDate": "2024-10-14",
         "image": "https://www.malerdelius.no/og-bilde.jpg",
         "sameAs": [
           "https://www.facebook.com/share/1CPdfc8UBm/",

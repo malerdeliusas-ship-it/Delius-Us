@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { BEDRIFT } from '../../lib/theme'
+import { JURIDISKE_LENKER } from '../SiteFooter'
 import logo from '../../assets/figma/logo.png'
 
 const LENKER = [
@@ -9,7 +10,6 @@ const LENKER = [
   { til: '/malertjenester', tekst: 'Malertjenester' },
   { til: '/blogg', tekst: 'Blogg' },
   { til: '/kontakt', tekst: 'Kontakt oss' },
-  { til: '/tilbud', tekst: 'Be om tilbud' },
 ]
 
 function MobilHeader() {
@@ -79,11 +79,7 @@ function MobilFooter() {
         <div>
           <a href={`mailto:${BEDRIFT.epost}`}>{BEDRIFT.epost}</a>
         </div>
-        <div>{BEDRIFT.orgnr}</div>
-        {/* Personvernerklæringen, samme plass som på desktop. */}
-        <div style={{ marginTop: 6 }}>
-          <Link to="/personvern">Personvern</Link>
-        </div>
+        <div>{BEDRIFT.orgnr}{BEDRIFT.mva ? ' MVA' : ''}</div>
       </div>
 
       <div>
@@ -113,6 +109,16 @@ function MobilFooter() {
           </a>
         </div>
       </div>
+
+      {/* De juridiske sidene, samme fire lenker som i raden under desktop-footeren. */}
+      <nav aria-label="Juridisk informasjon">
+        <div style={{ marginBottom: 6 }}>Juridisk</div>
+        {JURIDISKE_LENKER.map((j) => (
+          <div key={j.til}>
+            <Link to={j.til}>{j.tekst}</Link>
+          </div>
+        ))}
+      </nav>
     </footer>
   )
 }

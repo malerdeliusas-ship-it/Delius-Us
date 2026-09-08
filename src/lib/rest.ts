@@ -54,7 +54,29 @@ export async function settInn(tabell: string, rad: unknown): Promise<boolean> {
   }
 }
 
-/** Kall en databasefunksjon. Returnerer undefined om noe gikk galt. */
+/**
+ * Kall en databasefunksjon som ikke gir noe svar tilbake. Sier bare om det
+ * gikk bra.
+ *
+ * Egen funksjon fordi `rpc` under gir `undefined` både når kallet feilet og
+ * når det gikk bra men svaret var tomt. En funksjon som returnerer `void`
+ * svarer 204 uten innhold, og da så det ut som en feil hver eneste gang.
+ */
+export async function rpcUtenSvar(navn: string, args: unknown): Promise<boolean> {
+  if (!harBase) return false
+  try {
+    const svar = await fetch(`${base}/rest/v1/rpc/${navn}`, {
+      method: 'POST',
+      headers: hoder(),
+      body: JSON.stringify(args),
+    })
+    return svar.ok
+  } catch {
+    return false
+  }
+}
+
+/** Kall en databasefunksjon som gir et svar. Returnerer undefined om noe gikk galt. */
 export async function rpc<T>(navn: string, args: unknown): Promise<T | undefined> {
   if (!harBase) return undefined
   try {

@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState, type ChangeEvent, type DragEvent as ReactDragEvent } from 'react'
 import { Link } from 'react-router-dom'
 import SkjemaStatus from './SkjemaStatus'
-import { JOBBTYPER, MAKS_BILDER, TIDSPUNKT, type TilbudSkjemaTilstand } from '../lib/tilbud'
+import { MAKS_BILDER, type Felt, type TilbudSkjemaTilstand } from '../lib/tilbud'
+import icOpplasting from '../assets/figma/ic-opplasting.webp'
 
 /**
- * Tilbudsskjemaet: den blå flaten med hvite felt, som kontaktskjemaet på
- * forsiden, bare med plass til det en maler trenger for å gi en pris:
- * hvem du er, hva slags jobb, hvor, hvor stort, når, bilder og noen ord.
+ * Tilbudsskjemaet på mobil: de samme seks nummererte spørsmålene som i
+ * Figma-designet, stablet i én kolonne. Designeren har ikke tegnet en
+ * mobilutgave ennå, så formene er hentet fra desktopversjonen: hvite
+ * pilleformede felt, dempet blå etiketter, gul knapp.
  *
- * Flytende layout, så den samme komponenten brukes på desktop (inne i
- * Stage) og på mobil (inne i .m). Utseendet ligger i index.css (`tb-`),
- * logikken i `src/lib/tilbud.ts`. Tilstanden `s` eies av siden rundt, så
- * den overlever at skjemaet bytter mellom mobil- og desktop-utgaven.
+ * Utseendet ligger i index.css (`tb-`), logikken i `src/lib/tilbud.ts`.
+ * Tilstanden `s` eies av siden rundt, så den overlever at skjemaet bytter
+ * mellom mobil- og desktoputgaven.
+ *
+ * Spørsmål 7 står ikke i designet, men uten navn, telefon og e-post har
+ * ikke Delius noen måte å svare kunden på.
  */
 export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
   const skjemaRef = useRef<HTMLFormElement>(null)
@@ -28,7 +32,7 @@ export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
     let el: Element | null = null
     if (s.status === 'feil' && f && skjema) {
       el =
-        f === 'jobbtype' || f === 'bilder'
+        f === 'bilder' || f === 'samtykke'
           ? skjema.querySelector(`[data-felt="${f}"]`)
           : skjema.querySelector(`[name="${f}"]`)
     }
@@ -64,11 +68,11 @@ export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
     }
   }, [])
 
-  const felt = (navn: string) => `tb-felt${s.feilFelt === navn ? ' felt-feil' : ''}`
+  const felt = (navn: Felt) => `tb-felt${s.feilFelt === navn ? ' felt-feil' : ''}`
   const utkast = s.utkast.current
 
   /** Feilmeldingen står ved feltet den gjelder, ikke bare nederst i skjemaet. */
-  const feilFor = (...felter: string[]) =>
+  const feilFor = (...felter: Felt[]) =>
     s.status === 'feil' && s.feilFelt && felter.includes(s.feilFelt) && s.feil ? (
       <p className="tb-feltfeil" role="alert">
         {s.feil}
@@ -92,119 +96,70 @@ export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
   return (
     <form ref={skjemaRef} className="tb-panel" onSubmit={s.send} onInput={s.merk} noValidate>
       <section className="tb-del">
-        <h2 className="tb-tittel">Om deg</h2>
-        <p className="tb-hjelp">Slik at vi kan ringe eller skrive til deg om tilbudet.</p>
+        <h2 className="tb-sporsmal">1. Hva slags jobb gjelder det?</h2>
         <div className="tb-rad">
           <input
-            className={felt('navn')}
-            name="navn"
+            className={felt('jobbtype')}
+            name="jobbtype"
             type="text"
             maxLength={120}
-            autoComplete="name"
-            placeholder="Navn, etternavn"
-            aria-label="Navn, etternavn"
-            defaultValue={utkast.navn ?? ''}
+            placeholder="Skrive type jobb"
+            aria-label="Hva slags jobb gjelder det?"
+            defaultValue={utkast.jobbtype ?? ''}
           />
         </div>
-        {feilFor('navn')}
-        <div className="tb-rad tb-rad--2">
-          <input
-            className={felt('telefon')}
-            name="telefon"
-            type="tel"
-            maxLength={40}
-            autoComplete="tel"
-            inputMode="tel"
-            placeholder="Telefon"
-            aria-label="Telefon"
-            defaultValue={utkast.telefon ?? ''}
-          />
-          <input
-            className={felt('epost')}
-            name="epost"
-            type="email"
-            maxLength={200}
-            autoComplete="email"
-            placeholder="E-post"
-            aria-label="E-post"
-            defaultValue={utkast.epost ?? ''}
-          />
-        </div>
-        {feilFor('telefon', 'epost')}
+        {feilFor('jobbtype')}
       </section>
 
       <section className="tb-del">
-        <h2 className="tb-tittel">Om jobben</h2>
-        <p className="tb-hjelp">Velg det som passer. Du kan velge flere.</p>
-        <div
-          className={`tb-brikker${s.feilFelt === 'jobbtype' ? ' tb-brikker--feil' : ''}`}
-          role="group"
-          aria-label="Type jobb"
-          data-felt="jobbtype"
-        >
-          {JOBBTYPER.map((j) => (
-            <button
-              key={j}
-              type="button"
-              role="checkbox"
-              aria-checked={s.jobbtyper.includes(j)}
-              className="tb-brikke"
-              onClick={() => s.veksleJobbtype(j)}
-            >
-              {j}
-            </button>
-          ))}
-        </div>
-        {feilFor('jobbtype')}
-        <div className="tb-rad tb-rad--2" style={{ marginTop: 22 }}>
+        <h2 className="tb-sporsmal">2. Hvor er jobben?</h2>
+        <div className="tb-rad">
           <input
             className={felt('adresse')}
             name="adresse"
             type="text"
             maxLength={200}
             autoComplete="street-address"
-            placeholder="Adresse, postnummer og sted"
-            aria-label="Adresse"
+            placeholder="Postnummer eller adresse"
+            aria-label="Hvor er jobben?"
             defaultValue={utkast.adresse ?? ''}
           />
-          <div className="tb-suffiks">
-            <input
-              className={felt('areal')}
-              name="areal"
-              type="text"
-              maxLength={5}
-              inputMode="numeric"
-              placeholder="Areal, omtrent (valgfritt)"
-              aria-label="Areal i kvadratmeter, valgfritt"
-              defaultValue={utkast.areal ?? ''}
-            />
-            <span aria-hidden="true">m²</span>
-          </div>
         </div>
-        {feilFor('adresse', 'areal')}
-        <p className="tb-hjelp" style={{ marginTop: 22 }}>
-          Når passer det å starte? <span className="tb-valgfritt">valgfritt</span>
-        </p>
-        <div className="tb-brikker" role="group" aria-label="Ønsket oppstart" style={{ marginTop: 12 }}>
-          {TIDSPUNKT.map((t) => (
-            <button
-              key={t}
-              type="button"
-              aria-pressed={s.tidspunkt === t}
-              className="tb-brikke"
-              onClick={() => s.velgTidspunkt(t)}
-            >
-              {t}
-            </button>
-          ))}
+        {feilFor('adresse')}
+      </section>
+
+      <section className="tb-del">
+        <h2 className="tb-sporsmal">3. Omtrent hvor stort er arealet?</h2>
+        <div className="tb-rad">
+          <input
+            className={felt('areal')}
+            name="areal"
+            type="text"
+            maxLength={40}
+            placeholder="f.eks. 80 m²"
+            aria-label="Omtrent hvor stort er arealet?"
+            defaultValue={utkast.areal ?? ''}
+          />
         </div>
       </section>
 
       <section className="tb-del">
-        <h2 className="tb-tittel">
-          Bilder <span className="tb-valgfritt">valgfritt</span>
-        </h2>
-        <p className="tb-hjelp">Et par bilder av rommet eller fasaden gjør tilbudet mer presist.</p>
+        <h2 className="tb-sporsmal">4. Når ønsker du at jobben kan utføres?</h2>
+        <div className="tb-rad">
+          <input
+            className={felt('tidspunkt')}
+            name="tidspunkt"
+            type="text"
+            maxLength={120}
+            placeholder="Skriv ønsket tidspunkt eller periode"
+            aria-label="Når ønsker du at jobben kan utføres?"
+            defaultValue={utkast.tidspunkt ?? ''}
+          />
+        </div>
+      </section>
+
+      <section className="tb-del">
+        <h2 className="tb-sporsmal">5. Legg ved bilder (valgfritt)</h2>
         <button
           type="button"
           className={`tb-slipp${drar ? ' tb-slipp--over' : ''}${s.feilFelt === 'bilder' ? ' felt-feil' : ''}`}
@@ -218,27 +173,15 @@ export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
           onDrop={slipp}
           disabled={fullt || s.status === 'sender'}
         >
-          <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
-            <path
-              d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.6l1.2-1.8c.2-.3.5-.5.9-.5h3.6c.4 0 .7.2.9.5L15.9 6h1.6A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-8z"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinejoin="round"
-            />
-            <circle cx="12" cy="12.5" r="3.2" fill="none" stroke="currentColor" strokeWidth="1.8" />
-          </svg>
+          <img src={icOpplasting} alt="" loading="lazy" decoding="async" />
           <strong>
             {s.behandler > 0
               ? 'Klargjør bildene …'
               : fullt
                 ? `Du har lagt til ${MAKS_BILDER} bilder`
-                : 'Legg til bilder'}
+                : 'Klikk for å laste opp bilder'}
           </strong>
-          <small>
-            Trykk her<span className="tb-dra">, eller dra bildene hit</span>. Inntil {MAKS_BILDER}{' '}
-            bilder, gjerne rett fra telefonen.
-          </small>
+          <small>JPG, PNG eller HEIC- maks 10 MB</small>
         </button>
         <input
           ref={filRef}
@@ -272,20 +215,75 @@ export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
       </section>
 
       <section className="tb-del">
-        <h2 className="tb-tittel">
-          Beskriv jobben <span className="tb-valgfritt">valgfritt</span>
-        </h2>
+        <h2 className="tb-sporsmal">6. Beskriv kort jobben (valgfritt)</h2>
         <div className="tb-rad">
           <textarea
             className={`${felt('melding')} tb-felt--stor`}
             name="melding"
             maxLength={5000}
-            placeholder="Hva skal gjøres, hvilke rom eller flater, farger, spesielle ønsker …"
-            aria-label="Beskrivelse av jobben"
+            placeholder="Skriv gjerne noen linjer om hva som skal gjøres, farger, spesielle ønsker osv."
+            aria-label="Beskriv kort jobben"
             defaultValue={utkast.melding ?? ''}
           />
         </div>
-        {feilFor('melding')}
+      </section>
+
+      {/* Bolken som ikke står i designet, men uten den kan ingen svare kunden */}
+      <section className="tb-del">
+        <h2 className="tb-sporsmal">7. Hvordan når vi deg?</h2>
+        <div className="tb-rad">
+          <input
+            className={felt('navn')}
+            name="navn"
+            type="text"
+            maxLength={120}
+            autoComplete="name"
+            placeholder="Navn, etternavn"
+            aria-label="Navn, etternavn"
+            defaultValue={utkast.navn ?? ''}
+          />
+        </div>
+        {feilFor('navn')}
+        <div className="tb-rad tb-rad--2">
+          <input
+            className={felt('telefon')}
+            name="telefon"
+            type="tel"
+            maxLength={40}
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="Telefon"
+            aria-label="Telefon (telefon eller e-post må fylles ut)"
+            defaultValue={utkast.telefon ?? ''}
+          />
+          <input
+            className={felt('epost')}
+            name="epost"
+            type="email"
+            maxLength={200}
+            autoComplete="email"
+            placeholder="E-post"
+            aria-label="E-post (telefon eller e-post må fylles ut)"
+            defaultValue={utkast.epost ?? ''}
+          />
+        </div>
+        {feilFor('telefon', 'epost')}
+      </section>
+
+      {/* Bekreftelsen på at personvernerklæringen er lest, før noe sendes. */}
+      <section className="tb-del">
+        <label className={`skjema-samtykke${s.feilFelt === 'samtykke' ? ' felt-feil' : ''}`}>
+          <input type="checkbox" name="samtykke" value="ja" data-felt="samtykke" />
+          <span>
+            Jeg har lest{' '}
+            <Link to="/personvern" onClick={(e) => e.stopPropagation()}>
+              personvernerklæringen
+            </Link>{' '}
+            og godtar at Maler Delius AS bruker opplysningene til å svare på henvendelsen og gi
+            tilbud. Opplysningene brukes ikke til noe annet.
+          </span>
+        </label>
+        {feilFor('samtykke')}
       </section>
 
       {/* Honningkrukke: usynlig for folk, fylt ut av roboter. Samme felt som
@@ -311,10 +309,6 @@ export default function TilbudSkjema({ s }: { s: TilbudSkjemaTilstand }) {
         >
           {s.knappetekst}
         </button>
-        <p className="tb-note">
-          Opplysningene brukes bare til å svare deg, se{' '}
-          <Link to="/personvern">personvernerklæringen</Link>.
-        </p>
       </div>
 
       {/* Nederst står bare kvitteringen og feil som ikke hører til ett felt */}

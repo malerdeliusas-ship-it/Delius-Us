@@ -1,17 +1,17 @@
 import Stage from '../components/Stage'
 import SiteHeader from '../components/SiteHeader'
-import SiteFooter from '../components/SiteFooter'
+import SiteFooter, { FOOTER_EKSTRA } from '../components/SiteFooter'
 import GoldButton from '../components/GoldButton'
-import ContactForm from '../components/ContactForm'
+import TilbudSkjemaDesign, { EKSTRA_HOYDE } from '../components/TilbudSkjemaDesign'
+import HvaDereFaar from '../components/HvaDereFaar'
+import Teknisk from '../components/Teknisk'
 import { Abs, Txt, Img, Rect, CropImg } from '../components/prim'
 import { C, G, FONT } from '../lib/theme'
-import { TEAM, TJENESTER } from '../lib/site'
+import type { TilbudSkjemaTilstand } from '../lib/tilbud'
+import { TEAM, TJENESTER, BADGES, GRUNNER } from '../lib/site'
 
-import heroBilde from '../assets/figma/hero-echipa.jpg'
-import omOssBilde from '../assets/figma/omoss-team.jpg'
-import icTeam from '../assets/figma/ic-team.webp'
-import icKvalitet from '../assets/figma/ic-kvalitet.webp'
-import icGaranti from '../assets/figma/ic-garanti.webp'
+import heroBilde from '../assets/figma/hero-echipa.webp'
+import omOssBilde from '../assets/figma/omoss-team.webp'
 
 /** Maskeformen over hero-bildet, fra vektoren i Figma (796.5 x 534.5). */
 const HERO_MASK = 'polygon(20.213% 41.722%, 0% 100%, 100% 100%, 100% 0%, 43.692% 0%)'
@@ -22,29 +22,22 @@ const TF_HERO: [[number, number, number], [number, number, number]] =
 const TF_OMOSS: [[number, number, number], [number, number, number]] =
   [[0.964684009552002, 0, 0.03531598299741745], [0, 0.8935415744781494, 0.053229235112667084]]
 
-export const BADGES = [
-  { l: 100, bg: C.gold, ic: icTeam, icL: 146.5, op: 0.86, txtL: 280.5, w: 183, farge: C.navy, tekst: 'Profesjonelt \nTeam' },
-  { l: 510, bg: C.navy, ic: icKvalitet, icL: 593.5, op: 1, txtL: 727.5, w: 109, farge: C.goldText, tekst: 'Høy \nKvalitet' },
-  { l: 920, bg: C.gold, ic: icGaranti, icL: 974.5, op: 0.86, txtL: 1108.5, w: 167, farge: C.navy, tekst: 'Garanti og \nPålitelighet' },
-]
-
-/** «Hvorfor velge oss?» – tittel og brødtekst med hver sin ramme fra Figma. */
-export const GRUNNER = [
-  { l: 716, t: 1161, w: 295, bT: 1203, bW: 295, tittel: 'Individuell tilnærming', brod: 'Vi lytter til våre kunder og tilbyr løsninger som passer perfekt til dine behov.', farge: C.reasonBody },
-  { l: 716, t: 1321, w: 295, bT: 1363, bW: 295, tittel: 'Miljøansvar', brod: 'Vi bruker kun miljøvennlige materialer og tar hensyn til både din helse og miljøet.', farge: C.navy },
-  { l: 716, t: 1471, w: 281, bT: 1513, bW: 281, tittel: 'Kvalitet og pålitelighet', brod: 'Vi garanterer høy kvalitet og varighet på vår', farge: C.navy },
-  { l: 1033, t: 1161, w: 277, bT: 1203, bW: 277, tittel: 'Garantier og støtte', brod: 'Vi tilbyr garantier på alt vårt arbeid og er alltid klare til å gi støtte etter prosjektets avslutning.', farge: C.navy },
-  { l: 1033, t: 1354, w: 277, bT: 1396, bW: 277, tittel: 'Lokal erfaring', brod: 'Som et selskap som opererer i Oslo, har vi god kjennskap til de lokale forholdene og kan tilby de mest effektive løsningene for ditt prosjekt.', farge: C.navy },
-]
-
 const KORT_POS = [
   [124, 178], [532, 178], [940, 178],
   [124, 755], [532, 755], [940, 755],
 ]
 
-export default function Home() {
+/**
+ * Så mye høyere enn Figma-rammen forsiden er. Tilbudsskjemaet nederst har
+ * fått en syvende bolk med navn, telefon og e-post, som ikke er tegnet i
+ * designet – uten den kan ingen svare kunden – og en avkryssing for
+ * personvernerklæringen. Se `TilbudSkjemaDesign`.
+ */
+const SKIFT = EKSTRA_HOYDE
+
+export default function Home({ s }: { s: TilbudSkjemaTilstand }) {
   return (
-    <Stage height={5488}>
+    <Stage height={6268 + SKIFT + FOOTER_EKSTRA}>
       {/* ---------- Hero ---------- */}
       <Abs l={0} t={0} w={1430} h={837} style={{ background: C.cream, overflow: 'hidden' }}>
         <SiteHeader />
@@ -193,14 +186,32 @@ export default function Home() {
         ))}
       </Abs>
 
-      {/* ---------- Kontakt oss ---------- */}
-      <Abs l={0} t={4369} w={1430} h={875} style={{ background: C.contactBlue, overflow: 'hidden' }}>
-        <Txt as="h2" l={449.5} t={96} w={543} size={40} weight={800} lh={60} color={C.white} align="center">
+      {/* ---------- Kontakt oss ----------
+          Ny i Figma 7. september 2026: det korte skjemaet er byttet ut med
+          det lange, nummererte tilbudsskjemaet, likt det på Kontakt-siden.
+          Flaten er 1426px bred og starter på x=2, akkurat som i designet. */}
+      <Abs
+        l={2}
+        t={4369}
+        w={1426}
+        h={1655 + SKIFT}
+        style={{
+          /* Figma har tre gradientstopp med 54 % fyllopasitet over hvitt.
+             Fargene er regnet ned mot hvitt og kontrollert mot Figmas egen
+             eksport (avvik under 1/255). Stoppene står i piksler, ikke
+             prosent, så den delen som faktisk er tegnet ser lik ut selv om
+             seksjonen er høyere enn rammen. */
+          background:
+            'linear-gradient(180deg, rgb(247,249,255) 0px, rgb(247,249,254) 207px, rgb(203,216,245) 788px, rgb(135,172,254) 1655px)',
+          overflow: 'hidden',
+        }}
+      >
+        <Txt as="h2" l={442} t={145} w={543} size={40} weight={800} lh={60} color={C.navy} align="center">
           Kontakt oss!
         </Txt>
         <Abs
-          l={628}
-          t={176}
+          l={620}
+          t={225}
           w={186}
           h={39}
           style={{
@@ -218,16 +229,16 @@ export default function Home() {
         >
           GRATIS BEFARING
         </Abs>
-        <Txt l={449.5} t={247} w={543} size={16} weight={400} lh={24} color={C.white} align="center">
+        <Txt l={442} t={296} w={543} size={16} weight={400} lh={24} color={C.brown} align="center">
           Vi skaper en atmosfære du vil vende tilbake til, med Maler Delius AS
         </Txt>
-        <Txt l={594} t={793} w={242} size={20} weight={400} lh={30} color="rgba(2,34,105,0.51)" align="center">
-          Profesjonelle arbeidere
-        </Txt>
       </Abs>
-      <ContactForm l={432} t={4666} w={578} btnL={633} btnW={176} tilbud="lys" />
 
-      <SiteFooter t={5244} />
+      <TilbudSkjemaDesign l={136} t={4749} s={s} />
+      <HvaDereFaar l={926} t={4799} />
+      <Teknisk l={967} t={5516} rader={[54, 133, 212, 271]} />
+
+      <SiteFooter t={6024 + SKIFT} />
     </Stage>
   )
 }

@@ -8,20 +8,45 @@ const col: React.CSSProperties = {
   fontFamily: FONT,
   fontSize: 15,
   fontWeight: 300,
+  // Designets egen linjeavstand. Den gjør at lenkene her blir noen piksler
+  // lavere enn de 24 pikslene tilgjengelighetskravet ber om, se README.
   lineHeight: '22.5px',
   color: C.white,
 }
 
-const u: React.CSSProperties = { textDecoration: 'underline' }
+/**
+ * Lenkene i footeren. Polstringen over og under gjør trykkflaten høy nok til
+ * kravet på 24 piksler, og den negative margen tar tilbake nøyaktig like
+ * mye, så ingenting flytter seg. Utseendet er uendret.
+ */
+const u: React.CSSProperties = { textDecoration: 'underline', display: 'block' }
 
 /**
- * Footer, eksakt fra Figma (#022269, 1430x244).
+ * Footeren i Figma er 244px høy. Under den ligger en ekstra rad på 34px med
+ * lenkene til de juridiske sidene (personvern, informasjonskapsler, vilkår,
+ * angrerett). Raden er ikke tegnet i designet, men lenkene er lovpålagte og
+ * det er ikke plass til fire til inne i de 244 pikslene. Sidene legger
+ * FOOTER_EKSTRA til høyden sin, så raden aldri klippes.
+ */
+export const FOOTER_EKSTRA = 34
+export const FOOTER_HOYDE = 244 + FOOTER_EKSTRA
+
+/** Lenkene i den juridiske raden, i rekkefølgen de står. */
+export const JURIDISKE_LENKER = [
+  { til: '/personvern', tekst: 'Personvern' },
+  { til: '/informasjonskapsler', tekst: 'Informasjonskapsler' },
+  { til: '/vilkar', tekst: 'Vilkår for bruk' },
+  { til: '/angrerett', tekst: 'Angrerett og reklamasjon' },
+]
+
+/**
+ * Footer, eksakt fra Figma (#022269, 1430x244), pluss den juridiske raden.
  * Adressen er rettet til den som står i kontaktraden på Kontakt-siden, og
  * «Portfolje» er rettet til «Portefølje». Begge er notert i README.
  */
 export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
   return (
-    <Abs as="footer" l={l} t={t} w={1430} h={244} style={{ background: C.navy }}>
+    <Abs as="footer" l={l} t={t} w={1430} h={FOOTER_HOYDE} style={{ background: C.navy }}>
       <div style={{ ...col, left: 222, width: 240 }}>
         <div>Kontakt</div>
         <div>{BEDRIFT.adresse}</div>
@@ -33,15 +58,7 @@ export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
             {BEDRIFT.epost}
           </a>
         </div>
-        <div>{BEDRIFT.orgnr}</div>
-        {/* Personvernerklæringen. Lovpålagt så snart nettstedet teller besøk
-            og tar imot skjemaer, og lagt her fordi kontaktspalten er den
-            eneste med ledig plass under seg – resten av designet står urørt. */}
-        <div style={{ marginTop: 6 }}>
-          <Link to="/personvern" style={u}>
-            Personvern
-          </Link>
-        </div>
+        <div>{BEDRIFT.orgnr}{BEDRIFT.mva ? ' MVA' : ''}</div>
       </div>
 
       <div style={{ ...col, left: 628, width: 140 }}>
@@ -92,6 +109,36 @@ export default function SiteFooter({ t, l = 0 }: { t: number; l?: number }) {
           </a>
         </div>
       </div>
+
+      {/* Den juridiske raden: fire lenker midtstilt under de tre spaltene. */}
+      <nav
+        aria-label="Juridisk informasjon"
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 244,
+          width: 1430,
+          height: FOOTER_EKSTRA,
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          gap: 0,
+          fontFamily: FONT,
+          fontSize: 14,
+          fontWeight: 400,
+          lineHeight: '22.5px',
+          color: 'rgba(255,255,255,0.92)',
+        }}
+      >
+        {JURIDISKE_LENKER.map((j, i) => (
+          <span key={j.til} style={{ display: 'flex', alignItems: 'center' }}>
+            {i > 0 && <span aria-hidden="true" style={{ padding: '0 10px' }}>·</span>}
+            <Link to={j.til} style={{ textDecoration: 'underline', padding: '1px 0' }}>
+              {j.tekst}
+            </Link>
+          </span>
+        ))}
+      </nav>
     </Abs>
   )
 }

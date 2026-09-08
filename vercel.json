@@ -1,4 +1,14 @@
 {
+  "regions": [
+    "fra1"
+  ],
+  "redirects": [
+    {
+      "source": "/tilbud",
+      "destination": "/kontakt",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
@@ -35,7 +45,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://fufzioaqnbbiyzhswjab.supabase.co; frame-src https://www.google.com https://consent.google.com; connect-src 'self' https://fufzioaqnbbiyzhswjab.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://fufzioaqnbbiyzhswjab.supabase.co https://*.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.google.no https://*.doubleclick.net https://www.googleadservices.com; frame-src https://www.google.com https://consent.google.com https://td.doubleclick.net; connect-src 'self' https://fufzioaqnbbiyzhswjab.supabase.co https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://www.google.no https://*.doubleclick.net https://www.googleadservices.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
         }
       ]
     },

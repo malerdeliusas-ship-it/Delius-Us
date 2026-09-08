@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 
 /**
- * Logikken bak tilbudsskjemaet (/tilbud): validering, krymping av bildene i
+ * Logikken bak tilbudsskjemaet: validering, krymping av bildene i
  * nettleseren, og sending til `/api/kontakt` med `skjema: 'tilbud'`.
+ *
+ * Skjemaet står på Kontakt-siden og nederst på forsiden, tegnet i Figma som
+ * seks nummererte spørsmål. Den syvende bolken, kontaktopplysningene, er
+ * ikke tegnet, men uten den kan ikke Delius svare kunden i det hele tatt.
  *
  * Bildene fra en telefon er gjerne 3 til 8 MB hver. Serverfunksjonen hos
  * Vercel tar imot høyst 4,5 MB per innsending, så bildene tegnes om på et
@@ -20,33 +24,19 @@ const MAKS_BYTES_TOTALT = 3_000_000
 /** Absolutt tak per bilde; serveren avviser alt over dette. */
 const ABSOLUTT_TAK_BILDE = 740_000
 
-export const JOBBTYPER = [
-  'Innvendig maling',
-  'Fasade og utvendig maling',
-  'Sparkling og reparasjon',
-  'Dekorative teknikker',
-  'Fargevalg og rådgivning',
-  'Annet eller usikker',
-] as const
-
-export const TIDSPUNKT = [
-  'Så snart som mulig',
-  'Innen 1 måned',
-  'Innen 3 måneder',
-  'Fleksibelt',
-] as const
-
 export type Bilde = { id: number; navn: string; url: string; blob: Blob }
 export type Status = 'klar' | 'sender' | 'sendt' | 'feil'
 export type Felt =
+  | 'jobbtype'
+  | 'adresse'
+  | 'areal'
+  | 'tidspunkt'
+  | 'bilder'
+  | 'melding'
   | 'navn'
   | 'telefon'
   | 'epost'
-  | 'adresse'
-  | 'jobbtype'
-  | 'areal'
-  | 'bilder'
-  | 'melding'
+  | 'samtykke'
   | null
 
 const EPOST_MONSTER = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
@@ -54,11 +44,12 @@ const EPOST_MONSTER = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 /** Feilmeldingene brukeren ser. På norsk, som resten av siden. */
 const FEIL = {
   navn: 'Skriv inn navnet ditt.',
-  telefon: 'Skriv inn et telefonnummer vi kan nå deg på.',
-  epost: 'Skriv inn en gyldig e-postadresse.',
-  adresse: 'Skriv inn adressen der jobben skal gjøres.',
-  jobbtype: 'Velg hva slags jobb det gjelder. Er du usikker, velg «Annet eller usikker».',
-  areal: 'Arealet må være et tall, for eksempel 80.',
+  kontakt: 'Oppgi et telefonnummer eller en e-postadresse, så vi kan svare deg.',
+  telefon: 'Telefonnummeret ser ikke riktig ut. Sjekk sifrene, eller oppgi e-post i stedet.',
+  epost: 'E-postadressen ser ikke riktig ut. Sjekk den, eller oppgi telefon i stedet.',
+  samtykke: 'Kryss av for at du har lest personvernerklæringen før du sender.',
+  adresse: 'Skriv inn hvor jobben er, postnummer eller adresse.',
+  jobbtype: 'Skriv hva slags jobb det gjelder.',
   bilderVenter: 'Vent litt til bildene er klare, og prøv igjen.',
   forMangeBilder: `Du kan legge ved inntil ${MAKS_BILDER} bilder.`,
   forStort: 'Bildene er for store til sammen. Fjern ett og prøv igjen.',
@@ -151,8 +142,6 @@ export function useTilbudSkjema() {
   const [status, setStatus] = useState<Status>('klar')
   const [feil, setFeil] = useState('')
   const [feilFelt, setFeilFelt] = useState<Felt>(null)
-  const [jobbtyper, setJobbtyper] = useState<string[]>([])
-  const [tidspunkt, setTidspunkt] = useState('')
   const [bilder, setBilder] = useState<Bilde[]>([])
   const [bildeFeil, setBildeFeil] = useState('')
   /** Antall bilder som er under krymping akkurat nå. */
@@ -202,18 +191,6 @@ export function useTilbudSkjema() {
       setFeil('')
       setFeilFelt(null)
     }
-  }
-
-  function veksleJobbtype(navn: string) {
-    merk()
-    setJobbtyper((liste) =>
-      liste.includes(navn) ? liste.filter((j) => j !== navn) : [...liste, navn],
-    )
-  }
-
-  function velgTidspunkt(navn: string) {
-    merk()
-    setTidspunkt((n) => (n === navn ? '' : navn))
   }
 
   async function leggTil(filer: FileList | File[]) {
@@ -285,21 +262,32 @@ export function useTilbudSkjema() {
     const skjema = e.currentTarget
     const data = new FormData(skjema)
     const hent = (navn: string) => String(data.get(navn) ?? '').trim()
+    const jobbtype = hent('jobbtype')
+    const adresse = hent('adresse')
+    const areal = hent('areal')
+    const tidspunkt = hent('tidspunkt')
+    const melding = hent('melding')
     const navn = hent('navn')
     const telefon = hent('telefon')
     const epost = hent('epost')
-    const adresse = hent('adresse')
-    const areal = hent('areal').replace(/\s/g, '')
-    const melding = hent('melding')
+    const samtykke = data.get('samtykke') === 'ja'
     const krukke = String(data.get('tilleggsinfo') ?? '')
 
-    if (!navn) return vis(FEIL.navn, 'navn')
-    if (!/^\+?\d{8,15}$/.test(telefon.replace(/[\s().-]/g, ''))) return vis(FEIL.telefon, 'telefon')
-    if (!EPOST_MONSTER.test(epost)) return vis(FEIL.epost, 'epost')
-    if (jobbtyper.length === 0) return vis(FEIL.jobbtype, 'jobbtype')
+    // Rekkefølgen følger spørsmålene i skjemaet, så den første feilen som
+    // vises er den øverste som mangler. Areal og tidspunkt er ikke krav:
+    // designet spør «omtrent» og «når ønsker du», og et svar vi ikke fikk
+    // er bedre enn en henvendelse kunden ga opp.
+    if (jobbtype.length < 2) return vis(FEIL.jobbtype, 'jobbtype')
     if (adresse.length < 3) return vis(FEIL.adresse, 'adresse')
-    if (areal && !/^\d{1,5}$/.test(areal)) return vis(FEIL.areal, 'areal')
     if (behandlerRef.current > 0) return vis(FEIL.bilderVenter, 'bilder')
+    if (!navn) return vis(FEIL.navn, 'navn')
+    // Én måte å nå kunden på er nok. Vi ber ikke om mer enn vi trenger
+    // (personvernforordningen artikkel 5 nr. 1 bokstav c), og det som er
+    // fylt ut må se riktig ut.
+    if (!telefon && !epost) return vis(FEIL.kontakt, 'telefon')
+    if (telefon && !/^\+?\d{8,15}$/.test(telefon.replace(/[\s().-]/g, ''))) return vis(FEIL.telefon, 'telefon')
+    if (epost && !EPOST_MONSTER.test(epost)) return vis(FEIL.epost, 'epost')
+    if (!samtykke) return vis(FEIL.samtykke, 'samtykke')
 
     setFeil('')
     setFeilFelt(null)
@@ -323,11 +311,15 @@ export function useTilbudSkjema() {
           telefon,
           epost,
           adresse,
-          jobbtyper,
+          // Serverfunksjonen skriver ut en liste; nå er det ett fritt svar.
+          jobbtyper: [jobbtype],
           areal,
           tidspunkt,
           melding,
           bilder: vedlegg,
+          // Dokumentasjon på at personvernerklæringen ble godtatt, og når
+          samtykke: true,
+          samtykkeTid: new Date().toISOString(),
           tilleggsinfo: krukke,
           apnet: forsteTast.current ? Date.now() - forsteTast.current : 0,
           side: window.location.pathname,
@@ -347,8 +339,6 @@ export function useTilbudSkjema() {
       skjema.reset()
       utkast.current = {}
       tomBilder()
-      setJobbtyper([])
-      setTidspunkt('')
       setBildeFeil('')
       setStatus('sendt')
     } catch {
@@ -357,8 +347,9 @@ export function useTilbudSkjema() {
     }
   }
 
+  // Store bokstaver og pil, som knappen er tegnet i Figma
   const knappetekst =
-    status === 'sender' ? 'Sender …' : status === 'sendt' ? 'Takk!' : 'Send forespørsel'
+    status === 'sender' ? 'SENDER …' : status === 'sendt' ? 'TAKK!' : 'SEND FORESPØRSEL →'
 
   return {
     status,
@@ -367,10 +358,6 @@ export function useTilbudSkjema() {
     send,
     merk,
     knappetekst,
-    jobbtyper,
-    veksleJobbtype,
-    tidspunkt,
-    velgTidspunkt,
     bilder,
     bildeFeil,
     behandler,

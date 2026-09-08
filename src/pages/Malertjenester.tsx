@@ -1,10 +1,10 @@
 import Stage from '../components/Stage'
 import SiteHeader from '../components/SiteHeader'
-import SiteFooter from '../components/SiteFooter'
+import SiteFooter, { FOOTER_EKSTRA } from '../components/SiteFooter'
 import GoldButton from '../components/GoldButton'
 import { Abs, Txt, Rect, CropImg } from '../components/prim'
 import { C, MT_OVERLAY, FONT } from '../lib/theme'
-import { TJENESTER } from '../lib/site'
+import { TJENESTER, TRINN } from '../lib/site'
 import splash from '../assets/figma/splash.webp'
 
 /** Tjenestekortene står likt som på forsiden, bare flyttet (+6, −2780). */
@@ -16,45 +16,9 @@ const KORT_POS = [
   [125, 1001], [533, 1001], [941, 1001],
 ]
 
-export const TRINN = [
-  {
-    kort: 125,
-    tittel: { l: 189, t: 1796, w: 363, tekst: 'Konsultasjon og planlegging' },
-    punkter: [
-      { l: 189, t: 1923, w: 262, tekst: 'Gratis innledende konsultasjon' },
-      { l: 189, t: 1997, w: 217, tekst: 'Vurdering av rommet' },
-      { l: 189, t: 2041, w: 277, tekst: 'Valg av farger og materialer' },
-      { l: 189, t: 2077, w: 267, tekst: 'Utarbeidelse av forslag og kostnadsoverslag' },
-    ],
-    merke: { l: 222, t: 2181, w: 159, tekst: 'TRINN 1' },
-  },
-  {
-    kort: 531,
-    tittel: { l: 604, t: 1797, w: 260, tekst: 'Forberedelse og utførelse' },
-    punkter: [
-      { l: 600, t: 1916, w: 262, tekst: 'Forberedelse av overflater' },
-      { l: 599, t: 1953, w: 259, tekst: 'Beskyttelse av tilstøtende områder' },
-      { l: 600, t: 2012, w: 277, tekst: 'Utførelse av malerarbeid' },
-      { l: 600, t: 2052, w: 267, tekst: 'Kvalitetskontroll under arbeidet' },
-    ],
-    merke: { l: 639, t: 2180, w: 164, tekst: 'TRINN 2' },
-  },
-  {
-    kort: 945,
-    tittel: { l: 1001, t: 1796, w: 263, tekst: 'Fullføring og støtte' },
-    punkter: [
-      { l: 1001, t: 1896, w: 262, tekst: 'Endelig kvalitetskontroll' },
-      { l: 1001, t: 1930, w: 320, tekst: 'Rydding og overlevering av prosjektet — vi rydder alltid etter oss' },
-      { l: 1001, t: 2033, w: 201, tekst: 'Sikring av garantier' },
-      { l: 1000, t: 2076, w: 235, tekst: 'Støtte etter prosjektets avslutning' },
-    ],
-    merke: { l: 1053, t: 2181, w: 158, tekst: 'TRINN 3' },
-  },
-]
-
 export default function Malertjenester() {
   return (
-    <Stage height={2838}>
+    <Stage height={2838 + FOOTER_EKSTRA}>
       {/* Akvarellsølet ligger under gradienten, akkurat som i Figma */}
       <CropImg
         src={splash}

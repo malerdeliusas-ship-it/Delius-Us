@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom'
 import MobilSide from '../../components/mobile/Shell'
 import { C, G } from '../../lib/theme'
-import { TJENESTER } from '../../lib/site'
-import { TRINN } from '../Malertjenester'
+import { TJENESTER, TRINN } from '../../lib/site'
 
-import splash from '../../assets/figma/splash.webp'
+import splash from '../../assets/figma/splash-mobil.webp'
 
 export default function MalertjenesterMobil() {
   return (

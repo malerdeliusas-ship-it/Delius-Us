@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom'
 import MobilSide from '../../components/mobile/Shell'
-import MobilSkjema from '../../components/mobile/MobilSkjema'
+import TilbudSkjema from '../../components/TilbudSkjema'
+import Fordeler from '../../components/mobile/Fordeler'
 import { C, G } from '../../lib/theme'
-import { TEAM, TJENESTER } from '../../lib/site'
-import { BADGES, GRUNNER } from '../Home'
+import type { TilbudSkjemaTilstand } from '../../lib/tilbud'
+import { TEAM, TJENESTER, BADGES, GRUNNER } from '../../lib/site'
 
-import heroBilde from '../../assets/figma/hero-echipa.jpg'
-import omOssBilde from '../../assets/figma/omoss-team.jpg'
+/* Mobilutgaver: sidene her viser bildene i full skjermbredde, høyst rundt
+   430 CSS-piksler, så 900 og 760 piksler dekker to ganger oppløsning. De
+   store filene hører til desktopsidene. */
+import heroBilde from '../../assets/figma/hero-echipa-mobil.webp'
+import omOssBilde from '../../assets/figma/omoss-team-mobil.webp'
 
-export default function HomeMobil() {
+export default function HomeMobil({ s }: { s: TilbudSkjemaTilstand }) {
   return (
     <MobilSide>
       {/* ---------- Hero ---------- */}
@@ -23,11 +27,16 @@ export default function HomeMobil() {
         <Link to="/kontakt" className="m-knapp m-knapp--senter btn-press" style={{ marginTop: 24 }}>
           Bestill gratis befaring
         </Link>
+        {/* width og height er filens egne mål. Uten dem vet ikke nettleseren
+            hvor høyt bildet blir før det er lastet, og alt under hopper når
+            det dukker opp. CSS-en holder bredden på 100 % og høyden auto. */}
         <img
           className="m-bilde"
           src={heroBilde}
           alt="Malere fra Maler Delius AS i arbeid"
           fetchPriority="high"
+          width={900}
+          height={600}
           style={{ marginTop: 28 }}
         />
       </section>
@@ -63,7 +72,7 @@ export default function HomeMobil() {
             MALER DELIUS AS
           </span>
         </div>
-        <img className="m-bilde" src={omOssBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} loading="lazy" decoding="async" />
+        <img className="m-bilde" src={omOssBilde} alt="Teamet i Maler Delius AS" width={760} height={1140} style={{ marginTop: 20 }} loading="lazy" decoding="async" />
         <p style={{ marginTop: 20, fontStyle: 'italic' }}>
           Vi er Maler Delius AS, et team av profesjonelle med over 5 års erfaring, som tilbyr
           høykvalitets maler- og reparasjonstjenester i Oslo. Vårt mål er å gjøre ditt rom mer
@@ -146,18 +155,28 @@ export default function HomeMobil() {
         </div>
       </section>
 
-      {/* ---------- Kontakt ---------- */}
-      <section className="m-seksjon m-inn" style={{ background: C.contactBlue, color: '#fff' }}>
-        <h2 style={{ color: '#fff' }}>Kontakt oss!</h2>
+      {/* ---------- Kontakt ----------
+          Ny i Figma 7. september 2026: det lange tilbudsskjemaet, med den
+          lyse blå flaten fra designet i stedet for den mørkeblå. */}
+      <section
+        className="m-seksjon m-inn"
+        style={{
+          background:
+            'linear-gradient(180deg, rgb(247,249,255) 0%, rgb(247,249,254) 12.5%, rgb(203,216,245) 47.6%, rgb(135,172,254) 100%)',
+          color: C.navy,
+        }}
+      >
+        <h2>Kontakt oss!</h2>
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
           <span className="m-merke">GRATIS BEFARING</span>
         </div>
-        <p style={{ marginTop: 16, textAlign: 'center' }}>
+        <p style={{ marginTop: 16, textAlign: 'center', color: C.brown }}>
           Vi skaper en atmosfære du vil vende tilbake til, med Maler Delius AS
         </p>
-        <div style={{ marginTop: 24 }}>
-          <MobilSkjema />
+        <div style={{ marginTop: 28 }}>
+          <TilbudSkjema s={s} />
         </div>
+        <Fordeler />
       </section>
     </MobilSide>
   )

@@ -123,6 +123,11 @@ export default async function handler(req: Req, res: Res) {
   // mellomrom, så ingen kan smugle egne linjer inn i emnefeltet eller e-posten.
   const navn = enLinje(tekst(kropp?.navn, 120))
   const epost = tekst(kropp?.epost, 200)
+  // Avkryssingen for personvernerklæringen, med tidspunktet nettleseren
+  // oppga. Begge skrives inn i e-posten, så bedriften kan dokumentere at
+  // kunden fikk informasjonen før opplysningene ble samlet inn.
+  const samtykke = kropp?.samtykke === true
+  const samtykkeTid = enLinje(tekst(kropp?.samtykkeTid, 40))
   const melding = tekst(kropp?.melding, 5000)
   const krukke = tekst(kropp?.tilleggsinfo, 200)
   const apnet = Number(kropp?.apnet ?? 0)
@@ -131,9 +136,12 @@ export default async function handler(req: Req, res: Res) {
   // Feltene som bare tilbudsskjemaet har
   const telefon = enLinje(tekst(kropp?.telefon, 40))
   const adresse = enLinje(tekst(kropp?.adresse, 200))
-  const areal = enLinje(tekst(kropp?.areal, 10)).replace(/\D/g, '').slice(0, 6)
-  const tidspunkt = enLinje(tekst(kropp?.tidspunkt, 60))
-  const jobbtyper = liste(kropp?.jobbtyper, 8, 60)
+  // Areal og tidspunkt er frie tekstfelt etter at skjemaet ble tegnet om
+  // («f.eks. 80 m²», «Skriv ønsket tidspunkt eller periode»), så de siles
+  // bare for lengde og linjeskift, ikke for siffer.
+  const areal = enLinje(tekst(kropp?.areal, 40))
+  const tidspunkt = enLinje(tekst(kropp?.tidspunkt, 120))
+  const jobbtyper = liste(kropp?.jobbtyper, 8, 120)
 
   // To uavhengige robottegn: det skjulte feltet er fylt ut, og skrivetiden
   // mangler eller er under to sekunder. Hver for seg tar de av og til feil –
@@ -153,13 +161,17 @@ export default async function handler(req: Req, res: Res) {
   if (mistenkt) console.log('Mistenkt robot, sender merket', { krukkeSlo, apnet })
 
   if (!navn) return res.status(400).json({ feil: 'Navn mangler' })
-  if (!EPOST_MONSTER.test(epost)) return res.status(400).json({ feil: 'Ugyldig e-post' })
 
   if (skjema === 'tilbud') {
-    if (!gyldigTelefon(telefon)) return res.status(400).json({ feil: 'Ugyldig telefonnummer' })
+    // Telefon eller e-post: minst én, og den som er oppgitt må være gyldig
+    if (!telefon && !epost) return res.status(400).json({ feil: 'Telefon eller e-post mangler' })
+    if (telefon && !gyldigTelefon(telefon)) return res.status(400).json({ feil: 'Ugyldig telefonnummer' })
+    if (epost && !EPOST_MONSTER.test(epost)) return res.status(400).json({ feil: 'Ugyldig e-post' })
     if (adresse.length < 3) return res.status(400).json({ feil: 'Adresse mangler' })
-  } else if (melding.length < 5) {
-    return res.status(400).json({ feil: 'Meldingen er for kort' })
+    if (!samtykke) return res.status(400).json({ feil: 'Personvernerklæringen må godtas' })
+  } else {
+    if (!EPOST_MONSTER.test(epost)) return res.status(400).json({ feil: 'Ugyldig e-post' })
+    if (melding.length < 5) return res.status(400).json({ feil: 'Meldingen er for kort' })
   }
 
   const bilder = skjema === 'tilbud' ? lesBilder(kropp?.bilder) : { vedlegg: [] as Vedlegg[] }
@@ -192,6 +204,7 @@ export default async function handler(req: Req, res: Res) {
           jobbtyper,
           melding,
           antallBilder: bilder.vedlegg.length,
+          samtykkeTid,
         })
       : kontaktEpost({ navn, epost, melding, side })
 
@@ -208,8 +221,8 @@ export default async function handler(req: Req, res: Res) {
       body: JSON.stringify({
         from: fra,
         to: til,
-        // Svar-knappen i e-postklienten går rett til kunden.
-        reply_to: epost,
+        // Svar-knappen i e-postklienten går rett til kunden, når vi har e-posten
+        ...(epost ? { reply_to: epost } : {}),
         subject: `${mistenkt ? '[Mistenkt robot] ' : ''}${innhold.emne}`,
         text: innhold.tekst,
         html: innhold.html,
@@ -330,6 +343,21 @@ function bildeBase() {
   return 'https://malerdelius.no'
 }
 
+/** ISO-tidspunktet fra nettleseren, i norsk språkdrakt og Oslo-tid. Ugyldig dato gir tom streng. */
+function samtykkeTidspunkt(iso: string) {
+  const t = Date.parse(iso)
+  if (!Number.isFinite(t)) return ''
+  try {
+    return new Intl.DateTimeFormat('nb-NO', {
+      timeZone: 'Europe/Oslo',
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(new Date(t))
+  } catch {
+    return ''
+  }
+}
+
 /** Tidspunktet meldingen kom inn, i norsk språkdrakt og Oslo-tid. */
 function mottatt() {
   try {
@@ -393,6 +421,7 @@ function tilbudEpost(d: {
   jobbtyper: string[]
   melding: string
   antallBilder: number
+  samtykkeTid: string
 }) {
   const ikkeOppgitt = 'Ikke oppgitt'
   const bilder =
@@ -403,13 +432,20 @@ function tilbudEpost(d: {
         : `${d.antallBilder} bilder vedlagt`
   const rader: Rad[] = [
     { etikett: 'Navn', tekst: d.navn },
-    { etikett: 'Telefon', tekst: d.telefon, html: telefonLenke(d.telefon) },
-    { etikett: 'E-post', tekst: d.epost, html: epostLenke(d.epost) },
+    d.telefon
+      ? { etikett: 'Telefon', tekst: d.telefon, html: telefonLenke(d.telefon) }
+      : { etikett: 'Telefon', tekst: ikkeOppgitt },
+    d.epost
+      ? { etikett: 'E-post', tekst: d.epost, html: epostLenke(d.epost) }
+      : { etikett: 'E-post', tekst: ikkeOppgitt },
     { etikett: 'Adresse', tekst: d.adresse },
     { etikett: 'Type jobb', tekst: d.jobbtyper.join(', ') || ikkeOppgitt },
-    { etikett: 'Areal', tekst: d.areal ? `ca. ${d.areal} m²` : ikkeOppgitt },
+    // Kunden skriver enheten selv i det nye skjemaet, så teksten står som den er
+    { etikett: 'Areal', tekst: d.areal || ikkeOppgitt },
     { etikett: 'Ønsket oppstart', tekst: d.tidspunkt || ikkeOppgitt },
     { etikett: 'Bilder', tekst: bilder },
+    // Dokumentasjon: kunden krysset av for personvernerklæringen før sending
+    { etikett: 'Personvern', tekst: `Godtatt${d.samtykkeTid ? ` ${samtykkeTidspunkt(d.samtykkeTid)}` : ''}` },
   ]
   const smakebit = [d.jobbtyper.join(', '), d.adresse].filter(Boolean).join(' · ')
   return byggEpost({
@@ -421,6 +457,7 @@ function tilbudEpost(d: {
     melding: d.melding || 'Kunden skrev ingen beskrivelse.',
     navn: d.navn,
     epost: d.epost,
+    telefon: d.telefon,
   })
 }
 
@@ -432,7 +469,9 @@ type Epost = {
   rader: Rad[]
   melding: string
   navn: string
+  /** Tom når kunden bare oppga telefon (tilbudsskjemaet). */
   epost: string
+  telefon?: string
 }
 
 function byggEpost(d: Epost) {
@@ -444,7 +483,9 @@ function byggEpost(d: Epost) {
     '',
     d.melding,
     '',
-    'Svar på denne e-posten for å svare kunden direkte.',
+    d.epost
+      ? 'Svar på denne e-posten for å svare kunden direkte.'
+      : `Kunden oppga bare telefon: ring ${d.telefon ?? ''}.`,
   ].join('\n')
 
   return { emne: d.emne, tekst, html: epostHtml(d) }
@@ -462,6 +503,17 @@ export function epostHtml(d: Omit<Epost, 'emne'>) {
   // RFC 6068 tillater prosentkodet adresse i mailto, og kodingen hindrer at
   // tegn som ?/&/% i adressen tolkes som egne parametre i lenken.
   const epostHref = encodeURIComponent(d.epost)
+  // Uten e-post går knappen til telefonen i stedet (nummeret er alt kontrollert)
+  const telSifre = (d.telefon ?? '').replace(/[\s().-]/g, '')
+  const knappHref = d.epost
+    ? `mailto:${epostHref}?subject=${svarEmne}`
+    : /^\+?\d{8,15}$/.test(telSifre)
+      ? `tel:${telSifre}`
+      : ''
+  const knappTekst = d.epost ? `Svar til ${fornavn}` : `Ring ${fornavn}`
+  const bunntekst = d.epost
+    ? `Trykk «Svar» i e-posten for å svare ${fornavn} direkte.`
+    : `${fornavn} oppga bare telefon: ${esc(d.telefon ?? '')}.`
   const skrift = "'Montserrat', Helvetica, Arial, sans-serif"
   // Forhåndsvisningen kuttes på hele tegn (ikke midt i et emoji-par).
   const smakebit = esc([...d.smakebit].slice(0, 140).join(''))
@@ -545,9 +597,9 @@ export function epostHtml(d: Omit<Epost, 'emne'>) {
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
                         <td align="center" style="background-color:#ffc717;border-radius:65px;mso-padding-alt:17px 46px;">
-                          <a href="mailto:${epostHref}?subject=${svarEmne}"
+                          <a href="${knappHref}"
                              style="display:inline-block;padding:17px 46px;font-family:${skrift};font-size:16px;font-weight:700;color:#002f96;text-decoration:none;border-radius:65px;">
-                            Svar til ${fornavn}
+                            ${knappTekst}
                           </a>
                         </td>
                       </tr>
@@ -575,7 +627,7 @@ export function epostHtml(d: Omit<Epost, 'emne'>) {
           <!-- Under kortet -->
           <tr>
             <td align="center" style="padding:22px 12px 0;font-family:${skrift};font-size:12px;line-height:19px;color:#a9aec9;">
-              Mottatt ${mottatt()} &nbsp;·&nbsp; Trykk «Svar» i e-posten for å svare ${fornavn} direkte.
+              Mottatt ${mottatt()} &nbsp;·&nbsp; ${bunntekst}
             </td>
           </tr>
 

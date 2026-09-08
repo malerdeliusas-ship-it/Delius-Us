@@ -1,14 +1,14 @@
 import { Link } from 'react-router-dom'
 import MobilSide from '../../components/mobile/Shell'
 import { C } from '../../lib/theme'
-import { GRUNNER } from '../OmOss'
+import { GRUNNER_OMOSS } from '../../lib/site'
 
 import splash from '../../assets/figma/splash-omoss.webp'
-import teamBilde from '../../assets/figma/omoss-team.jpg'
-import foto1 from '../../assets/figma/omoss-dsc06303-1.jpg'
-import foto2 from '../../assets/figma/omoss-dsc07360-1.jpg'
-import foto3 from '../../assets/figma/omoss-1-119-1.jpg'
-import foto4 from '../../assets/figma/omoss-dsc05502-1.jpg'
+import teamBilde from '../../assets/figma/omoss-team-mobil.webp'
+import foto1 from '../../assets/figma/omoss-dsc06303-1.webp'
+import foto2 from '../../assets/figma/omoss-dsc07360-1.webp'
+import foto3 from '../../assets/figma/omoss-1-119-1.webp'
+import foto4 from '../../assets/figma/omoss-dsc05502-1.webp'
 
 const GALLERI = [
   { src: foto1, alt: 'Maler ruller maling på vegg' },
@@ -35,7 +35,7 @@ export default function OmOssMobil() {
             MALER DELIUS AS
           </span>
         </div>
-        <img className="m-bilde" src={teamBilde} alt="Teamet i Maler Delius AS" style={{ marginTop: 20 }} loading="lazy" decoding="async" />
+        <img className="m-bilde" src={teamBilde} alt="Teamet i Maler Delius AS" width={760} height={1140} style={{ marginTop: 20 }} loading="lazy" decoding="async" />
         <p style={{ marginTop: 20, fontWeight: 500, letterSpacing: '0.04em' }}>
           Vi er Maler Delius AS, et team av profesjonelle med over 5 års erfaring, som tilbyr
           høykvalitets maler- og reparasjonstjenester i Oslo. Vårt mål er å gjøre ditt rom mer
@@ -46,7 +46,7 @@ export default function OmOssMobil() {
       <section className="m-seksjon m-inn" style={{ background: C.panelBlue, color: '#fff' }}>
         <h3 style={{ fontStyle: 'italic', fontWeight: 600 }}>Hvorfor velge oss?</h3>
         <div style={{ display: 'grid', gap: 24, marginTop: 20 }}>
-          {GRUNNER.map((g) => (
+          {GRUNNER_OMOSS.map((g) => (
             <div key={g.tittel}>
               <div style={{ color: g.farge, fontWeight: 700, fontSize: 18, lineHeight: '26px' }}>
                 {g.tittel}

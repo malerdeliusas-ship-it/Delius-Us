@@ -6,7 +6,7 @@
   "description": "Nettside for Maler Delius AS – profesjonelle malertjenester i Oslo",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node tools/etterbygg.mjs && node tools/forhaandsrender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
