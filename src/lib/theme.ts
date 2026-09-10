@@ -88,7 +88,8 @@ export const DESIGN_WIDTH = 1430
 /**
  * Bedriftens data. Adressen er den som står i kontaktraden i designet.
  * E-postadressen er firmaets offisielle adresse (bekreftet av kunden
- * 11. sep 2026); post dit videresendes til malerdelius@gmail.com.
+ * 11. sep 2026). Post dit leses i postkassen hos one.com; bare
+ * skjemaet på nettstedet leverer til malerdelius@gmail.com (KONTAKT_TIL).
  */
 export const BEDRIFT = {
   navn: 'Maler Delius AS',
