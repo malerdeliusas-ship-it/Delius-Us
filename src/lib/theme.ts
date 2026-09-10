@@ -87,15 +87,15 @@ export const DESIGN_WIDTH = 1430
 
 /**
  * Bedriftens data. Adressen er den som står i kontaktraden i designet.
- * E-postadressen er den bedriften selv bruker (bekreftet av kunden);
- * designet viste info@malerdelius.no, som ikke er i bruk.
+ * E-postadressen er firmaets offisielle adresse (bekreftet av kunden
+ * 11. sep 2026); post dit videresendes til malerdelius@gmail.com.
  */
 export const BEDRIFT = {
   navn: 'Maler Delius AS',
   adresse: 'Ullevålsveien 76, 0454 Oslo',
   telefon: '+47 966 93 780',
   telefonLenke: 'tel:+4796693780',
-  epost: 'malerdelius@gmail.com',
+  epost: 'info@malerdelius.no',
   nettsted: 'malerdelius.no',
   orgnr: 'Org nr. 934 409 256',
   /** Bare tallet, til juridiske sider og strukturerte data. */
