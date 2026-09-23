@@ -16,10 +16,10 @@
  * og skallet skjules der med en mediespørring (se `#skall` i index.css).
  * Desktopsidene er uansett raske nok.
  *
- * Titler, beskrivelser og kanoniske adresser hentes fra den rendrede siden,
- * så de står ferdig i HTML-en for søkemotorer som ikke kjører JavaScript.
+ * Titler, beskrivelser og kanoniske adresser legges inn av seo-html.mjs før
+ * dette skriptet, også når Chrome mangler.
  */
-import { readFileSync, writeFileSync, existsSync, statSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync, statSync } from 'node:fs'
 import { join, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createServer } from 'node:http'
@@ -48,18 +48,7 @@ const KUTT = 1200
  * serverer dem da rett på adressen, uten at det trengs en eneste linje
  * oppsett: Vercel sjekker filene før rewrite-regelen i vercel.json.
  */
-const RUTER = [
-  '/',
-  '/om-oss',
-  '/portefolje',
-  '/malertjenester',
-  '/kontakt',
-  '/blogg',
-  '/personvern',
-  '/informasjonskapsler',
-  '/vilkar',
-  '/angrerett',
-]
+const RUTER = Object.keys(JSON.parse(readFileSync(new URL('../src/lib/seo-sider.json', import.meta.url), 'utf8')))
 
 const TYPER = {
   '.html': 'text/html; charset=utf-8',
@@ -77,8 +66,6 @@ const TYPER = {
   '.txt': 'text/plain',
 }
 
-const mal = readFileSync(join(DIST, 'index.html'), 'utf8')
-
 const tjener = createServer((req, res) => {
   const sti = decodeURIComponent((req.url || '/').split('?')[0])
   let fil = join(DIST, sti)
@@ -86,7 +73,7 @@ const tjener = createServer((req, res) => {
   res.setHeader('Content-Type', TYPER[extname(fil)] || 'application/octet-stream')
   res.end(readFileSync(fil))
 })
-await new Promise((r) => tjener.listen(PORT, r))
+await new Promise((r) => tjener.listen(PORT, '127.0.0.1', r))
 
 const chrome = spawn(
   CHROME,
@@ -172,12 +159,7 @@ const HENT_SKALL = (kutt) => `(() => {
     el.setAttribute('tabindex', '-1')
     el.setAttribute('aria-hidden', 'true')
   }
-  return {
-    html: rot.innerHTML,
-    tittel: document.title,
-    beskrivelse: document.querySelector('meta[name=description]')?.content || '',
-    kanonisk: document.querySelector('link[rel=canonical]')?.href || '',
-  }
+  return { html: rot.innerHTML }
 })()`
 
 const rapport = []
@@ -192,25 +174,12 @@ for (const rute of RUTER) {
     continue
   }
 
-  let html = mal
+  const fil = rute === '/' ? join(DIST, 'index.html') : join(DIST, rute.slice(1), 'index.html')
+  let html = readFileSync(fil, 'utf8')
   // Skallet inn i #root. `display: contents` gjør at wrapperen ikke endrer
   // noe layoutmessig; mediespørringen i index.css skjuler den på desktop.
   html = html.replace('<div id="root"></div>', `<div id="root"><div id="skall">${data.html}</div></div>`)
-  if (data.tittel) html = html.replace(/<title>[^<]*<\/title>/, `<title>${data.tittel}</title>`)
-  if (data.beskrivelse) {
-    // Taggen står over flere linjer i index.html, derfor [\s\S]
-    html = html.replace(
-      /<meta\s+name="description"[\s\S]*?\/>/,
-      `<meta name="description" content="${data.beskrivelse.replace(/"/g, '&quot;')}" />`,
-    )
-  }
-  if (data.kanonisk) {
-    const kanon = `<link rel="canonical" href="${data.kanonisk}" />`
-    html = html.replace('</head>', `    ${kanon}\n  </head>`)
-  }
-  const mappe = rute === '/' ? DIST : join(DIST, rute)
-  if (rute !== '/') mkdirSync(mappe, { recursive: true })
-  writeFileSync(join(mappe, 'index.html'), html)
+  writeFileSync(fil, html)
   rapport.push(`${rute} (${Math.round(data.html.length / 1024)} kB)`)
 }
 

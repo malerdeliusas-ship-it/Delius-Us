@@ -77,7 +77,7 @@ export default function PortefoljeMobil() {
       />
 
       <section className="m-inn" style={{ paddingTop: 32, paddingBottom: 28 }}>
-        <h2>Portefølje</h2>
+        <h1 style={{ fontSize: 28, fontWeight: 800, textAlign: 'center', letterSpacing: 'normal', color: 'inherit' }}>Portefølje</h1>
       </section>
 
       {BLOKKER.map((b, i) => (

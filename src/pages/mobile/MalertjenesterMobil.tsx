@@ -18,7 +18,7 @@ export default function MalertjenesterMobil() {
 
       <div style={{ background: G.malertjenester }}>
         <section className="m-seksjon m-inn">
-          <h2>Våre tjenester</h2>
+          <h1 style={{ fontSize: 28, fontWeight: 800, textAlign: 'center', letterSpacing: 'normal', color: 'inherit' }}>Våre tjenester</h1>
           <div style={{ display: 'grid', gap: 20, marginTop: 28 }}>
             {TJENESTER.map((s) => (
               <div key={s.id} className="m-kort">

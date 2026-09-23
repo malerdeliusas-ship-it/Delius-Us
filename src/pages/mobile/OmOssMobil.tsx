@@ -29,12 +29,12 @@ export default function OmOssMobil() {
       />
 
       <section className="m-seksjon m-inn">
-        <div className="m-balanse" style={{ fontSize: 24, lineHeight: '32px', fontStyle: 'italic', textAlign: 'center' }}>
+        <h1 className="m-balanse" style={{ fontSize: 24, lineHeight: '32px', fontWeight: 400, fontStyle: 'italic', textAlign: 'center', letterSpacing: 'normal', color: 'inherit' }}>
           Velkommen til{' '}
           <span style={{ fontWeight: 700, fontStyle: 'normal', display: 'inline-block' }}>
             MALER DELIUS AS
           </span>
-        </div>
+        </h1>
         <img className="m-bilde" src={teamBilde} alt="Teamet i Maler Delius AS" width={760} height={1140} style={{ marginTop: 20 }} loading="lazy" decoding="async" />
         <p style={{ marginTop: 20, fontWeight: 500, letterSpacing: '0.04em' }}>
           Vi er Maler Delius AS, et team av profesjonelle med over 5 års erfaring, som tilbyr

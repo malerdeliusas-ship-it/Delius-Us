@@ -1,0 +1,42 @@
+{
+  "/": {
+    "tittel": "Maler i Oslo | Maler Delius AS",
+    "beskrivelse": "Trenger du maler i Oslo? Maler Delius AS utfører innvendig og utvendig maling, reparasjon og sparkling for hjem og bedrifter. Bestill gratis befaring."
+  },
+  "/om-oss": {
+    "tittel": "Malerfirma i Oslo – Om oss | Maler Delius AS",
+    "beskrivelse": "Møt teamet bak Maler Delius AS, et malerfirma i Oslo. Les om erfaringen vår og hvordan vi utfører malerarbeid for hjem og bedrifter."
+  },
+  "/portefolje": {
+    "tittel": "Malerprosjekter i Oslo | Maler Delius AS",
+    "beskrivelse": "Se malerprosjekter fra Maler Delius AS i Oslo, med interiørmaling, oppussing og restaurering av detaljer."
+  },
+  "/malertjenester": {
+    "tittel": "Malertjenester i Oslo | Maler Delius AS",
+    "beskrivelse": "Maler Delius AS tilbyr innvendig maling, fasadearbeid, reparasjon, sparkling og hjelp med fargevalg i Oslo. Se tjenestene og bestill gratis befaring."
+  },
+  "/kontakt": {
+    "tittel": "Gratis befaring for malerarbeid i Oslo | Maler Delius AS",
+    "beskrivelse": "Trenger du et malerfirma i Oslo? Beskriv jobben, legg ved bilder og be Maler Delius AS om gratis befaring og et uforpliktende tilbud."
+  },
+  "/blogg": {
+    "tittel": "Malingstips og prosjekter | Maler Delius AS",
+    "beskrivelse": "Les malingstips og se prosjekter fra Maler Delius AS i Oslo. Råd om maling, farger og malerarbeid fra teamet vårt."
+  },
+  "/personvern": {
+    "tittel": "Personvernerklæring – Maler Delius AS",
+    "beskrivelse": "Hva malerdelius.no samler inn om deg, hvorfor, hvor lenge, og hvilke rettigheter du har. Statistikk og kart fra Google bare med ditt samtykke."
+  },
+  "/informasjonskapsler": {
+    "tittel": "Informasjonskapsler – Maler Delius AS",
+    "beskrivelse": "Alt malerdelius.no lagrer i nettleseren din, hvem som setter det, hvor lenge det lever, og hvordan du endrer eller trekker tilbake samtykket."
+  },
+  "/vilkar": {
+    "tittel": "Vilkår for bruk – Maler Delius AS",
+    "beskrivelse": "Vilkår for bruk av malerdelius.no, opplysninger om Maler Delius AS (org.nr. 934 409 256), tilbud, priser, reklamasjon og tvisteløsning."
+  },
+  "/angrerett": {
+    "tittel": "Angrerett og reklamasjon – Maler Delius AS",
+    "beskrivelse": "14 dagers angrerett, tilbakebetaling og hvordan du reklamerer på malerarbeid, etter angrerettloven og håndverkertjenesteloven."
+  }
+}

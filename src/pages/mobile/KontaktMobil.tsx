@@ -40,9 +40,9 @@ export default function KontaktMobil({ s }: { s: TilbudSkjemaTilstand }) {
         />
 
         <section className="m-seksjon m-inn">
-          <h2 className="m-balanse" style={{ color: '#fff' }}>
+          <h1 className="m-balanse" style={{ color: '#fff', fontSize: 28, fontWeight: 800, textAlign: 'center', letterSpacing: 'normal' }}>
             Få et uforpliktende tilbud
-          </h2>
+          </h1>
           <p style={{ marginTop: 14, color: DEMPET, textAlign: 'center', fontWeight: 700 }}>
             En kort vei fra mobilbesøk til et riktig pristilbud
           </p>

@@ -255,12 +255,14 @@ Til sammenligning lå det som var live før dette: forsiden 62 og Kontakt 78 på
   CLS gikk fra 0,108 til 0.
 - **Ferdigrendring** (`tools/forhaandsrender.mjs`): hver side rendres én gang
   i en usynlig nettleser under bygget, og det første skjermbildet av
-  mobilutgaven legges rett inn i HTML-en sammen med riktig tittel,
-  beskrivelse og kanonisk adresse. Filene legges som `<rute>/index.html`, og
-  både Vercel og `tools/vis.mjs` serverer dem rett på adressen uten oppsett.
-  To gevinster: teksten kommer på skjermen omtrent 0,3 sekunder tidligere, og
-  søkemotorer som ikke kjører JavaScript ser riktig tittel og beskrivelse per
-  side. Skallet skjules på desktop og fjernes av React selv når den starter.
+  mobilutgaven legges rett inn i HTML-en. Filene legges som `<rute>/index.html`,
+  og både Vercel og `tools/vis.mjs` serverer dem rett på adressen uten oppsett.
+  Teksten kommer på skjermen omtrent 0,3 sekunder tidligere. Skallet skjules
+  på desktop og fjernes av React selv når den starter.
+- **SEO-metadata** (`tools/seo-html.mjs`): alle faste sider får egen tittel,
+  beskrivelse og kanonisk adresse i HTML-en. Dette byggesteget virker også på
+  Vercel, der Chrome ikke finnes og mobilskallet hoppes over. De norske
+  søkefrasene og videre prioritering står i `docs/SEO-OSLO.md`.
 
 **Prøvd og forkastet:** å dele koden i én bunt for desktop og én for mobil.
 Rollup la delte moduler i desktopbunten, det oppsto en sirkulær avhengighet,
